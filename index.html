@@ -46,7 +46,7 @@
             <label class="block text-gray-600 text-xs font-bold mb-2 uppercase tracking-wide">سعر الأوقية (دولار)</label>
             <div class="flex gap-2">
                 <div class="relative flex-grow">
-                    <input type="number" id="ouncePriceUSD" value="2300" class="w-full bg-blue-50 border-2 border-blue-100 rounded-xl p-3 text-lg font-bold focus:border-blue-400 outline-none transition-all">
+                    <input type="number" id="ouncePriceUSD" value="4300" class="w-full bg-blue-50 border-2 border-blue-100 rounded-xl p-3 text-lg font-bold focus:border-blue-400 outline-none transition-all">
                     <span class="absolute left-3 top-3.5 text-blue-400 font-bold">$</span>
                 </div>
                 <button onclick="convertOunceToGram()" class="bg-blue-600 text-white px-4 rounded-xl active:scale-95 transition-transform">
@@ -85,6 +85,12 @@
                     <button onclick="setKarat(24)" class="karat-btn p-2 border rounded-lg text-sm font-bold bg-white border-gray-200" data-val="24">24</button>
                     <input type="hidden" id="karat" value="21">
                 </div>
+            </div>
+
+            <!-- Selected Karat Price Display (New) -->
+            <div class="bg-gray-50 rounded-xl p-3 border border-dashed border-gray-200 flex justify-between items-center">
+                <span class="text-gray-500 text-xs font-bold">سعر الجرام الصافي لعيار <span id="selectedKaratLabel">21</span>:</span>
+                <span class="text-amber-700 font-bold text-sm"><span id="karatPriceOutput">0.00</span> ر.س</span>
             </div>
         </div>
 
@@ -177,7 +183,9 @@
             taxLabel: document.getElementById('taxLabel'),
             taxValueLabel: document.getElementById('taxValueLabel'),
             summaryWeight: document.getElementById('summaryWeight'),
-            summaryKarat: document.getElementById('summaryKarat')
+            summaryKarat: document.getElementById('summaryKarat'),
+            karatPrice: document.getElementById('karatPriceOutput'), // New
+            selectedKaratLabel: document.getElementById('selectedKaratLabel') // New
         };
 
         function adjust(id, amount) {
@@ -227,6 +235,10 @@
             const subtotal = totalGoldCost + totalLabor;
             const vatValue = subtotal * (taxRate / 100);
             const finalTotal = subtotal + vatValue;
+
+            // تحديث سعر الجرام للعيار المختار
+            outputs.karatPrice.textContent = formatNumber(pricePerGramSelectedKarat);
+            outputs.selectedKaratLabel.textContent = karat;
 
             // تحديث جميع تفاصيل الإجمالي
             outputs.goldCost.textContent = formatNumber(totalGoldCost);
