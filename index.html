@@ -30,7 +30,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen pb-10">
+<body class="bg-gray-50 min-h-screen pb-40">
 
     <!-- Header -->
     <div class="gradient-bg pt-8 pb-12 px-6 text-white text-center rounded-b-[2.5rem] shadow-lg">
@@ -118,21 +118,36 @@
             <input type="hidden" id="tax" value="15">
         </div>
 
-        <!-- Final Receipt -->
-        <div class="bg-slate-800 text-white rounded-2xl p-6 shadow-xl sticky bottom-4 border-t-4 border-amber-500">
-            <div class="flex justify-between items-end mb-4">
-                <div>
-                    <p class="text-slate-400 text-xs mb-1 uppercase tracking-widest font-bold">الإجمالي النهائي</p>
-                    <h2 class="text-4xl font-black text-amber-400 font-mono"><span id="finalTotalOutput">0.00</span></h2>
+        <!-- Final Receipt (Expanded with Details) -->
+        <div class="bg-slate-900 text-white rounded-3xl p-6 shadow-2xl sticky bottom-4 border-t-4 border-amber-500">
+            <div class="space-y-3 mb-4">
+                <div class="flex justify-between text-xs text-slate-400">
+                    <span>تكلفة الذهب (صافي):</span>
+                    <span class="font-mono text-slate-200"><span id="goldCostOutput">0.00</span> ر.س</span>
                 </div>
-                <div class="text-right">
-                    <p class="text-slate-400 text-[10px] mb-1">الضريبة المضافة</p>
-                    <p class="text-sm font-bold text-red-400"><span id="vatOutput">0.00</span> ر.س</p>
+                <div class="flex justify-between text-xs text-slate-400">
+                    <span>أجور المصنعية والربح:</span>
+                    <span class="font-mono text-slate-200"><span id="laborCostOutput">0.00</span> ر.س</span>
+                </div>
+                <div class="flex justify-between text-xs text-slate-400">
+                    <span>المجموع قبل الضريبة:</span>
+                    <span class="font-mono text-slate-200"><span id="subtotalOutput">0.00</span> ر.س</span>
+                </div>
+                <div class="flex justify-between text-xs text-red-400 border-b border-slate-700 pb-2">
+                    <span>ضريبة القيمة المضافة (<span id="taxValueLabel">15</span>%):</span>
+                    <span class="font-mono">+ <span id="vatOutput">0.00</span> ر.س</span>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-700 text-[11px] text-slate-300 uppercase">
-                <div>الوزن: <span id="summaryWeight" class="text-white font-bold text-xs">15</span>ج</div>
-                <div class="text-left">العيار: <span id="summaryKarat" class="text-white font-bold text-xs">21</span></div>
+
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-amber-500 text-[10px] uppercase font-bold tracking-widest">السعر النهائي للدفع</p>
+                    <h2 class="text-3xl font-black text-white font-mono"><span id="finalTotalOutput">0.00</span> <span class="text-sm font-normal text-slate-400">ر.س</span></h2>
+                </div>
+                <div class="text-left bg-slate-800 px-3 py-2 rounded-xl">
+                    <p class="text-[10px] text-slate-400">الوزن × العيار</p>
+                    <p class="text-xs font-bold text-amber-400"><span id="summaryWeight">15</span>ج / عيار <span id="summaryKarat">21</span></p>
+                </div>
             </div>
         </div>
 
@@ -154,14 +169,17 @@
         };
 
         const outputs = {
+            goldCost: document.getElementById('goldCostOutput'),
+            laborCost: document.getElementById('laborCostOutput'),
+            subtotal: document.getElementById('subtotalOutput'),
             vat: document.getElementById('vatOutput'),
             finalTotal: document.getElementById('finalTotalOutput'),
             taxLabel: document.getElementById('taxLabel'),
+            taxValueLabel: document.getElementById('taxValueLabel'),
             summaryWeight: document.getElementById('summaryWeight'),
             summaryKarat: document.getElementById('summaryKarat')
         };
 
-        // دالة الزيادة والنقصان
         function adjust(id, amount) {
             const el = document.getElementById(id);
             let val = parseFloat(el.value) || 0;
@@ -170,7 +188,6 @@
             calculate();
         }
 
-        // دالة اختيار العيار
         function setKarat(val) {
             inputs.karat.value = val;
             document.querySelectorAll('.karat-btn').forEach(btn => {
@@ -204,15 +221,22 @@
 
             const purity = karat / 24;
             const pricePerGramSelectedKarat = price24k * purity;
+            
             const totalGoldCost = pricePerGramSelectedKarat * weight;
             const totalLabor = (workmanship + profit) * weight;
             const subtotal = totalGoldCost + totalLabor;
             const vatValue = subtotal * (taxRate / 100);
             const finalTotal = subtotal + vatValue;
 
+            // تحديث جميع تفاصيل الإجمالي
+            outputs.goldCost.textContent = formatNumber(totalGoldCost);
+            outputs.laborCost.textContent = formatNumber(totalLabor);
+            outputs.subtotal.textContent = formatNumber(subtotal);
             outputs.vat.textContent = formatNumber(vatValue);
             outputs.finalTotal.textContent = formatNumber(finalTotal);
+            
             outputs.taxLabel.textContent = taxRate;
+            outputs.taxValueLabel.textContent = taxRate;
             outputs.summaryWeight.textContent = weight;
             outputs.summaryKarat.textContent = karat;
         }
