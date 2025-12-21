@@ -2,24 +2,18 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حاسبة الذهب - السوق السعودي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>حاسبة الذهب - نسخة الجوال</title>
     
-    <!-- استدعاء خط Tajawal من جوجل -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <!-- استدعاء Tailwind CSS للتصميم -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- استدعاء أيقونات FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         body {
             font-family: 'Tajawal', sans-serif;
-            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
         }
-        /* إخفاء أسهم الأرقام في المتصفحات */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
             -webkit-appearance: none; 
@@ -28,196 +22,128 @@
         .gradient-bg {
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
         }
-        /* لإظهار أيقونة التحويل بشكل واضح */
-        .conversion-btn {
-            height: 44px; /* ليتساوى مع ارتفاع حقل الإدخال */
+        .step-btn {
+            @apply flex items-center justify-center w-12 h-12 bg-gray-100 active:bg-amber-200 text-gray-700 rounded-lg transition-colors border border-gray-200;
+        }
+        .input-card {
+            @apply bg-white p-4 rounded-xl border border-gray-100 shadow-sm;
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-50 min-h-screen pb-10">
 
-    <!-- الحاوية الرئيسية -->
-    <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+    <!-- Header -->
+    <div class="gradient-bg pt-8 pb-12 px-6 text-white text-center rounded-b-[2.5rem] shadow-lg">
+        <h1 class="text-2xl font-bold mb-1">حاسبة الذهب الذكية</h1>
+        <p class="text-yellow-100 text-sm opacity-90">سهلة وسريعة للاستخدام اليومي</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="px-4 -mt-8 space-y-4 max-w-md mx-auto">
         
-        <!-- رأس الصفحة -->
-        <div class="gradient-bg p-6 text-white text-center relative">
-            <div class="absolute top-4 right-4 opacity-20">
-                <i class="fa-solid fa-coins fa-3x"></i>
+        <!-- Section: Market Data -->
+        <div class="input-card">
+            <label class="block text-gray-600 text-xs font-bold mb-2 uppercase tracking-wide">سعر الأوقية (دولار)</label>
+            <div class="flex gap-2">
+                <div class="relative flex-grow">
+                    <input type="number" id="ouncePriceUSD" value="2300" class="w-full bg-blue-50 border-2 border-blue-100 rounded-xl p-3 text-lg font-bold focus:border-blue-400 outline-none transition-all">
+                    <span class="absolute left-3 top-3.5 text-blue-400 font-bold">$</span>
+                </div>
+                <button onclick="convertOunceToGram()" class="bg-blue-600 text-white px-4 rounded-xl active:scale-95 transition-transform">
+                    <i class="fa-solid fa-sync"></i>
+                </button>
             </div>
-            <h1 class="text-2xl font-bold mb-1">حاسبة سعر الذهب المصاغ</h1>
-            <p class="text-yellow-50 text-sm opacity-90">حساب دقيق يشمل المصنعية والضريبة</p>
-        </div>
-
-        <div class="p-6 space-y-6">
             
-            <!-- قسم المدخلات -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                <!-- حقل إدخال سعر الأوقية بالدولار (جديد) -->
-                <div class="col-span-2">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
-                        <i class="fa-solid fa-dollar-sign text-blue-600 ml-1"></i>
-                        سعر الأوقية (Troy Ounce) بالدولار الأمريكي
-                    </label>
-                    <div class="relative flex items-center">
-                        <!-- قيمة افتراضية لسعر الأوقية -->
-                        <input type="number" id="ouncePriceUSD" value="4299.285" class="w-full bg-blue-50 text-gray-900 border border-blue-300 rounded-lg p-3 focus:ring-blue-500 focus:border-blue-500 pl-12 shadow-sm transition-all" placeholder="مثلاً: 2300">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold text-xs">
-                            $
-                        </div>
-                        <!-- زر التحويل -->
-                        <button onclick="convertOunceToGram()" class="conversion-btn mr-2 bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-4 rounded-lg transition-colors flex items-center whitespace-nowrap text-sm">
-                            <i class="fa-solid fa-sync ml-1"></i>
-                            تحويل لـ ر.س
-                        </button>
-                    </div>
-                    <p class="text-xs text-blue-400 mt-1 mr-1">سيتم تحويل هذا السعر لسعر جرام عيار 24 بالريال</p>
-                </div>
-                
-                <!-- سعر الجرام الخام (النتيجة بعد التحويل أو إدخال يدوي) -->
-                <div class="col-span-2">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
-                        <i class="fa-solid fa-chart-line text-amber-500 ml-1"></i>
-                        سعر جرام الذهب عيار 24 (الخام اليوم) - ر.س
-                    </label>
-                    <div class="relative">
-                        <input type="number" id="marketPrice" value="518.34" class="w-full bg-gray-50 text-gray-900 border border-gray-300 rounded-lg p-3 focus:ring-amber-500 focus:border-amber-500 pl-12 shadow-sm transition-all" placeholder="مثلاً: 287.97">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold text-xs">
-                            ر.س
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-1 mr-1">هذا السعر هو المعيار الأساسي للحسابات</p>
-                </div>
-
-                <!-- وزن القطعة -->
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
-                        <i class="fa-solid fa-weight-hanging text-amber-500 ml-1"></i>
-                        وزن القطعة
-                    </label>
-                    <div class="relative">
-                        <input type="number" id="weight" value="1" class="w-full bg-gray-50 text-gray-900 border border-gray-300 rounded-lg p-3 focus:ring-amber-500 focus:border-amber-500 pl-12 shadow-sm" placeholder="الوزن">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold text-xs">
-                            جرام
-                        </div>
-                    </div>
-                </div>
-
-                <!-- اختيار العيار -->
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
-                        <i class="fa-regular fa-gem text-amber-500 ml-1"></i>
-                        عيار الذهب
-                    </label>
-                    <select id="karat" class="w-full bg-gray-50 text-gray-900 border border-gray-300 rounded-lg p-3 focus:ring-amber-500 focus:border-amber-500 shadow-sm cursor-pointer">
-                        <option value="24">عيار 24 (ذهب خالص)</option>
-                        <option value="22">عيار 22</option>
-                        <option value="21" selected>عيار 21 (الأكثر شيوعاً)</option>
-                        <option value="18">عيار 18</option>
-                    </select>
-                </div>
-
-                <!-- المصنعية -->
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
-                        <i class="fa-solid fa-hammer text-amber-500 ml-1"></i>
-                        المصنعية (للجرام)
-                    </label>
-                    <div class="relative">
-                        <input type="number" id="workmanship" value="15" class="w-full bg-gray-50 text-gray-900 border border-gray-300 rounded-lg p-3 focus:ring-amber-500 focus:border-amber-500 pl-12 shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold text-xs">
-                            ر.س
-                        </div>
-                    </div>
-                </div>
-
-                <!-- هامش الربح -->
-                <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
-                        <i class="fa-solid fa-hand-holding-dollar text-amber-500 ml-1"></i>
-                        هامش ربح التاجر (للجرام)
-                    </label>
-                    <div class="relative">
-                        <input type="number" id="profit" value="15" class="w-full bg-gray-50 text-gray-900 border border-gray-300 rounded-lg p-3 focus:ring-amber-500 focus:border-amber-500 pl-12 shadow-sm">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold text-xs">
-                            ر.س
-                        </div>
-                    </div>
-                </div>
-
-                <!-- الضريبة -->
-                <div class="col-span-2">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
-                        <i class="fa-solid fa-file-invoice-dollar text-amber-500 ml-1"></i>
-                        ضريبة القيمة المضافة
-                    </label>
-                    <div class="relative flex items-center">
-                        <input type="range" id="taxRange" min="0" max="30" value="15" class="w-full ml-3 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
-                        <div class="relative w-24">
-                            <input type="number" id="tax" value="15" class="w-full bg-gray-50 text-gray-900 border border-gray-300 rounded-lg p-2 text-center font-bold focus:ring-amber-500 focus:border-amber-500 pl-8">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 font-bold text-xs">
-                                %
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <hr class="border-dashed border-gray-300">
-
-            <!-- النتائج -->
-            <div class="bg-amber-50 rounded-xl p-5 border border-amber-100">
-                <h3 class="text-amber-800 font-bold mb-4 flex items-center">
-                    <i class="fa-solid fa-receipt ml-2"></i>
-                    فاتورة الشراء التقديرية
-                </h3>
-                
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between items-center text-gray-600">
-                        <span>سعر الذهب الصافي (للعيار المختار):</span>
-                        <span class="font-bold font-mono"><span id="goldCostOutput">0.00</span> ر.س</span>
-                    </div>
-                    
-                    <div class="flex justify-between items-center text-gray-600">
-                        <span>إجمالي المصنعية + الربح:</span>
-                        <span class="font-bold font-mono text-blue-600"><span id="laborCostOutput">0.00</span> ر.س</span>
-                    </div>
-
-                    <div class="flex justify-between items-center text-gray-600">
-                        <span>السعر قبل الضريبة:</span>
-                        <span class="font-bold font-mono"><span id="subtotalOutput">0.00</span> ر.س</span>
-                    </div>
-
-                    <div class="flex justify-between items-center text-red-500">
-                        <span>قيمة الضريبة (<span id="taxLabel">15</span>%):</span>
-                        <span class="font-bold font-mono">+ <span id="vatOutput">0.00</span> ر.س</span>
-                    </div>
-                </div>
-
-                <div class="mt-4 pt-4 border-t border-amber-200 flex justify-between items-center">
-                    <span class="text-lg font-bold text-amber-900">إجمالي السعر النهائي:</span>
-                    <span class="text-2xl font-bold text-amber-600 font-mono"><span id="finalTotalOutput">0.00</span> ر.س</span>
+            <div class="mt-4 pt-4 border-t border-gray-50">
+                <label class="block text-gray-600 text-xs font-bold mb-2 uppercase">سعر جرام 24 (ريال)</label>
+                <div class="relative">
+                    <input type="number" id="marketPrice" value="287.97" class="w-full bg-amber-50 border-2 border-amber-100 rounded-xl p-3 text-lg font-bold text-amber-700 outline-none">
+                    <span class="absolute left-3 top-3.5 text-amber-300 font-bold">ر.س</span>
                 </div>
             </div>
-
-            <!-- ملاحظة -->
-            <div class="text-xs text-gray-400 text-center leading-relaxed">
-                <i class="fa-solid fa-circle-info ml-1"></i>
-                ملاحظة: الأسعار تقديرية وتعتمد على دقة البيانات المدخلة. سعر المصنعية وربح التاجر يختلف من محل لآخر.
-            </div>
-
         </div>
+
+        <!-- Section: Main Specs -->
+        <div class="input-card space-y-4">
+            <!-- Weight with Steppers -->
+            <div>
+                <label class="block text-gray-600 text-xs font-bold mb-2">وزن الذهب (جرام)</label>
+                <div class="flex items-center gap-2">
+                    <button onclick="adjust('weight', -1)" class="step-btn"><i class="fa-solid fa-minus"></i></button>
+                    <input type="number" id="weight" value="15" class="flex-grow text-center bg-gray-50 border border-gray-200 rounded-lg p-3 text-xl font-bold">
+                    <button onclick="adjust('weight', 1)" class="step-btn"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+
+            <!-- Karat Selector -->
+            <div>
+                <label class="block text-gray-600 text-xs font-bold mb-2">العيار</label>
+                <div class="grid grid-cols-4 gap-2">
+                    <button onclick="setKarat(18)" class="karat-btn p-2 border rounded-lg text-sm font-bold bg-white border-gray-200" data-val="18">18</button>
+                    <button onclick="setKarat(21)" class="karat-btn p-2 border rounded-lg text-sm font-bold bg-amber-500 text-white border-amber-500" data-val="21">21</button>
+                    <button onclick="setKarat(22)" class="karat-btn p-2 border rounded-lg text-sm font-bold bg-white border-gray-200" data-val="22">22</button>
+                    <button onclick="setKarat(24)" class="karat-btn p-2 border rounded-lg text-sm font-bold bg-white border-gray-200" data-val="24">24</button>
+                    <input type="hidden" id="karat" value="21">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Costs -->
+        <div class="input-card space-y-4">
+            <div>
+                <label class="block text-gray-600 text-xs font-bold mb-2">المصنعية (لكل جرام)</label>
+                <div class="flex items-center gap-2">
+                    <button onclick="adjust('workmanship', -5)" class="step-btn"><i class="fa-solid fa-minus text-xs"></i>5</button>
+                    <input type="number" id="workmanship" value="35" class="flex-grow text-center bg-gray-50 border border-gray-200 rounded-lg p-3 font-bold">
+                    <button onclick="adjust('workmanship', 5)" class="step-btn"><i class="fa-solid fa-plus text-xs"></i>5</button>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-gray-600 text-xs font-bold mb-2">هامش الربح (لكل جرام)</label>
+                <div class="flex items-center gap-2">
+                    <button onclick="adjust('profit', -1)" class="step-btn"><i class="fa-solid fa-minus"></i></button>
+                    <input type="number" id="profit" value="20" class="flex-grow text-center bg-gray-50 border border-gray-200 rounded-lg p-3 font-bold">
+                    <button onclick="adjust('profit', 1)" class="step-btn"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Tax -->
+        <div class="input-card">
+            <div class="flex justify-between items-center mb-3">
+                <label class="text-gray-600 text-xs font-bold">الضريبة: <span id="taxLabel" class="text-amber-600">15</span>%</label>
+            </div>
+            <input type="range" id="taxRange" min="0" max="25" value="15" class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+            <input type="hidden" id="tax" value="15">
+        </div>
+
+        <!-- Final Receipt -->
+        <div class="bg-slate-800 text-white rounded-2xl p-6 shadow-xl sticky bottom-4 border-t-4 border-amber-500">
+            <div class="flex justify-between items-end mb-4">
+                <div>
+                    <p class="text-slate-400 text-xs mb-1 uppercase tracking-widest font-bold">الإجمالي النهائي</p>
+                    <h2 class="text-4xl font-black text-amber-400 font-mono"><span id="finalTotalOutput">0.00</span></h2>
+                </div>
+                <div class="text-right">
+                    <p class="text-slate-400 text-[10px] mb-1">الضريبة المضافة</p>
+                    <p class="text-sm font-bold text-red-400"><span id="vatOutput">0.00</span> ر.س</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-700 text-[11px] text-slate-300 uppercase">
+                <div>الوزن: <span id="summaryWeight" class="text-white font-bold text-xs">15</span>ج</div>
+                <div class="text-left">العيار: <span id="summaryKarat" class="text-white font-bold text-xs">21</span></div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // ثوابت التحويل
-        const OUNCE_GRAMS = 31.1034768; // 1 أوقية طروادة بالجرام
-        const USD_SAR_RATE = 3.75; // سعر صرف الدولار مقابل الريال السعودي (ثابت)
+        const OUNCE_GRAMS = 31.1034768;
+        const USD_SAR_RATE = 3.75;
 
-        // الحصول على العناصر
         const inputs = {
-            ouncePriceUSD: document.getElementById('ouncePriceUSD'), // جديد
+            ouncePriceUSD: document.getElementById('ouncePriceUSD'),
             marketPrice: document.getElementById('marketPrice'),
             weight: document.getElementById('weight'),
             karat: document.getElementById('karat'),
@@ -228,43 +154,47 @@
         };
 
         const outputs = {
-            goldCost: document.getElementById('goldCostOutput'),
-            laborCost: document.getElementById('laborCostOutput'),
-            subtotal: document.getElementById('subtotalOutput'),
             vat: document.getElementById('vatOutput'),
             finalTotal: document.getElementById('finalTotalOutput'),
-            taxLabel: document.getElementById('taxLabel')
+            taxLabel: document.getElementById('taxLabel'),
+            summaryWeight: document.getElementById('summaryWeight'),
+            summaryKarat: document.getElementById('summaryKarat')
         };
 
-        /**
-         * تحسب سعر جرام الذهب عيار 24 بالريال السعودي بناءً على سعر الأوقية بالدولار.
-         */
-        function convertOunceToGram() {
-            const ouncePriceUSD = parseFloat(inputs.ouncePriceUSD.value) || 0;
-
-            if (ouncePriceUSD <= 0) {
-                inputs.marketPrice.value = 0;
-                calculate();
-                return;
-            }
-
-            // 1. حساب سعر جرام الذهب عيار 24 بالدولار
-            const pricePerGramUSD = ouncePriceUSD / OUNCE_GRAMS;
-            
-            // 2. التحويل إلى الريال السعودي
-            const price24KSAR = pricePerGramUSD * USD_SAR_RATE;
-
-            // تحديث حقل سعر السوق (2 خانة عشرية)
-            inputs.marketPrice.value = price24KSAR.toFixed(2);
-            
-            // تشغيل الحساب الرئيسي
+        // دالة الزيادة والنقصان
+        function adjust(id, amount) {
+            const el = document.getElementById(id);
+            let val = parseFloat(el.value) || 0;
+            val = Math.max(0, val + amount);
+            el.value = id === 'weight' ? val.toFixed(2) : Math.round(val);
             calculate();
         }
 
+        // دالة اختيار العيار
+        function setKarat(val) {
+            inputs.karat.value = val;
+            document.querySelectorAll('.karat-btn').forEach(btn => {
+                if(btn.dataset.val == val) {
+                    btn.classList.add('bg-amber-500', 'text-white', 'border-amber-500');
+                    btn.classList.remove('bg-white', 'border-gray-200');
+                } else {
+                    btn.classList.remove('bg-amber-500', 'text-white', 'border-amber-500');
+                    btn.classList.add('bg-white', 'border-gray-200');
+                }
+            });
+            calculate();
+        }
 
-        // دالة الحساب الرئيسية
+        function convertOunceToGram() {
+            const ouncePriceUSD = parseFloat(inputs.ouncePriceUSD.value) || 0;
+            if (ouncePriceUSD > 0) {
+                const price24KSAR = (ouncePriceUSD / OUNCE_GRAMS) * USD_SAR_RATE;
+                inputs.marketPrice.value = price24KSAR.toFixed(2);
+                calculate();
+            }
+        }
+
         function calculate() {
-            // جلب القيم وتحويلها لأرقام
             const price24k = parseFloat(inputs.marketPrice.value) || 0;
             const weight = parseFloat(inputs.weight.value) || 0;
             const karat = parseFloat(inputs.karat.value);
@@ -272,69 +202,40 @@
             const profit = parseFloat(inputs.profit.value) || 0;
             const taxRate = parseFloat(inputs.tax.value) || 0;
 
-            // 1. حساب نسبة النقاء بناءً على العيار (العيار / 24)
             const purity = karat / 24;
-
-            // 2. حساب سعر جرام الذهب للعيار المختار (بدون مصنعية)
             const pricePerGramSelectedKarat = price24k * purity;
-
-            // 3. حساب تكلفة الذهب الصافي للقطعة كاملة
             const totalGoldCost = pricePerGramSelectedKarat * weight;
-
-            // 4. حساب تكلفة المصنعية والربح (تضرب في الوزن)
-            const totalWorkmanship = workmanship * weight;
-            const totalProfit = profit * weight;
-            const totalLabor = totalWorkmanship + totalProfit;
-
-            // 5. المجموع قبل الضريبة
+            const totalLabor = (workmanship + profit) * weight;
             const subtotal = totalGoldCost + totalLabor;
-
-            // 6. قيمة الضريبة
             const vatValue = subtotal * (taxRate / 100);
-
-            // 7. الإجمالي النهائي
             const finalTotal = subtotal + vatValue;
 
-            // تحديث الواجهة (تنسيق الأرقام بخانتين عشريتين)
-            outputs.goldCost.textContent = formatNumber(totalGoldCost);
-            outputs.laborCost.textContent = formatNumber(totalLabor);
-            outputs.subtotal.textContent = formatNumber(subtotal);
             outputs.vat.textContent = formatNumber(vatValue);
             outputs.finalTotal.textContent = formatNumber(finalTotal);
             outputs.taxLabel.textContent = taxRate;
+            outputs.summaryWeight.textContent = weight;
+            outputs.summaryKarat.textContent = karat;
         }
 
-        // دالة لتنسيق الأرقام (تضيف فواصل الآلاف)
         function formatNumber(num) {
             return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // ربط شريط التمرير بحقل الضريبة
         inputs.taxRange.addEventListener('input', (e) => {
             inputs.tax.value = e.target.value;
             calculate();
         });
-        
-        inputs.tax.addEventListener('input', (e) => {
-            inputs.taxRange.value = e.target.value;
-            calculate();
-        });
 
-        // إضافة مستمعي الأحداث لجميع المدخلات
         Object.values(inputs).forEach(input => {
-            if(input.id === 'ouncePriceUSD') {
-                // تشغيل التحويل والحساب عند تغيير سعر الأوقية
-                input.addEventListener('input', convertOunceToGram);
-            } else if(input.id !== 'taxRange' && input.id !== 'tax') { 
-                // تشغيل الحساب عند تغيير باقي المدخلات (وزن، عيار، مصنعية، ربح، وسعر السوق اليدوي)
-                input.addEventListener('input', calculate);
-            }
+            input.addEventListener('input', () => {
+                if(input.id === 'ouncePriceUSD') convertOunceToGram();
+                calculate();
+            });
         });
 
-        // الحساب الأولي عند تحميل الصفحة
         window.addEventListener('load', () => {
-             // ابدأ بتحويل سعر الأوقية الافتراضي
             convertOunceToGram();
+            calculate();
         });
     </script>
 </body>
