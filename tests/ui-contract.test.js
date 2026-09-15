@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const arabic = fs.readFileSync('index.html', 'utf8');
 const english = fs.readFileSync('en.html', 'utf8');
 const app = fs.readFileSync('app.js', 'utf8');
+const styles = fs.readFileSync('styles.css', 'utf8');
 
 const requiredIds = [
   'transactionMode',
@@ -70,4 +71,15 @@ test('live UI stores a short-lived cached quote and can fall back to manual pric
   assert.match(app, /LIVE_CACHE_MAX_AGE_MS/);
   assert.match(app, /useCachedLiveQuote/);
   assert.match(app, /fallbackToManualPrice/);
+});
+
+test('VAT slider fill follows page direction', () => {
+  assert.match(
+    styles,
+    /html\[dir=ltr\]\s+input\[type=range\]::\-webkit-slider-runnable-track\{[^}]*linear-gradient\(to right,/,
+  );
+  assert.match(
+    styles,
+    /html\[dir=rtl\]\s+input\[type=range\]::\-webkit-slider-runnable-track\{[^}]*linear-gradient\(to left,/,
+  );
 });
