@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#d97706">
-  <meta name="description" content="Gold jewellery purchase calculator in Saudi riyals with karat, workmanship, optional margin and VAT.">
+  <meta name="description" content="Gold buy and sell calculator in Saudi riyals with karat, workmanship, VAT and shop quote comparison.">
   <title>Gold Calculator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +22,7 @@
       <i class="fa-solid fa-coins text-yellow-200 text-xl" aria-hidden="true"></i>
       <h1 class="text-2xl font-bold">Smart Gold Calculator</h1>
     </div>
-    <p class="text-yellow-100 text-sm opacity-90">Clear jewellery pricing in Saudi riyals</p>
+    <p class="text-yellow-100 text-sm opacity-90">Calculate buy or sell value and compare a shop quote with the reference</p>
   </header>
 
   <main class="page-content px-4 -mt-8 space-y-4 max-w-md mx-auto">
@@ -59,6 +59,16 @@
       <p id="priceWarning" class="status-note text-[11px] font-bold" aria-live="polite"></p>
     </section>
 
+    <section class="input-card" aria-labelledby="transactionHeading">
+      <p id="transactionHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔄 Transaction Type</p>
+      <div class="grid grid-cols-2 gap-2" role="group" aria-label="Transaction type">
+        <button type="button" class="mode-btn active" data-mode="buy" aria-pressed="true">Buy Jewellery</button>
+        <button type="button" class="mode-btn" data-mode="sell" aria-pressed="false">Sell Used Gold</button>
+      </div>
+      <input type="hidden" id="transactionMode" value="buy">
+      <p id="transactionHelp" class="status-note mt-2 text-[11px] leading-relaxed text-gray-400"></p>
+    </section>
+
     <section class="input-card space-y-5" aria-labelledby="itemHeading">
       <p id="itemHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">⚖️ Item Details</p>
 
@@ -88,8 +98,8 @@
       </div>
     </section>
 
-    <section class="input-card space-y-5" aria-labelledby="extrasHeading">
-      <p id="extrasHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">💼 Additional Costs</p>
+    <section id="buyCostsPanel" class="input-card space-y-5" aria-labelledby="extrasHeading">
+      <p id="extrasHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">💼 Purchase Costs</p>
 
       <div>
         <div class="flex justify-between items-center mb-2">
@@ -116,7 +126,7 @@
       </div>
     </section>
 
-    <section class="input-card" aria-labelledby="vatHeading">
+    <section id="vatPanel" class="input-card" aria-labelledby="vatHeading">
       <p id="vatHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🧾 Value Added Tax</p>
       <div class="flex justify-between items-center mb-3">
         <span class="text-gray-600 text-sm font-bold">VAT rate</span>
@@ -127,22 +137,47 @@
       <div class="flex justify-between text-[10px] text-gray-400 mt-1 px-0.5"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%</span></div>
     </section>
 
+    <section id="sellDeductionPanel" class="input-card" aria-labelledby="sellHeading" hidden>
+      <p id="sellHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🏷️ Buyer Deduction</p>
+      <div class="flex justify-between items-center mb-2">
+        <label for="sellDeduction" class="text-gray-600 text-xs font-bold">Deduction from raw metal value</label>
+        <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="sellDeductionLabel">0</span>%</span>
+      </div>
+      <input type="number" id="sellDeduction" value="0" min="0" max="100" step="0.1" inputmode="decimal" autocomplete="off" class="num-input">
+      <p class="mt-2 text-[11px] leading-relaxed text-gray-400">Enter the percentage the buyer or shop deducts from raw metal value. Sell mode does not add workmanship or VAT.</p>
+    </section>
+
+    <section id="comparisonPanel" class="input-card" aria-labelledby="compareHeading">
+      <p id="compareHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔎 Shop Quote Comparison</p>
+      <label id="quotedTotalLabel" for="quotedTotal" class="block text-gray-600 text-xs font-bold mb-2">Shop quoted total (SAR)</label>
+      <input type="number" id="quotedTotal" min="0" step="0.01" placeholder="Enter the quote to compare" inputmode="decimal" autocomplete="off" class="num-input">
+
+      <div class="comparison-result mt-3" aria-live="polite">
+        <p id="comparisonStatus" class="font-bold text-sm text-gray-700">Enter the quoted amount to start the comparison.</p>
+        <div class="grid grid-cols-2 gap-2 mt-2 text-xs">
+          <div class="comparison-metric"><span class="text-gray-400">Difference</span><strong id="comparisonDifference">—</strong></div>
+          <div class="comparison-metric"><span class="text-gray-400">Percentage</span><strong id="comparisonPercent">—</strong></div>
+        </div>
+      </div>
+      <p class="mt-2 text-[10px] leading-relaxed text-gray-400">The comparison is a reference only. Shop quotes can differ because of workmanship, stones, promotions, commercial policy and tax treatment.</p>
+    </section>
+
     <aside class="input-card text-[11px] leading-relaxed text-gray-500" aria-label="Note">
-      <strong class="text-gray-700">Note:</strong> Prices are estimates and depend on the values you enter. A 15% VAT default is suitable for ordinary taxable sales; special cases such as qualifying investment metals can be treated differently. No live gold price is fetched automatically; enter the current price yourself.
+      <strong class="text-gray-700">Note:</strong> Results are estimates based on your inputs. Buy mode uses the entered workmanship and VAT; sell mode uses raw metal value and the buyer deduction you enter. Live gold pricing is not included in this phase.
     </aside>
   </main>
 
   <div class="bottom-receipt">
     <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="Price summary">
       <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3">
-        <div class="flex justify-between text-[11px]"><span class="text-slate-400">Gold cost</span><span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span></div>
-        <div class="flex justify-between text-[11px]"><span class="text-slate-400">Workmanship + margin</span><span class="text-slate-200 font-mono" id="laborCostOutput">0.00</span></div>
-        <div class="flex justify-between text-[11px]"><span class="text-slate-400">Before VAT</span><span class="text-slate-200 font-mono" id="subtotalOutput">0.00</span></div>
-        <div class="flex justify-between text-[11px]"><span class="text-red-400">VAT (<span id="taxValueLabel">15</span>%)</span><span class="text-red-300 font-mono">+<span id="vatOutput">0.00</span></span></div>
+        <div class="flex justify-between text-[11px]"><span id="summaryPrimaryLabel" class="text-slate-400">Gold cost</span><span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span></div>
+        <div class="flex justify-between text-[11px]"><span id="summarySecondaryLabel" class="text-slate-400">Workmanship + margin</span><span class="text-slate-200 font-mono" id="laborCostOutput">0.00</span></div>
+        <div id="summarySubtotalRow" class="flex justify-between text-[11px]"><span id="summarySubtotalLabel" class="text-slate-400">Before VAT</span><span class="text-slate-200 font-mono" id="subtotalOutput">0.00</span></div>
+        <div id="summaryTaxRow" class="flex justify-between text-[11px]"><span class="text-red-400">VAT (<span id="taxValueLabel">15</span>%)</span><span class="text-red-300 font-mono">+<span id="vatOutput">0.00</span></span></div>
       </div>
       <div class="border-t border-slate-700 pt-3 flex justify-between items-center">
         <div>
-          <p class="text-amber-500 text-[10px] uppercase font-bold tracking-widest mb-0.5">Final amount</p>
+          <p id="finalAmountLabel" class="text-amber-500 text-[10px] uppercase font-bold tracking-widest mb-0.5">Final amount</p>
           <div class="flex items-baseline gap-1"><span class="text-3xl font-black font-mono live-val" id="finalTotalOutput">0.00</span><span class="text-sm text-slate-400">SAR</span></div>
         </div>
         <div class="bg-slate-800 px-3 py-2 rounded-xl text-center">
