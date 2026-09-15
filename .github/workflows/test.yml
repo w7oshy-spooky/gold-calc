@@ -16,5 +16,7 @@ jobs:
         with:
           node-version: '22'
       - run: node --check gold-calculator.js
+      - run: node --check live-gold.js
+      - run: node --check api/gold-price.js
       - run: node --check app.js
       - run: node --test tests/*.test.js

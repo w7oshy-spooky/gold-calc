@@ -9,12 +9,23 @@
   const core = globalThis.GoldCalculator;
   const $ = (id) => document.getElementById(id);
   const locale = document.documentElement.lang === 'ar' ? 'ar' : 'en';
+  const LIVE_CACHE_KEY = 'gold-calc-live-quote-v1';
+  const LIVE_CACHE_MAX_AGE_MS = 15 * 60 * 1000;
 
   const copy = {
     ar: {
-      ounceMode: 'يتم احتساب سعر جرام 24 تلقائيًا من سعر الأوقية دون تقريب مبكر.',
+      liveMode: 'يتم جلب سعر الأوقية الحي تلقائيًا ثم تحويله إلى سعر جرام 24 قيراط بالريال السعودي.',
+      ounceMode: 'يتم احتساب سعر جرام 24 تلقائيًا من سعر الأوقية التي تدخلها دون تقريب مبكر.',
       manualMode: 'أدخل سعر جرام 24 يدويًا قبل المصنعية والضريبة.',
-      needPrice: 'أدخل سعر أوقية صالحًا أو اختر الإدخال اليدوي لسعر 24 قيراط.',
+      needPrice: 'أدخل سعرًا صالحًا أو اختر LIVE لجلب السعر الحالي.',
+      liveLoading: 'جاري تحديث سعر الذهب…',
+      liveReady: 'LIVE · السعر الحي متصل',
+      liveStale: 'السعر وصل من المصدر ولكنه متأخر قليلًا.',
+      liveCached: 'تعذر التحديث الآن · يتم استخدام آخر سعر محفوظ مؤقتًا.',
+      liveUnavailable: 'تعذر جلب السعر الحي ولا يوجد سعر محفوظ حديث. تم التحويل إلى إدخال الأوقية اليدوي.',
+      refresh: 'تحديث',
+      lastUpdated: 'آخر تحديث',
+      source: 'المصدر',
       buyHelp: 'وضع الشراء يضيف المصنعية والربح الاختياري والضريبة التي تحددها.',
       sellHelp: 'وضع البيع يعتمد قيمة الذهب الخام ويطرح فقط نسبة خصم المشتري التي تدخلها.',
       buyQuoteLabel: 'السعر الإجمالي المعروض من المحل (ر.س)',
@@ -41,11 +52,21 @@
         subtotal: 'صافي المبلغ المرجعي',
         final: 'المبلغ المرجعي المتوقع',
       },
+      note: '<strong class="text-gray-700">ملاحظة:</strong> سعر LIVE سعر فوري إرشادي للذهب الخام XAU/USD ويُحوّل إلى الريال السعودي. النتائج تقديرية، وقد يختلف سعر التنفيذ الفعلي لدى المحلات بسبب فرق الشراء والبيع والمصنعية والأحجار والعروض والمعاملة الضريبية.',
     },
     en: {
-      ounceMode: '24K price is calculated from the ounce price without early rounding.',
+      liveMode: 'The live troy-ounce price is fetched automatically and converted to the 24K gram price in Saudi riyals.',
+      ounceMode: '24K price is calculated from the ounce price you enter without early rounding.',
       manualMode: 'Enter the 24K gram price manually before workmanship and VAT.',
-      needPrice: 'Enter a valid ounce price or switch to manual 24K pricing.',
+      needPrice: 'Enter a valid price or choose LIVE to fetch the current price.',
+      liveLoading: 'Updating live gold price…',
+      liveReady: 'LIVE · price feed connected',
+      liveStale: 'The provider returned a delayed quote.',
+      liveCached: 'Live refresh failed · using the most recent cached quote temporarily.',
+      liveUnavailable: 'Live pricing is unavailable and no recent cached quote exists. Switched to manual ounce entry.',
+      refresh: 'Refresh',
+      lastUpdated: 'Last updated',
+      source: 'Source',
       buyHelp: 'Buy mode adds workmanship, optional extra margin and the VAT rate you select.',
       sellHelp: 'Sell mode uses raw metal value and subtracts only the buyer deduction you enter.',
       buyQuoteLabel: 'Shop quoted total (SAR)',
@@ -72,8 +93,47 @@
         subtotal: 'Reference net payout',
         final: 'Estimated reference payout',
       },
+      note: '<strong class="text-gray-700">Note:</strong> LIVE uses an indicative XAU/USD raw-gold spot quote converted to Saudi riyals. Results are estimates; actual shop execution can differ because of bid/ask spreads, workmanship, stones, promotions and tax treatment.',
     },
   }[locale];
+
+  function installLiveUi() {
+    const firstSourceButton = document.querySelector('.source-btn');
+    const sourceGroup = firstSourceButton?.parentElement;
+    if (sourceGroup && !sourceGroup.querySelector('[data-source="live"]')) {
+      sourceGroup.classList.remove('grid-cols-2');
+      sourceGroup.classList.add('grid-cols-3');
+      sourceGroup.insertAdjacentHTML('afterbegin', `<button type="button" class="source-btn" data-source="live" aria-pressed="false">LIVE</button>`);
+    }
+
+    const warning = $('priceWarning');
+    if (warning && !$('livePricePanel')) {
+      warning.insertAdjacentHTML('afterend', `
+        <div id="livePricePanel" class="live-price-panel mt-3" hidden>
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="live-dot" aria-hidden="true"></span>
+                <strong id="livePriceStatus" class="text-xs text-gray-700">${copy.liveLoading}</strong>
+              </div>
+              <p id="liveUpdatedAt" class="text-[10px] text-gray-400 mt-1">—</p>
+            </div>
+            <button type="button" id="liveRefresh" class="live-refresh-btn" aria-label="${copy.refresh}">↻ ${copy.refresh}</button>
+          </div>
+          <div class="live-karat-grid mt-3" aria-label="Live karat prices">
+            <div><span>24K</span><strong id="liveKarat24">—</strong></div>
+            <div><span>22K</span><strong id="liveKarat22">—</strong></div>
+            <div><span>21K</span><strong id="liveKarat21">—</strong></div>
+            <div><span>18K</span><strong id="liveKarat18">—</strong></div>
+          </div>
+        </div>`);
+    }
+
+    const note = document.querySelector('main aside.input-card');
+    if (note) note.innerHTML = copy.note;
+  }
+
+  installLiveUi();
 
   const inputs = {
     priceSource: $('priceSource'),
@@ -88,7 +148,11 @@
     taxRange: $('taxRange'),
     sellDeduction: $('sellDeduction'),
     quotedTotal: $('quotedTotal'),
+    liveRefresh: $('liveRefresh'),
   };
+
+  let liveQuote = null;
+  let liveFetchInFlight = false;
 
   function vibrate(ms = 8) {
     if ('vibrate' in navigator) navigator.vibrate(ms);
@@ -129,8 +193,131 @@
     return value;
   }
 
-  function setPriceSource(source) {
-    const safeSource = source === 'manual' ? 'manual' : 'ounce';
+  function sourceDisplayName(source) {
+    if (source === 'gold-api') return 'Gold API';
+    if (source === 'xaus') return 'XAUS';
+    return source || '—';
+  }
+
+  function formatLiveTime(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '—';
+    return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-SA' : 'en-US', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(date);
+  }
+
+  function renderLiveKaratPrices(priceUsdOunce) {
+    const price24k = core.ounceUsdTo24kSar(priceUsdOunce);
+    setText('liveKarat24', `${formatMoney(price24k)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
+    setText('liveKarat22', `${formatMoney(price24k * 22 / 24)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
+    setText('liveKarat21', `${formatMoney(price24k * 21 / 24)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
+    setText('liveKarat18', `${formatMoney(price24k * 18 / 24)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
+  }
+
+  function renderLiveStatus(quote, state) {
+    const status = $('livePriceStatus');
+    const updated = $('liveUpdatedAt');
+    const dot = document.querySelector('.live-dot');
+    if (!status || !updated) return;
+
+    if (state === 'loading') {
+      status.textContent = copy.liveLoading;
+      status.dataset.state = 'loading';
+      updated.textContent = '—';
+    } else if (state === 'cached') {
+      status.textContent = copy.liveCached;
+      status.dataset.state = 'cached';
+      updated.textContent = `${copy.lastUpdated}: ${formatLiveTime(quote.updatedAt)} · ${copy.source}: ${sourceDisplayName(quote.source)}`;
+    } else if (state === 'error') {
+      status.textContent = copy.liveUnavailable;
+      status.dataset.state = 'error';
+      updated.textContent = '—';
+    } else {
+      status.textContent = quote?.stale ? copy.liveStale : copy.liveReady;
+      status.dataset.state = quote?.stale ? 'stale' : 'live';
+      updated.textContent = `${copy.lastUpdated}: ${formatLiveTime(quote.updatedAt)} · ${copy.source}: ${sourceDisplayName(quote.source)}`;
+    }
+
+    if (dot) dot.dataset.state = status.dataset.state;
+  }
+
+  function cacheLiveQuote(quote) {
+    try {
+      localStorage.setItem(LIVE_CACHE_KEY, JSON.stringify({ quote, storedAt: Date.now() }));
+    } catch {}
+  }
+
+  function useCachedLiveQuote() {
+    try {
+      const cached = JSON.parse(localStorage.getItem(LIVE_CACHE_KEY) || 'null');
+      if (!cached?.quote || !Number.isFinite(cached.storedAt)) return false;
+      if (Date.now() - cached.storedAt > LIVE_CACHE_MAX_AGE_MS) return false;
+      if (!Number.isFinite(Number(cached.quote.priceUsdOunce)) || Number(cached.quote.priceUsdOunce) <= 0) return false;
+      applyLiveQuote(cached.quote, 'cached');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function applyLiveQuote(quote, state = 'live') {
+    liveQuote = quote;
+    inputs.ouncePriceUSD.value = formatInput(Number(quote.priceUsdOunce), 2);
+    renderLiveKaratPrices(Number(quote.priceUsdOunce));
+    renderLiveStatus(quote, state);
+    calculate();
+  }
+
+  function fallbackToManualPrice() {
+    liveQuote = null;
+    renderLiveStatus(null, 'error');
+    inputs.ouncePriceUSD.value = '';
+    setPriceSource('ounce', { fetchLive: false });
+    const warning = $('priceWarning');
+    if (warning) {
+      warning.textContent = copy.liveUnavailable;
+      warning.classList.add('warning-text');
+    }
+  }
+
+  async function fetchLiveGoldPrice({ force = false } = {}) {
+    if (liveFetchInFlight) return;
+    liveFetchInFlight = true;
+    if (inputs.liveRefresh) inputs.liveRefresh.disabled = true;
+    renderLiveStatus(liveQuote, 'loading');
+
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    const timeout = controller ? setTimeout(() => controller.abort(), 8000) : null;
+
+    try {
+      const url = force ? `/api/gold-price?refresh=${Date.now()}` : '/api/gold-price';
+      const response = await fetch(url, {
+        headers: { accept: 'application/json' },
+        cache: 'no-store',
+        ...(controller ? { signal: controller.signal } : {}),
+      });
+      if (!response.ok) throw new Error(`Live price HTTP ${response.status}`);
+      const quote = await response.json();
+      if (!Number.isFinite(Number(quote.priceUsdOunce)) || Number(quote.priceUsdOunce) <= 0) {
+        throw new Error('Invalid live quote');
+      }
+      if (Number.isNaN(new Date(quote.updatedAt).getTime())) throw new Error('Invalid live timestamp');
+
+      cacheLiveQuote(quote);
+      applyLiveQuote(quote, 'live');
+    } catch (error) {
+      if (!useCachedLiveQuote()) fallbackToManualPrice();
+    } finally {
+      if (timeout) clearTimeout(timeout);
+      liveFetchInFlight = false;
+      if (inputs.liveRefresh) inputs.liveRefresh.disabled = false;
+    }
+  }
+
+  function setPriceSource(source, options = {}) {
+    const safeSource = ['live', 'ounce', 'manual'].includes(source) ? source : 'live';
     inputs.priceSource.value = safeSource;
 
     document.querySelectorAll('.source-btn').forEach((button) => {
@@ -139,11 +326,19 @@
       button.setAttribute('aria-pressed', String(active));
     });
 
+    const liveMode = safeSource === 'live';
     const ounceMode = safeSource === 'ounce';
-    inputs.ouncePriceUSD.disabled = !ounceMode;
-    inputs.marketPrice.readOnly = ounceMode;
-    $('priceModeHelp').textContent = ounceMode ? copy.ounceMode : copy.manualMode;
+    inputs.ouncePriceUSD.disabled = safeSource === 'manual';
+    inputs.ouncePriceUSD.readOnly = liveMode;
+    inputs.marketPrice.readOnly = safeSource !== 'manual';
+    $('livePricePanel').hidden = !liveMode;
+    $('priceModeHelp').textContent = liveMode ? copy.liveMode : ounceMode ? copy.ounceMode : copy.manualMode;
+
     calculate();
+
+    if (liveMode && options.fetchLive !== false) {
+      fetchLiveGoldPrice();
+    }
   }
 
   function setTransactionMode(mode) {
@@ -169,14 +364,16 @@
 
   function getPrice24k() {
     const source = inputs.priceSource.value;
-    const price24k = core.resolvePrice24k({
-      source,
-      ouncePriceUsd: inputs.ouncePriceUSD.value,
-      manualPrice24k: inputs.marketPrice.value,
-    });
+    let price24k = 0;
 
-    if (source === 'ounce') {
+    if (source === 'live' || source === 'ounce') {
+      price24k = core.ounceUsdTo24kSar(inputs.ouncePriceUSD.value);
       inputs.marketPrice.value = formatInput(price24k, 2);
+    } else {
+      price24k = core.resolvePrice24k({
+        source: 'manual',
+        manualPrice24k: inputs.marketPrice.value,
+      });
     }
 
     return price24k;
@@ -256,8 +453,10 @@
     const warning = $('priceWarning');
     if (warning) {
       const needsPrice = price24k <= 0;
-      warning.textContent = needsPrice ? copy.needPrice : '';
-      warning.classList.toggle('warning-text', needsPrice);
+      if (!needsPrice || inputs.priceSource.value !== 'live') {
+        warning.textContent = needsPrice ? copy.needPrice : '';
+        warning.classList.toggle('warning-text', needsPrice);
+      }
     }
   }
 
@@ -286,6 +485,7 @@
   globalThis.setKarat = setKarat;
   globalThis.setPriceSource = setPriceSource;
   globalThis.setTransactionMode = setTransactionMode;
+  globalThis.fetchLiveGoldPrice = fetchLiveGoldPrice;
 
   document.querySelectorAll('.source-btn').forEach((button) => {
     button.addEventListener('click', () => setPriceSource(button.dataset.source));
@@ -295,6 +495,11 @@
     button.addEventListener('click', () => setTransactionMode(button.dataset.mode));
   });
 
+  inputs.liveRefresh?.addEventListener('click', () => {
+    vibrate();
+    fetchLiveGoldPrice({ force: true });
+  });
+
   inputs.taxRange.addEventListener('input', (event) => {
     const rate = core.clampTaxRate(event.target.value);
     inputs.tax.value = rate;
@@ -302,6 +507,7 @@
   });
 
   inputs.ouncePriceUSD.addEventListener('input', () => {
+    if (inputs.priceSource.value === 'live') return;
     if (Number.parseFloat(inputs.ouncePriceUSD.value) < 0) inputs.ouncePriceUSD.value = '0';
     calculate();
   });
@@ -326,7 +532,9 @@
     calculate();
   });
 
-  inputs.ouncePriceUSD.addEventListener('blur', () => sanitizeVisibleField(inputs.ouncePriceUSD, 2));
+  inputs.ouncePriceUSD.addEventListener('blur', () => {
+    if (inputs.priceSource.value !== 'live') sanitizeVisibleField(inputs.ouncePriceUSD, 2);
+  });
   inputs.marketPrice.addEventListener('blur', () => sanitizeVisibleField(inputs.marketPrice, 2));
   inputs.weight.addEventListener('blur', () => { sanitizeVisibleField(inputs.weight, 2); calculate(); });
   inputs.workmanship.addEventListener('blur', () => { sanitizeVisibleField(inputs.workmanship, 2); calculate(); });
@@ -338,7 +546,7 @@
   });
 
   window.addEventListener('load', () => {
-    setPriceSource(inputs.priceSource.value || 'ounce');
     setTransactionMode(inputs.transactionMode.value || 'buy');
+    setPriceSource('live');
   });
 })();

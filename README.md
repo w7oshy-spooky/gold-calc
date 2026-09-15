@@ -6,14 +6,20 @@ Bilingual Arabic and English calculator for gold jewellery pricing and used-gold
 
 - Arabic: `index.html`
 - English: `en.html`
+- Live XAU/USD spot mode is the default price source
+- Primary live provider: Gold API; automatic fallback: XAUS
+- Live quote status, upstream timestamp, refresh button and 24K / 22K / 21K / 18K SAR-per-gram reference prices
+- A recent live quote is cached locally for up to 15 minutes; if both providers fail and no recent cache exists, the UI falls back to manual ounce entry
+- Manual ounce-price and manual 24K-price modes remain available
 - Buy mode: metal value + workmanship + optional extra margin + configurable VAT
 - Sell mode: raw metal value minus an explicit buyer deduction percentage
 - Shop Quote Comparison: compares an entered quote with the calculated reference total and reports the SAR and percentage difference
-- Ounce-price or manual 24K-price input
 - Shared calculation core: `gold-calculator.js`
+- Live quote normalization: `live-gold.js`
+- Vercel Function: `api/gold-price.js`
 - Shared UI behavior: `app.js`
 
-The quote comparison is descriptive, not a guarantee that a shop price is fair or unfair. Real transactions can differ because of workmanship, stones, promotions, commercial policy, spreads and tax treatment.
+Live spot quotes are indicative raw-gold references, not guaranteed shop execution prices. Real transactions can differ because of bid/ask spreads, workmanship, stones, promotions, commercial policy and tax treatment.
 
 ## Tests
 
@@ -21,8 +27,10 @@ Run all checks with Node.js 22 or newer:
 
 ```bash
 node --check gold-calculator.js
+node --check live-gold.js
+node --check api/gold-price.js
 node --check app.js
 node --test tests/*.test.js
 ```
 
-The app does not fetch a live gold price yet. Enter the current ounce price or a manual 24K gram price. Live pricing, saved shop offers and PWA support are planned as separate follow-up phases.
+No live-price API key is required for the current providers. The Vercel Function keeps provider-specific response formats out of the browser UI and allows the upstream source to be changed later without rewriting the calculator.
