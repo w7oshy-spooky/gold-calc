@@ -15,4 +15,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test tests/gold-calculator.test.js
+      - run: node --check gold-calculator.js
+      - run: node --check app.js
+      - run: node --test tests/*.test.js
