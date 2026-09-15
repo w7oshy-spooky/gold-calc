@@ -51,3 +51,23 @@ test('Arabic and English pages keep shared calculation and UI scripts', () => {
     assert.match(html, /src=["']app\.js["']/);
   }
 });
+
+test('UI includes a live price mode backed by the Vercel endpoint', () => {
+  assert.match(app, /fetchLiveGoldPrice/);
+  assert.match(app, /\/api\/gold-price/);
+  assert.match(app, /setPriceSource\(['"]live['"]\)/);
+  assert.match(app, /data-source=["']live["']/);
+});
+
+test('live UI exposes refresh, status, update time and all supported karat prices', () => {
+  for (const id of ['liveRefresh', 'livePriceStatus', 'liveUpdatedAt', 'liveKarat24', 'liveKarat22', 'liveKarat21', 'liveKarat18']) {
+    assert.match(app, new RegExp(id));
+  }
+});
+
+test('live UI stores a short-lived cached quote and can fall back to manual pricing', () => {
+  assert.match(app, /localStorage/);
+  assert.match(app, /LIVE_CACHE_MAX_AGE_MS/);
+  assert.match(app, /useCachedLiveQuote/);
+  assert.match(app, /fallbackToManualPrice/);
+});
