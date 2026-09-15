@@ -1,0 +1,36 @@
+name: package-site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify site files
+        run: |
+          test -f index.html
+          test -f en.html
+          test -f app.js
+          test -f gold-calculator.js
+          test -f styles.css
+          grep -q 'transactionMode' index.html
+          grep -q 'comparisonPanel' index.html
+      - name: Upload static site
+        uses: actions/upload-artifact@v4
+        with:
+          name: gold-calc-site
+          if-no-files-found: error
+          path: |
+            index.html
+            en.html
+            app.js
+            gold-calculator.js
+            styles.css
+            README.md
