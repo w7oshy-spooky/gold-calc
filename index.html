@@ -1,456 +1,159 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#d97706">
-    <title>حاسبة الذهب</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        /* ── Reset & Base ─────────────────────────────── */
-        * { touch-action: manipulation; box-sizing: border-box; }
-
-        body {
-            font-family: 'Tajawal', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            overscroll-behavior-y: none;
-            background: #f9fafb;
-        }
-
-        /* إخفاء أسهم حقول الأرقام */
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-
-        /* ⚠️ مهم: font-size 16px يمنع iOS من تكبير الشاشة عند التركيز */
-        input { font-size: 16px !important; }
-
-        /* ── Gradient Header ──────────────────────────── */
-        .gradient-bg {
-            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-        }
-
-        /* ── Cards ────────────────────────────────────── */
-        .input-card {
-            background: white;
-            padding: 1rem;
-            border-radius: 1rem;
-            border: 1px solid #f3f4f6;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-        }
-
-        /* ── Step Buttons ─────────────────────────────── */
-        .step-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 48px;   /* حد أدنى لمساحة اللمس */
-            min-height: 48px;
-            width: 3rem;
-            height: 3rem;
-            background: #f3f4f6;
-            color: #374151;
-            border-radius: 0.625rem;
-            border: 1px solid #e5e7eb;
-            font-weight: 700;
-            transition: background 0.15s, transform 0.1s;
-            user-select: none;
-            cursor: pointer;
-        }
-        .step-btn:active { background: #fde68a; transform: scale(0.93); }
-
-        /* ── Karat Buttons ────────────────────────────── */
-        .karat-btn {
-            padding: 0.7rem 0;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            font-weight: 700;
-            background: white;
-            color: #374151;
-            transition: all 0.15s;
-            cursor: pointer;
-            min-height: 48px;
-        }
-        .karat-btn:active { transform: scale(0.95); }
-        .karat-btn.active {
-            background: #f59e0b;
-            color: white;
-            border-color: #f59e0b;
-        }
-
-        /* ── Number Inputs ────────────────────────────── */
-        .num-input {
-            width: 100%;
-            text-align: center;
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            padding: 0.75rem 0.5rem;
-            font-weight: 700;
-            color: #1f2937;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .num-input:focus { border-color: #f59e0b; background: #fffbeb; }
-
-        /* ── Range Slider (كبير للإصبع) ───────────────── */
-        input[type=range] {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            height: 36px; /* منطقة لمس كبيرة */
-            background: transparent;
-            cursor: pointer;
-            padding: 0;
-            margin: 0;
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            height: 8px;
-            background: linear-gradient(to left, #f59e0b var(--pct, 60%), #e5e7eb var(--pct, 60%));
-            border-radius: 4px;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            background: #f59e0b;
-            margin-top: -10px;
-            box-shadow: 0 2px 8px rgba(245,158,11,0.5);
-            border: 3px solid white;
-        }
-        input[type=range]::-moz-range-track {
-            height: 8px; background: #e5e7eb; border-radius: 4px;
-        }
-        input[type=range]::-moz-range-thumb {
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            background: #f59e0b;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(245,158,11,0.5);
-        }
-
-        /* ── Fixed Bottom Receipt ─────────────────────── */
-        .bottom-receipt {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            /* ✅ Safe area لـ iPhone الحديثة (home indicator) */
-            padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
-            padding-left: 1rem;
-            padding-right: 1rem;
-            padding-top: 0.5rem;
-            z-index: 50;
-            background: linear-gradient(to top, #0f172a 70%, transparent);
-        }
-
-        /* مسافة كافية حتى لا يغطي الـ receipt المحتوى */
-        .page-content {
-            padding-bottom: calc(210px + env(safe-area-inset-bottom));
-        }
-
-        /* ── Safe area للهيدر (notch) ─────────────────── */
-        .header-wrap {
-            padding-top: max(2rem, env(safe-area-inset-top));
-        }
-
-        /* ── Animated values ──────────────────────────── */
-        .live-val { transition: color 0.2s; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#d97706">
+  <meta name="description" content="حاسبة لشراء المجوهرات الذهبية بالريال السعودي مع العيار والمصنعية والربح والضريبة.">
+  <title>حاسبة الذهب</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    <!-- ═══ Header ═══════════════════════════════════════ -->
-    <div class="gradient-bg header-wrap pb-14 px-5 text-white text-center rounded-b-[2.5rem] shadow-lg">
-        <div class="flex items-center justify-center gap-2 mb-1">
-            <i class="fa-solid fa-coins text-yellow-200 text-xl"></i>
-            <h1 class="text-2xl font-bold">حاسبة الذهب الذكية</h1>
-        </div>
-        <p class="text-yellow-100 text-sm opacity-80">سهلة وسريعة للاستخدام اليومي</p>
+  <header class="gradient-bg header-wrap pb-14 px-5 text-white text-center rounded-b-[2.5rem] shadow-lg">
+    <a class="lang-switch" href="en.html" aria-label="فتح النسخة الإنجليزية">EN</a>
+    <div class="flex items-center justify-center gap-2 mb-1">
+      <i class="fa-solid fa-coins text-yellow-200 text-xl" aria-hidden="true"></i>
+      <h1 class="text-2xl font-bold">حاسبة الذهب الذكية</h1>
     </div>
+    <p class="text-yellow-100 text-sm opacity-90">حساب واضح للمجوهرات الذهبية بالريال السعودي</p>
+  </header>
 
-    <!-- ═══ Page Content ══════════════════════════════════ -->
-    <div class="page-content px-4 -mt-8 space-y-4 max-w-md mx-auto">
+  <main class="page-content px-4 -mt-8 space-y-4 max-w-md mx-auto">
+    <section class="input-card" aria-labelledby="marketHeading">
+      <p id="marketHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">📈 بيانات السوق</p>
 
-        <!-- ─── بيانات السوق ─────────────────────────── -->
-        <div class="input-card">
-            <p class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">📈 بيانات السوق</p>
+      <div class="grid grid-cols-2 gap-2 mb-4" role="group" aria-label="مصدر سعر الذهب">
+        <button type="button" class="source-btn active" data-source="ounce" aria-pressed="true">من سعر الأوقية</button>
+        <button type="button" class="source-btn" data-source="manual" aria-pressed="false">سعر 24 يدويًا</button>
+      </div>
+      <input type="hidden" id="priceSource" value="ounce">
 
-            <label class="block text-gray-600 text-xs font-bold mb-2">سعر الأوقية (دولار)</label>
-            <div class="flex gap-2">
-                <div class="relative flex-grow">
-                    <input type="number" id="ouncePriceUSD" value="4300"
-                           inputmode="decimal" autocomplete="off"
-                           class="w-full bg-blue-50 border-2 border-blue-200 rounded-xl px-4 py-3 text-lg font-bold text-blue-800 outline-none focus:border-blue-500 transition-colors"
-                           style="padding-left:2.8rem;">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400 font-bold text-sm pointer-events-none">$</span>
-                </div>
-                <button onclick="convertOunceToGram()"
-                        class="bg-blue-600 active:bg-blue-800 active:scale-95 text-white w-14 rounded-xl transition-all flex items-center justify-center">
-                    <i class="fa-solid fa-rotate-right"></i>
-                </button>
-            </div>
+      <label for="ouncePriceUSD" class="block text-gray-600 text-xs font-bold mb-2">سعر الأوقية الترويسية (دولار)</label>
+      <div class="relative mb-3">
+        <input type="number" id="ouncePriceUSD" min="0" step="0.01" placeholder="مثال: 4300"
+               inputmode="decimal" autocomplete="off"
+               class="market-input bg-blue-50 border-blue-200 text-blue-800"
+               style="padding-inline-start:2.8rem;">
+        <span class="absolute start-3 top-1/2 -translate-y-1/2 text-blue-400 font-bold text-sm pointer-events-none">$</span>
+      </div>
 
-            <div class="mt-4 pt-4 border-t border-gray-100">
-                <label class="block text-gray-600 text-xs font-bold mb-2">سعر جرام 24 قيراط (ريال)</label>
-                <div class="relative">
-                    <input type="number" id="marketPrice" value="287.97"
-                           inputmode="decimal" autocomplete="off"
-                           class="w-full bg-amber-50 border-2 border-amber-200 rounded-xl px-4 py-3 text-lg font-bold text-amber-700 outline-none focus:border-amber-500 transition-colors"
-                           style="padding-left:3rem;">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400 text-xs font-bold pointer-events-none">ر.س</span>
-                </div>
-            </div>
+      <div class="pt-3 border-t border-gray-100">
+        <label for="marketPrice" class="block text-gray-600 text-xs font-bold mb-2">سعر جرام 24 قيراط قبل المصنعية والضريبة</label>
+        <div class="relative">
+          <input type="number" id="marketPrice" min="0" step="0.01" placeholder="مثال: 520.00"
+                 inputmode="decimal" autocomplete="off" readonly
+                 class="market-input bg-amber-50 border-amber-200 text-amber-700"
+                 style="padding-inline-start:3.5rem;">
+          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-amber-400 text-xs font-bold pointer-events-none">ر.س</span>
         </div>
+      </div>
 
-        <!-- ─── مواصفات القطعة ───────────────────────── -->
-        <div class="input-card space-y-5">
-            <p class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">⚖️ مواصفات القطعة</p>
+      <p id="priceModeHelp" class="status-note mt-2 text-[11px] leading-relaxed text-gray-400"></p>
+      <p id="priceWarning" class="status-note text-[11px] font-bold" aria-live="polite"></p>
+    </section>
 
-            <!-- الوزن -->
-            <div>
-                <label class="block text-gray-600 text-xs font-bold mb-2">الوزن (جرام)</label>
-                <div class="flex items-center gap-2">
-                    <button onclick="adjust('weight', -0.5)" class="step-btn text-xl">−</button>
-                    <input type="number" id="weight" value="15"
-                           inputmode="decimal" autocomplete="off"
-                           class="num-input text-xl">
-                    <button onclick="adjust('weight', 0.5)" class="step-btn text-xl">+</button>
-                </div>
-            </div>
+    <section class="input-card space-y-5" aria-labelledby="itemHeading">
+      <p id="itemHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">⚖️ مواصفات القطعة</p>
 
-            <!-- العيار -->
-            <div>
-                <label class="block text-gray-600 text-xs font-bold mb-2">العيار</label>
-                <div class="grid grid-cols-4 gap-2">
-                    <button onclick="setKarat(18)" class="karat-btn" data-val="18">18</button>
-                    <button onclick="setKarat(21)" class="karat-btn active" data-val="21">21</button>
-                    <button onclick="setKarat(22)" class="karat-btn" data-val="22">22</button>
-                    <button onclick="setKarat(24)" class="karat-btn" data-val="24">24</button>
-                    <input type="hidden" id="karat" value="21">
-                </div>
-            </div>
-
-            <!-- سعر الجرام للعيار المختار -->
-            <div class="bg-gradient-to-l from-amber-50 to-yellow-50 rounded-xl p-3 border border-amber-100 flex justify-between items-center">
-                <span class="text-gray-500 text-xs font-bold">
-                    سعر الجرام / عيار <span id="selectedKaratLabel" class="text-amber-600 font-black">21</span>
-                </span>
-                <div>
-                    <span class="text-amber-700 font-black text-base live-val" id="karatPriceOutput">0.00</span>
-                    <span class="text-amber-400 text-xs"> ر.س</span>
-                </div>
-            </div>
+      <div>
+        <label for="weight" class="block text-gray-600 text-xs font-bold mb-2">الوزن (جرام)</label>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="adjust('weight', -0.5)" class="step-btn text-xl" aria-label="إنقاص الوزن">−</button>
+          <input type="number" id="weight" value="15" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input text-xl">
+          <button type="button" onclick="adjust('weight', 0.5)" class="step-btn text-xl" aria-label="زيادة الوزن">+</button>
         </div>
+      </div>
 
-        <!-- ─── التكاليف الإضافية ─────────────────────── -->
-        <div class="input-card space-y-5">
-            <p class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">💼 التكاليف الإضافية</p>
-
-            <div>
-                <div class="flex justify-between items-center mb-2">
-                    <label class="text-gray-600 text-xs font-bold">المصنعية (ر.س / جرام)</label>
-                    <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg">
-                        <span id="workmanshipLabel">35</span> ر.س
-                    </span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="adjust('workmanship', -5)" class="step-btn text-xs font-black">−5</button>
-                    <input type="number" id="workmanship" value="35"
-                           inputmode="decimal" autocomplete="off"
-                           class="num-input">
-                    <button onclick="adjust('workmanship', 5)" class="step-btn text-xs font-black">+5</button>
-                </div>
-            </div>
-
-            <div>
-                <div class="flex justify-between items-center mb-2">
-                    <label class="text-gray-600 text-xs font-bold">هامش الربح (ر.س / جرام)</label>
-                    <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg">
-                        <span id="profitLabel">20</span> ر.س
-                    </span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="adjust('profit', -1)" class="step-btn text-xl">−</button>
-                    <input type="number" id="profit" value="20"
-                           inputmode="decimal" autocomplete="off"
-                           class="num-input">
-                    <button onclick="adjust('profit', 1)" class="step-btn text-xl">+</button>
-                </div>
-            </div>
+      <div>
+        <span class="block text-gray-600 text-xs font-bold mb-2">العيار</span>
+        <div class="grid grid-cols-4 gap-2" role="group" aria-label="العيار">
+          <button type="button" onclick="setKarat(18)" class="karat-btn" data-val="18" aria-pressed="false">18</button>
+          <button type="button" onclick="setKarat(21)" class="karat-btn active" data-val="21" aria-pressed="true">21</button>
+          <button type="button" onclick="setKarat(22)" class="karat-btn" data-val="22" aria-pressed="false">22</button>
+          <button type="button" onclick="setKarat(24)" class="karat-btn" data-val="24" aria-pressed="false">24</button>
+          <input type="hidden" id="karat" value="21">
         </div>
+      </div>
 
-        <!-- ─── الضريبة ───────────────────────────────── -->
-        <div class="input-card">
-            <p class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🧾 ضريبة القيمة المضافة</p>
-            <div class="flex justify-between items-center mb-3">
-                <span class="text-gray-600 text-sm font-bold">نسبة الضريبة</span>
-                <span class="bg-amber-100 text-amber-700 font-black text-xl px-4 py-1 rounded-xl">
-                    <span id="taxLabel">15</span>%
-                </span>
-            </div>
-            <input type="range" id="taxRange" min="0" max="25" value="15">
-            <input type="hidden" id="tax" value="15">
-            <div class="flex justify-between text-[10px] text-gray-400 mt-1 px-0.5">
-                <span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%</span>
-            </div>
+      <div class="bg-gradient-to-l from-amber-50 to-yellow-50 rounded-xl p-3 border border-amber-100 flex justify-between items-center">
+        <span class="text-gray-500 text-xs font-bold">سعر الجرام / عيار <span id="selectedKaratLabel" class="text-amber-600 font-black">21</span>ق</span>
+        <div><span class="text-amber-700 font-black text-base live-val" id="karatPriceOutput">0.00</span> <span class="text-amber-400 text-xs">ر.س</span></div>
+      </div>
+    </section>
+
+    <section class="input-card space-y-5" aria-labelledby="extrasHeading">
+      <p id="extrasHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">💼 التكاليف الإضافية</p>
+
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label for="workmanship" class="text-gray-600 text-xs font-bold">المصنعية (ر.س / جرام)</label>
+          <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="workmanshipLabel">35</span> ر.س</span>
         </div>
-
-    </div>
-
-    <!-- ═══ Fixed Bottom Receipt ══════════════════════════ -->
-    <div class="bottom-receipt">
-        <div class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto">
-
-            <!-- تفاصيل في شبكة 2×2 -->
-            <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3">
-                <div class="flex justify-between text-[11px]">
-                    <span class="text-slate-400">تكلفة الذهب</span>
-                    <span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span>
-                </div>
-                <div class="flex justify-between text-[11px]">
-                    <span class="text-slate-400">مصنعية + ربح</span>
-                    <span class="text-slate-200 font-mono" id="laborCostOutput">0.00</span>
-                </div>
-                <div class="flex justify-between text-[11px]">
-                    <span class="text-slate-400">قبل الضريبة</span>
-                    <span class="text-slate-200 font-mono" id="subtotalOutput">0.00</span>
-                </div>
-                <div class="flex justify-between text-[11px]">
-                    <span class="text-red-400">ض.ق.م (<span id="taxValueLabel">15</span>%)</span>
-                    <span class="text-red-300 font-mono">+<span id="vatOutput">0.00</span></span>
-                </div>
-            </div>
-
-            <!-- الإجمالي النهائي -->
-            <div class="border-t border-slate-700 pt-3 flex justify-between items-center">
-                <div>
-                    <p class="text-amber-500 text-[10px] uppercase font-bold tracking-widest mb-0.5">السعر النهائي للدفع</p>
-                    <div class="flex items-baseline gap-1">
-                        <span class="text-3xl font-black font-mono live-val" id="finalTotalOutput">0.00</span>
-                        <span class="text-sm text-slate-400">ر.س</span>
-                    </div>
-                </div>
-                <div class="bg-slate-800 px-3 py-2 rounded-xl text-center">
-                    <p class="text-[10px] text-slate-500 mb-0.5">الوزن / العيار</p>
-                    <p class="text-sm font-bold text-amber-400">
-                        <span id="summaryWeight">15</span>ج · <span id="summaryKarat">21</span>ق
-                    </p>
-                </div>
-            </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="adjust('workmanship', -5)" class="step-btn text-xs font-black">−5</button>
+          <input type="number" id="workmanship" value="35" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input">
+          <button type="button" onclick="adjust('workmanship', 5)" class="step-btn text-xs font-black">+5</button>
         </div>
-    </div>
+      </div>
 
-    <script>
-        const OUNCE_GRAMS  = 31.1034768;
-        const USD_SAR_RATE = 3.75;
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label for="profit" class="text-gray-600 text-xs font-bold">هامش ربح إضافي اختياري (ر.س / جرام)</label>
+          <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="profitLabel">0</span> ر.س</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="adjust('profit', -1)" class="step-btn text-xl">−</button>
+          <input type="number" id="profit" value="0" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input">
+          <button type="button" onclick="adjust('profit', 1)" class="step-btn text-xl">+</button>
+        </div>
+      </div>
+    </section>
 
-        const $ = id => document.getElementById(id);
+    <section class="input-card" aria-labelledby="vatHeading">
+      <p id="vatHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🧾 ضريبة القيمة المضافة</p>
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-gray-600 text-sm font-bold">نسبة الضريبة</span>
+        <span class="bg-amber-100 text-amber-700 font-black text-xl px-4 py-1 rounded-xl"><span id="taxLabel">15</span>%</span>
+      </div>
+      <input type="range" id="taxRange" min="0" max="25" step="1" value="15" aria-label="نسبة الضريبة">
+      <input type="hidden" id="tax" value="15">
+      <div class="flex justify-between text-[10px] text-gray-400 mt-1 px-0.5"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%</span></div>
+    </section>
 
-        const inputs = {
-            ouncePriceUSD : $('ouncePriceUSD'),
-            marketPrice   : $('marketPrice'),
-            weight        : $('weight'),
-            karat         : $('karat'),
-            workmanship   : $('workmanship'),
-            profit        : $('profit'),
-            tax           : $('tax'),
-            taxRange      : $('taxRange')
-        };
+    <aside class="input-card text-[11px] leading-relaxed text-gray-500" aria-label="ملاحظة">
+      <strong class="text-gray-700">ملاحظة:</strong> الأسعار تقديرية وتعتمد على البيانات المدخلة. نسبة 15% مناسبة للمبيعات العادية الخاضعة للضريبة، وقد تختلف المعاملة للحالات الخاصة مثل بعض المعادن الاستثمارية. لا يوجد سعر ذهب حي تلقائيًا؛ أدخل السعر الحالي بنفسك.
+    </aside>
+  </main>
 
-        /* ── اهتزاز خفيف للتغذية الراجعة (يعمل على Android) ── */
-        function vibrate(ms = 10) {
-            if ('vibrate' in navigator) navigator.vibrate(ms);
-        }
+  <div class="bottom-receipt">
+    <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="ملخص السعر">
+      <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3">
+        <div class="flex justify-between text-[11px]"><span class="text-slate-400">تكلفة الذهب</span><span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span></div>
+        <div class="flex justify-between text-[11px]"><span class="text-slate-400">مصنعية + ربح</span><span class="text-slate-200 font-mono" id="laborCostOutput">0.00</span></div>
+        <div class="flex justify-between text-[11px]"><span class="text-slate-400">قبل الضريبة</span><span class="text-slate-200 font-mono" id="subtotalOutput">0.00</span></div>
+        <div class="flex justify-between text-[11px]"><span class="text-red-400">ض.ق.م (<span id="taxValueLabel">15</span>%)</span><span class="text-red-300 font-mono">+<span id="vatOutput">0.00</span></span></div>
+      </div>
+      <div class="border-t border-slate-700 pt-3 flex justify-between items-center">
+        <div>
+          <p class="text-amber-500 text-[10px] uppercase font-bold tracking-widest mb-0.5">السعر النهائي للدفع</p>
+          <div class="flex items-baseline gap-1"><span class="text-3xl font-black font-mono live-val" id="finalTotalOutput">0.00</span><span class="text-sm text-slate-400">ر.س</span></div>
+        </div>
+        <div class="bg-slate-800 px-3 py-2 rounded-xl text-center">
+          <p class="text-[10px] text-slate-500 mb-0.5">الوزن / العيار</p>
+          <p class="text-sm font-bold text-amber-400"><span id="summaryWeight">15</span>ج · <span id="summaryKarat">21</span>ق</p>
+        </div>
+      </div>
+    </section>
+  </div>
 
-        /* ── تعديل قيمة حقل بالزيادة/النقصان ─────────────── */
-        function adjust(id, amount) {
-            const el  = $(id);
-            let val   = parseFloat(el.value) || 0;
-            val       = Math.max(0, val + amount);
-            el.value  = id === 'weight' ? parseFloat(val.toFixed(2)) : Math.round(val);
-            vibrate(8);
-            calculate();
-        }
-
-        /* ── اختيار العيار ────────────────────────────────── */
-        function setKarat(val) {
-            inputs.karat.value = val;
-            document.querySelectorAll('.karat-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.val == val);
-            });
-            vibrate(8);
-            calculate();
-        }
-
-        /* ── تحويل سعر الأوقية → جرام 24 ──────────────────── */
-        function convertOunceToGram() {
-            const usd = parseFloat(inputs.ouncePriceUSD.value) || 0;
-            if (usd > 0) {
-                inputs.marketPrice.value = ((usd / OUNCE_GRAMS) * USD_SAR_RATE).toFixed(2);
-            }
-            calculate();
-        }
-
-        /* ── الحساب الرئيسي ───────────────────────────────── */
-        function calculate() {
-            const price24k    = parseFloat(inputs.marketPrice.value)  || 0;
-            const weight      = parseFloat(inputs.weight.value)       || 0;
-            const karat       = parseFloat(inputs.karat.value)        || 21;
-            const workmanship = parseFloat(inputs.workmanship.value)  || 0;
-            const profit      = parseFloat(inputs.profit.value)       || 0;
-            const taxRate     = parseFloat(inputs.tax.value)          || 0;
-
-            const purity      = karat / 24;
-            const gramPrice   = price24k * purity;
-            const goldCost    = gramPrice * weight;
-            const laborCost   = (workmanship + profit) * weight;
-            const subtotal    = goldCost + laborCost;
-            const vat         = subtotal * (taxRate / 100);
-            const total       = subtotal + vat;
-
-            const set = (id, val) => { const el = $(id); if(el) el.textContent = val; };
-
-            set('karatPriceOutput',   fmt(gramPrice));
-            set('selectedKaratLabel', karat);
-            set('goldCostOutput',     fmt(goldCost));
-            set('laborCostOutput',    fmt(laborCost));
-            set('subtotalOutput',     fmt(subtotal));
-            set('vatOutput',          fmt(vat));
-            set('finalTotalOutput',   fmt(total));
-            set('taxLabel',           taxRate);
-            set('taxValueLabel',      taxRate);
-            set('summaryWeight',      weight);
-            set('summaryKarat',       karat);
-            set('workmanshipLabel',   workmanship);
-            set('profitLabel',        profit);
-
-            /* تحديث لون شريط الضريبة */
-            const pct = (taxRate / 25 * 100).toFixed(1) + '%';
-            inputs.taxRange.style.setProperty('--pct', pct);
-        }
-
-        function fmt(n) {
-            return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        /* ── الأحداث ──────────────────────────────────────── */
-        inputs.taxRange.addEventListener('input', e => {
-            inputs.tax.value = e.target.value;
-            calculate();
-        });
-
-        inputs.ouncePriceUSD.addEventListener('input', convertOunceToGram);
-        [inputs.marketPrice, inputs.weight, inputs.workmanship, inputs.profit].forEach(el => {
-            el.addEventListener('input', calculate);
-        });
-
-        window.addEventListener('load', () => { convertOunceToGram(); calculate(); });
-    </script>
+  <script src="gold-calculator.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
