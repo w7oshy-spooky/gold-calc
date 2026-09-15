@@ -9,16 +9,69 @@
   const core = globalThis.GoldCalculator;
   const $ = (id) => document.getElementById(id);
   const locale = document.documentElement.lang === 'ar' ? 'ar' : 'en';
-  const messages = {
+
+  const copy = {
     ar: {
       ounceMode: 'يتم احتساب سعر جرام 24 تلقائيًا من سعر الأوقية دون تقريب مبكر.',
       manualMode: 'أدخل سعر جرام 24 يدويًا قبل المصنعية والضريبة.',
       needPrice: 'أدخل سعر أوقية صالحًا أو اختر الإدخال اليدوي لسعر 24 قيراط.',
+      buyHelp: 'وضع الشراء يضيف المصنعية والربح الاختياري والضريبة التي تحددها.',
+      sellHelp: 'وضع البيع يعتمد قيمة الذهب الخام ويطرح فقط نسبة خصم المشتري التي تدخلها.',
+      buyQuoteLabel: 'السعر الإجمالي المعروض من المحل (ر.س)',
+      sellQuoteLabel: 'المبلغ الإجمالي الذي عرضه المشتري أو المحل (ر.س)',
+      comparePrompt: 'أدخل عرض المحل لبدء المقارنة.',
+      statuses: {
+        close: 'العرض قريب من السعر المرجعي (ضمن ±2%).',
+        moderate_high: 'العرض أعلى من المرجع قليلًا (بين 2% و5%).',
+        high: 'العرض أعلى من المرجع بأكثر من 5%.',
+        below_reference: 'العرض أقل من السعر المرجعي.',
+        moderate_low: 'عرض الشراء أقل من المرجع قليلًا (بين 2% و5%).',
+        low: 'عرض الشراء أقل من المرجع بأكثر من 5%.',
+        above_reference: 'عرض الشراء أعلى من السعر المرجعي.',
+      },
+      buyLabels: {
+        primary: 'تكلفة الذهب',
+        secondary: 'مصنعية + ربح',
+        subtotal: 'قبل الضريبة',
+        final: 'السعر النهائي للدفع',
+      },
+      sellLabels: {
+        primary: 'قيمة الذهب الخام',
+        secondary: 'خصم المشتري',
+        subtotal: 'صافي المبلغ المرجعي',
+        final: 'المبلغ المرجعي المتوقع',
+      },
     },
     en: {
       ounceMode: '24K price is calculated from the ounce price without early rounding.',
       manualMode: 'Enter the 24K gram price manually before workmanship and VAT.',
       needPrice: 'Enter a valid ounce price or switch to manual 24K pricing.',
+      buyHelp: 'Buy mode adds workmanship, optional extra margin and the VAT rate you select.',
+      sellHelp: 'Sell mode uses raw metal value and subtracts only the buyer deduction you enter.',
+      buyQuoteLabel: 'Shop quoted total (SAR)',
+      sellQuoteLabel: 'Buyer or shop offered total (SAR)',
+      comparePrompt: 'Enter the quoted amount to start the comparison.',
+      statuses: {
+        close: 'The quote is close to the reference (within ±2%).',
+        moderate_high: 'The quote is moderately above the reference (2% to 5%).',
+        high: 'The quote is more than 5% above the reference.',
+        below_reference: 'The quote is below the reference amount.',
+        moderate_low: 'The buyback offer is moderately below the reference (2% to 5%).',
+        low: 'The buyback offer is more than 5% below the reference.',
+        above_reference: 'The buyback offer is above the reference amount.',
+      },
+      buyLabels: {
+        primary: 'Gold cost',
+        secondary: 'Workmanship + margin',
+        subtotal: 'Before VAT',
+        final: 'Final amount',
+      },
+      sellLabels: {
+        primary: 'Raw metal value',
+        secondary: 'Buyer deduction',
+        subtotal: 'Reference net payout',
+        final: 'Estimated reference payout',
+      },
     },
   }[locale];
 
@@ -26,12 +79,15 @@
     priceSource: $('priceSource'),
     ouncePriceUSD: $('ouncePriceUSD'),
     marketPrice: $('marketPrice'),
+    transactionMode: $('transactionMode'),
     weight: $('weight'),
     karat: $('karat'),
     workmanship: $('workmanship'),
     profit: $('profit'),
     tax: $('tax'),
     taxRange: $('taxRange'),
+    sellDeduction: $('sellDeduction'),
+    quotedTotal: $('quotedTotal'),
   };
 
   function vibrate(ms = 8) {
@@ -45,6 +101,16 @@
   function formatInput(value, decimals = 2) {
     if (!Number.isFinite(value) || value <= 0) return '';
     return value.toFixed(decimals);
+  }
+
+  function formatSignedMoney(value) {
+    const sign = value > 0 ? '+' : value < 0 ? '−' : '';
+    return `${sign}${formatMoney(Math.abs(value))} ${locale === 'ar' ? 'ر.س' : 'SAR'}`;
+  }
+
+  function formatSignedPercent(value) {
+    const sign = value > 0 ? '+' : value < 0 ? '−' : '';
+    return `${sign}${Math.abs(value).toFixed(2)}%`;
   }
 
   function setText(id, value) {
@@ -76,7 +142,28 @@
     const ounceMode = safeSource === 'ounce';
     inputs.ouncePriceUSD.disabled = !ounceMode;
     inputs.marketPrice.readOnly = ounceMode;
-    $('priceModeHelp').textContent = ounceMode ? messages.ounceMode : messages.manualMode;
+    $('priceModeHelp').textContent = ounceMode ? copy.ounceMode : copy.manualMode;
+    calculate();
+  }
+
+  function setTransactionMode(mode) {
+    const safeMode = core.normalizeMode(mode);
+    inputs.transactionMode.value = safeMode;
+
+    document.querySelectorAll('.mode-btn').forEach((button) => {
+      const active = button.dataset.mode === safeMode;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+
+    const selling = safeMode === 'sell';
+    $('buyCostsPanel').hidden = selling;
+    $('vatPanel').hidden = selling;
+    $('sellDeductionPanel').hidden = !selling;
+    $('summaryTaxRow').hidden = selling;
+    $('transactionHelp').textContent = selling ? copy.sellHelp : copy.buyHelp;
+    $('quotedTotalLabel').textContent = selling ? copy.sellQuoteLabel : copy.buyQuoteLabel;
+
     calculate();
   }
 
@@ -95,38 +182,81 @@
     return price24k;
   }
 
+  function renderComparison(referenceTotal) {
+    const comparison = core.compareQuote({
+      mode: inputs.transactionMode.value,
+      referenceTotal,
+      quotedTotal: inputs.quotedTotal.value,
+    });
+
+    const status = $('comparisonStatus');
+    if (!comparison.available) {
+      status.textContent = copy.comparePrompt;
+      status.dataset.status = 'unavailable';
+      setText('comparisonDifference', '—');
+      setText('comparisonPercent', '—');
+      return;
+    }
+
+    status.textContent = copy.statuses[comparison.status] || copy.comparePrompt;
+    status.dataset.status = comparison.status;
+    setText('comparisonDifference', formatSignedMoney(comparison.difference));
+    setText('comparisonPercent', formatSignedPercent(comparison.differencePct));
+  }
+
   function calculate() {
     const price24k = getPrice24k();
-    const result = core.calculateGoldPurchase({
+    const mode = core.normalizeMode(inputs.transactionMode.value);
+    const result = core.calculateTransaction({
+      mode,
       price24k,
       weight: inputs.weight.value,
       karat: inputs.karat.value,
       workmanshipPerGram: inputs.workmanship.value,
       profitPerGram: inputs.profit.value,
       taxRate: inputs.tax.value,
+      deductionRate: inputs.sellDeduction.value,
     });
 
     setText('karatPriceOutput', formatMoney(result.gramPrice));
     setText('selectedKaratLabel', result.karat);
-    setText('goldCostOutput', formatMoney(result.goldCost));
-    setText('laborCostOutput', formatMoney(result.laborCost));
-    setText('subtotalOutput', formatMoney(result.subtotal));
-    setText('vatOutput', formatMoney(result.vat));
-    setText('finalTotalOutput', formatMoney(result.total));
-    setText('taxLabel', result.taxRate);
-    setText('taxValueLabel', result.taxRate);
     setText('summaryWeight', result.weight);
     setText('summaryKarat', result.karat);
-    setText('workmanshipLabel', result.workmanshipPerGram);
-    setText('profitLabel', result.profitPerGram);
+    setText('workmanshipLabel', core.sanitizeNonNegative(inputs.workmanship.value));
+    setText('profitLabel', core.sanitizeNonNegative(inputs.profit.value));
+    setText('sellDeductionLabel', core.clampPercent(inputs.sellDeduction.value));
 
-    const pct = ((result.taxRate / 25) * 100).toFixed(1) + '%';
-    inputs.taxRange.style.setProperty('--pct', pct);
+    const selling = mode === 'sell';
+    const labels = selling ? copy.sellLabels : copy.buyLabels;
+    setText('summaryPrimaryLabel', labels.primary);
+    setText('summarySecondaryLabel', labels.secondary);
+    setText('summarySubtotalLabel', labels.subtotal);
+    setText('finalAmountLabel', labels.final);
+
+    if (selling) {
+      setText('goldCostOutput', formatMoney(result.rawMetalValue));
+      setText('laborCostOutput', formatMoney(result.deductionValue));
+      setText('subtotalOutput', formatMoney(result.total));
+      setText('vatOutput', '0.00');
+    } else {
+      setText('goldCostOutput', formatMoney(result.goldCost));
+      setText('laborCostOutput', formatMoney(result.laborCost));
+      setText('subtotalOutput', formatMoney(result.subtotal));
+      setText('vatOutput', formatMoney(result.vat));
+      setText('taxLabel', result.taxRate);
+      setText('taxValueLabel', result.taxRate);
+
+      const pct = ((result.taxRate / 25) * 100).toFixed(1) + '%';
+      inputs.taxRange.style.setProperty('--pct', pct);
+    }
+
+    setText('finalTotalOutput', formatMoney(result.total));
+    renderComparison(result.total);
 
     const warning = $('priceWarning');
     if (warning) {
       const needsPrice = price24k <= 0;
-      warning.textContent = needsPrice ? messages.needPrice : '';
+      warning.textContent = needsPrice ? copy.needPrice : '';
       warning.classList.toggle('warning-text', needsPrice);
     }
   }
@@ -155,9 +285,14 @@
   globalThis.adjust = adjust;
   globalThis.setKarat = setKarat;
   globalThis.setPriceSource = setPriceSource;
+  globalThis.setTransactionMode = setTransactionMode;
 
   document.querySelectorAll('.source-btn').forEach((button) => {
     button.addEventListener('click', () => setPriceSource(button.dataset.source));
+  });
+
+  document.querySelectorAll('.mode-btn').forEach((button) => {
+    button.addEventListener('click', () => setTransactionMode(button.dataset.mode));
   });
 
   inputs.taxRange.addEventListener('input', (event) => {
@@ -176,11 +311,19 @@
     if (inputs.priceSource.value === 'manual') calculate();
   });
 
-  [inputs.weight, inputs.workmanship, inputs.profit].forEach((el) => {
+  [inputs.weight, inputs.workmanship, inputs.profit, inputs.quotedTotal].forEach((el) => {
     el.addEventListener('input', () => {
       if (Number.parseFloat(el.value) < 0) el.value = '0';
       calculate();
     });
+  });
+
+  inputs.sellDeduction.addEventListener('input', () => {
+    const rate = core.clampPercent(inputs.sellDeduction.value);
+    if (Number.parseFloat(inputs.sellDeduction.value) < 0 || Number.parseFloat(inputs.sellDeduction.value) > 100) {
+      inputs.sellDeduction.value = rate;
+    }
+    calculate();
   });
 
   inputs.ouncePriceUSD.addEventListener('blur', () => sanitizeVisibleField(inputs.ouncePriceUSD, 2));
@@ -188,6 +331,14 @@
   inputs.weight.addEventListener('blur', () => { sanitizeVisibleField(inputs.weight, 2); calculate(); });
   inputs.workmanship.addEventListener('blur', () => { sanitizeVisibleField(inputs.workmanship, 2); calculate(); });
   inputs.profit.addEventListener('blur', () => { sanitizeVisibleField(inputs.profit, 2); calculate(); });
+  inputs.quotedTotal.addEventListener('blur', () => { sanitizeVisibleField(inputs.quotedTotal, 2); calculate(); });
+  inputs.sellDeduction.addEventListener('blur', () => {
+    inputs.sellDeduction.value = core.clampPercent(inputs.sellDeduction.value);
+    calculate();
+  });
 
-  window.addEventListener('load', () => setPriceSource(inputs.priceSource.value || 'ounce'));
+  window.addEventListener('load', () => {
+    setPriceSource(inputs.priceSource.value || 'ounce');
+    setTransactionMode(inputs.transactionMode.value || 'buy');
+  });
 })();
