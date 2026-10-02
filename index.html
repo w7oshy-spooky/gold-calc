@@ -30,33 +30,79 @@
       <p id="marketHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">📈 بيانات السوق</p>
 
       <div class="grid grid-cols-2 gap-2 mb-4" role="group" aria-label="مصدر سعر الذهب">
-        <button type="button" class="source-btn active" data-source="ounce" aria-pressed="true">من سعر الأوقية</button>
-        <button type="button" class="source-btn" data-source="manual" aria-pressed="false">سعر 24 يدويًا</button>
+        <button type="button" class="source-btn active" data-source="live" aria-pressed="true">LIVE</button>
+        <button type="button" class="source-btn" data-source="ounce-usd" aria-pressed="false">أونصة USD</button>
+        <button type="button" class="source-btn" data-source="ounce-sar" aria-pressed="false">أونصة SAR</button>
+        <button type="button" class="source-btn" data-source="gram-sar" aria-pressed="false">جرام SAR</button>
       </div>
-      <input type="hidden" id="priceSource" value="ounce">
+      <input type="hidden" id="priceSource" value="live">
 
-      <label for="ouncePriceUSD" class="block text-gray-600 text-xs font-bold mb-2">سعر الأوقية الترويسية (دولار)</label>
-      <div class="relative mb-3">
-        <input type="number" id="ouncePriceUSD" min="0" step="0.01" placeholder="مثال: 4300"
-               inputmode="decimal" autocomplete="off"
-               class="market-input bg-blue-50 border-blue-200 text-blue-800"
-               style="padding-inline-start:2.8rem;">
-        <span class="absolute start-3 top-1/2 -translate-y-1/2 text-blue-400 font-bold text-sm pointer-events-none">$</span>
+      <div id="ounceUsdInputPanel">
+        <label for="ouncePriceUSD" class="block text-gray-600 text-xs font-bold mb-2">سعر الأونصة الترويسية (دولار)</label>
+        <div class="relative mb-3">
+          <input type="number" id="ouncePriceUSD" min="0" step="0.01" placeholder="مثال: 4300"
+                 inputmode="decimal" autocomplete="off"
+                 class="market-input bg-blue-50 border-blue-200 text-blue-800"
+                 style="padding-inline-start:2.8rem;">
+          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-blue-400 font-bold text-sm pointer-events-none">$</span>
+        </div>
+      </div>
+
+      <div id="ounceSarInputPanel" hidden>
+        <label for="ouncePriceSAR" class="block text-gray-600 text-xs font-bold mb-2">سعر الأونصة الترويسية (ريال سعودي)</label>
+        <div class="relative mb-3">
+          <input type="number" id="ouncePriceSAR" min="0" step="0.01" placeholder="مثال: 16125"
+                 inputmode="decimal" autocomplete="off"
+                 class="market-input bg-emerald-50 border-emerald-200 text-emerald-800"
+                 style="padding-inline-start:3.5rem;">
+          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-emerald-500 text-xs font-bold pointer-events-none">ر.س</span>
+        </div>
+      </div>
+
+      <div id="gramSarInputPanel" hidden>
+        <label for="gramPriceSAR" class="block text-gray-600 text-xs font-bold mb-2">سعر جرام الذهب الخام (ريال سعودي)</label>
+        <div class="relative mb-3">
+          <input type="number" id="gramPriceSAR" min="0" step="0.01" placeholder="مثال: 453.63"
+                 inputmode="decimal" autocomplete="off"
+                 class="market-input bg-amber-50 border-amber-200 text-amber-800"
+                 style="padding-inline-start:3.5rem;">
+          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-amber-500 text-xs font-bold pointer-events-none">ر.س</span>
+        </div>
+        <span class="block text-gray-600 text-xs font-bold mb-2">عيار السعر المدخل</span>
+        <div class="grid grid-cols-4 gap-2 mb-2" role="group" aria-label="عيار سعر الجرام المدخل">
+          <button type="button" class="gram-karat-btn" data-gram-karat="18" aria-pressed="false">18</button>
+          <button type="button" class="gram-karat-btn active" data-gram-karat="21" aria-pressed="true">21</button>
+          <button type="button" class="gram-karat-btn" data-gram-karat="22" aria-pressed="false">22</button>
+          <button type="button" class="gram-karat-btn" data-gram-karat="24" aria-pressed="false">24</button>
+        </div>
+        <input type="hidden" id="gramInputKarat" value="21">
+        <p class="text-[10px] leading-relaxed text-gray-400">استخدم سعر الذهب الخام للجرام بدون مصنعية أو ضريبة.</p>
       </div>
 
       <div class="pt-3 border-t border-gray-100">
-        <label for="marketPrice" class="block text-gray-600 text-xs font-bold mb-2">سعر جرام 24 قيراط قبل المصنعية والضريبة</label>
+        <label for="marketPrice" class="block text-gray-600 text-xs font-bold mb-2">سعر جرام 24 قيراط المكافئ</label>
         <div class="relative">
-          <input type="number" id="marketPrice" min="0" step="0.01" placeholder="مثال: 520.00"
-                 inputmode="decimal" autocomplete="off" readonly
-                 class="market-input bg-amber-50 border-amber-200 text-amber-700"
+          <input type="number" id="marketPrice" min="0" step="0.01" readonly
+                 class="market-input bg-slate-50 border-slate-200 text-slate-700"
                  style="padding-inline-start:3.5rem;">
-          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-amber-400 text-xs font-bold pointer-events-none">ر.س</span>
+          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold pointer-events-none">ر.س</span>
         </div>
       </div>
 
       <p id="priceModeHelp" class="status-note mt-2 text-[11px] leading-relaxed text-gray-400"></p>
       <p id="priceWarning" class="status-note text-[11px] font-bold" aria-live="polite"></p>
+
+      <div id="marketEquivalentPanel" class="mt-3 rounded-xl border border-gray-100 bg-slate-50 p-3" hidden>
+        <p class="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">القيم المكافئة</p>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div><span class="text-gray-400">USD/oz</span><strong id="equivalentOunceUSD" class="block text-gray-700">—</strong></div>
+          <div><span class="text-gray-400">SAR/oz</span><strong id="equivalentOunceSAR" class="block text-gray-700">—</strong></div>
+          <div><span class="text-gray-400">24K/g</span><strong id="equivalentGram24" class="block text-gray-700">—</strong></div>
+          <div><span class="text-gray-400">22K/g</span><strong id="equivalentGram22" class="block text-gray-700">—</strong></div>
+          <div><span class="text-gray-400">21K/g</span><strong id="equivalentGram21" class="block text-gray-700">—</strong></div>
+          <div><span class="text-gray-400">18K/g</span><strong id="equivalentGram18" class="block text-gray-700">—</strong></div>
+        </div>
+      </div>
     </section>
 
     <section class="input-card" aria-labelledby="transactionHeading">
