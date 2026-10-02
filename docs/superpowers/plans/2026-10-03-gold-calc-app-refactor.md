@@ -39,6 +39,7 @@
 **Files:**
 - Create: `js/core/price-converter.js`
 - Modify: `gold-calculator.js`
+- Modify: `app.js`
 - Create: `tests/price-converter.test.js`
 - Modify: `tests/gold-calculator.test.js`
 - Modify: `index.html`
@@ -60,6 +61,7 @@
   - `resolvePrice24k(input)`
   - `deriveMarketPrices(input)`
 - Consumes: none.
+- Migration rule: after this task, `app.js` reads market conversion, sanitization, and karat normalization from `GoldPriceConverter`; `GoldCalculator` does not remain the public owner of those helpers.
 
 - [ ] **Step 1: Write failing converter tests**
   - Move the existing market conversion assertions into `tests/price-converter.test.js`.
@@ -78,6 +80,7 @@ Expected: FAIL because `js/core/price-converter.js` does not exist or the new ex
 - [ ] **Step 3: Implement the converter module and remove duplicate conversion ownership from `gold-calculator.js`**
   - Use a browser-global/CommonJS wrapper matching the current project style.
   - `gold-calculator.js` keeps transaction-domain functions only and consumes shared sanitization/karat normalization from `GoldPriceConverter`.
+  - Update root `app.js` to use `GoldPriceConverter` for `deriveMarketPrices`, ounce conversions, `sanitizeNonNegative`, and `normalizeKarat` so each task leaves the application runnable.
   - Load `js/core/price-converter.js` before `gold-calculator.js` in both HTML pages.
 
 - [ ] **Step 4: Run focused tests and verify GREEN**
@@ -93,7 +96,7 @@ Expected: all focused tests PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add js/core/price-converter.js gold-calculator.js tests/price-converter.test.js tests/gold-calculator.test.js index.html en.html
+git add js/core/price-converter.js gold-calculator.js app.js tests/price-converter.test.js tests/gold-calculator.test.js index.html en.html
 git commit -m "refactor: extract market price converter"
 ```
 
@@ -295,7 +298,8 @@ git commit -m "refactor: extract market UI and static live markup"
 
 **Interfaces:**
 - Consumes:
-  - `GoldCalculator.normalizeMode`, `sanitizeNonNegative`, `clampTaxRate`, `clampPercent`, `compareQuote`, `calculateTransaction`.
+  - `GoldCalculator.normalizeMode`, `clampTaxRate`, `clampPercent`, `compareQuote`, `calculateTransaction`.
+  - `GoldPriceConverter.sanitizeNonNegative`, `GoldPriceConverter.normalizeKarat`.
   - Task 2 formatting and translations.
 - Produces:
   - `GoldTransactionUI.createTransactionUI({ document, core, copy, onChange })` → `getTransactionInput()`, `setTransactionMode(mode)`, `setKarat(karat)`, `renderInputLabels(result)`.
