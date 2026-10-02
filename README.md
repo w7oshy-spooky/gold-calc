@@ -10,7 +10,8 @@ Bilingual Arabic and English calculator for gold jewellery pricing and used-gold
 - Primary live provider: Gold API; automatic fallback: XAUS
 - Live quote status, upstream timestamp, refresh button and 24K / 22K / 21K / 18K SAR-per-gram reference prices
 - A recent live quote is cached locally for up to 15 minutes; if both providers fail and no recent cache exists, the UI falls back to manual ounce entry
-- Manual ounce-price and manual 24K-price modes remain available
+- Manual price entry supports troy ounce in USD, troy ounce in SAR, or raw gold gram price in SAR with 18K / 21K / 22K / 24K selection
+- Manual inputs are normalized to equivalent USD/oz, SAR/oz and 24K / 22K / 21K / 18K SAR-per-gram reference prices
 - Buy mode: metal value + workmanship + optional extra margin + configurable VAT
 - Sell mode: raw metal value minus an explicit buyer deduction percentage
 - Shop Quote Comparison: compares an entered quote with the calculated reference total and reports the SAR and percentage difference
