@@ -20,6 +20,16 @@ const requiredIds = [
   'comparisonPercent',
   'summaryPrimaryLabel',
   'summarySecondaryLabel',
+  'ouncePriceSAR',
+  'gramPriceSAR',
+  'gramInputKarat',
+  'marketEquivalentPanel',
+  'equivalentOunceUSD',
+  'equivalentOunceSAR',
+  'equivalentGram24',
+  'equivalentGram22',
+  'equivalentGram21',
+  'equivalentGram18',
 ];
 
 for (const id of requiredIds) {
@@ -37,6 +47,22 @@ test('both pages expose buy and sell mode buttons', () => {
     assert.match(html, /data-mode=["']buy["']/);
     assert.match(html, /data-mode=["']sell["']/);
   }
+});
+
+test('both pages expose all four market price source modes', () => {
+  for (const html of [arabic, english]) {
+    assert.match(html, /data-source=["']live["']/);
+    assert.match(html, /data-source=["']ounce-usd["']/);
+    assert.match(html, /data-source=["']ounce-sar["']/);
+    assert.match(html, /data-source=["']gram-sar["']/);
+  }
+});
+
+test('UI adapter supports SAR ounce and SAR gram market inputs', () => {
+  assert.match(app, /ounce-sar/);
+  assert.match(app, /gram-sar/);
+  assert.match(app, /deriveMarketPrices\s*\(/);
+  assert.match(app, /gramInputKarat/);
 });
 
 test('UI adapter uses transaction and quote comparison core functions', () => {

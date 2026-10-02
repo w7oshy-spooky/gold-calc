@@ -15,7 +15,9 @@
   const copy = {
     ar: {
       liveMode: 'يتم جلب سعر الأوقية الحي تلقائيًا ثم تحويله إلى سعر جرام 24 قيراط بالريال السعودي.',
-      ounceMode: 'يتم احتساب سعر جرام 24 تلقائيًا من سعر الأوقية التي تدخلها دون تقريب مبكر.',
+      ounceMode: 'أدخل سعر الأوقية بالدولار، وسيتم تحويله إلى الريال وأسعار الجرام تلقائيًا.',
+      ounceSarMode: 'أدخل سعر الأوقية بالريال السعودي، وسيتم حساب السعر المكافئ بالدولار وأسعار الجرام.',
+      gramSarMode: 'أدخل سعر جرام الذهب الخام بالريال وحدد عياره لحساب سعر الأوقية والقيم المكافئة.',
       manualMode: 'أدخل سعر جرام 24 يدويًا قبل المصنعية والضريبة.',
       needPrice: 'أدخل سعرًا صالحًا أو اختر LIVE لجلب السعر الحالي.',
       liveLoading: 'جاري تحديث سعر الذهب…',
@@ -56,7 +58,9 @@
     },
     en: {
       liveMode: 'The live troy-ounce price is fetched automatically and converted to the 24K gram price in Saudi riyals.',
-      ounceMode: '24K price is calculated from the ounce price you enter without early rounding.',
+      ounceMode: 'Enter the ounce price in USD to calculate SAR ounce and gram equivalents automatically.',
+      ounceSarMode: 'Enter the ounce price in SAR to calculate its USD and gram equivalents.',
+      gramSarMode: 'Enter a raw gold gram price in SAR and choose its karat to calculate ounce and equivalent prices.',
       manualMode: 'Enter the 24K gram price manually before workmanship and VAT.',
       needPrice: 'Enter a valid price or choose LIVE to fetch the current price.',
       liveLoading: 'Updating live gold price…',
@@ -138,6 +142,9 @@
   const inputs = {
     priceSource: $('priceSource'),
     ouncePriceUSD: $('ouncePriceUSD'),
+    ouncePriceSAR: $('ouncePriceSAR'),
+    gramPriceSAR: $('gramPriceSAR'),
+    gramInputKarat: $('gramInputKarat'),
     marketPrice: $('marketPrice'),
     transactionMode: $('transactionMode'),
     weight: $('weight'),
@@ -274,7 +281,7 @@
     liveQuote = null;
     renderLiveStatus(null, 'error');
     inputs.ouncePriceUSD.value = '';
-    setPriceSource('ounce', { fetchLive: false });
+    setPriceSource('ounce-usd', { fetchLive: false });
     const warning = $('priceWarning');
     if (warning) {
       warning.textContent = copy.liveUnavailable;
@@ -317,7 +324,7 @@
   }
 
   function setPriceSource(source, options = {}) {
-    const safeSource = ['live', 'ounce', 'manual'].includes(source) ? source : 'live';
+    const safeSource = ['live', 'ounce-usd', 'ounce-sar', 'gram-sar'].includes(source) ? source : 'live';
     inputs.priceSource.value = safeSource;
 
     document.querySelectorAll('.source-btn').forEach((button) => {
@@ -327,12 +334,23 @@
     });
 
     const liveMode = safeSource === 'live';
-    const ounceMode = safeSource === 'ounce';
-    inputs.ouncePriceUSD.disabled = safeSource === 'manual';
+    const ounceUsdMode = safeSource === 'ounce-usd';
+    const ounceSarMode = safeSource === 'ounce-sar';
+    const gramSarMode = safeSource === 'gram-sar';
+
+    $('ounceUsdInputPanel').hidden = !(liveMode || ounceUsdMode);
+    $('ounceSarInputPanel').hidden = !ounceSarMode;
+    $('gramSarInputPanel').hidden = !gramSarMode;
     inputs.ouncePriceUSD.readOnly = liveMode;
-    inputs.marketPrice.readOnly = safeSource !== 'manual';
+    inputs.marketPrice.readOnly = true;
     $('livePricePanel').hidden = !liveMode;
-    $('priceModeHelp').textContent = liveMode ? copy.liveMode : ounceMode ? copy.ounceMode : copy.manualMode;
+    $('priceModeHelp').textContent = liveMode
+      ? copy.liveMode
+      : ounceUsdMode
+        ? copy.ounceMode
+        : ounceSarMode
+          ? copy.ounceSarMode
+          : copy.gramSarMode;
 
     calculate();
 
@@ -362,21 +380,35 @@
     calculate();
   }
 
-  function getPrice24k() {
-    const source = inputs.priceSource.value;
-    let price24k = 0;
-
-    if (source === 'live' || source === 'ounce') {
-      price24k = core.ounceUsdTo24kSar(inputs.ouncePriceUSD.value);
-      inputs.marketPrice.value = formatInput(price24k, 2);
-    } else {
-      price24k = core.resolvePrice24k({
-        source: 'manual',
-        manualPrice24k: inputs.marketPrice.value,
-      });
+  function renderMarketEquivalents(prices) {
+    const panel = $('marketEquivalentPanel');
+    const available = prices.gram24kSar > 0;
+    if (panel) panel.hidden = !available;
+    if (!available) {
+      inputs.marketPrice.value = '';
+      return;
     }
 
-    return price24k;
+    inputs.marketPrice.value = formatInput(prices.gram24kSar, 2);
+    setText('equivalentOunceUSD', `${formatMoney(prices.ounceUsd)}`);
+    setText('equivalentOunceSAR', `${formatMoney(prices.ounceSar)} ${locale === 'ar' ? 'ر.س' : 'SAR'}`);
+    setText('equivalentGram24', `${formatMoney(prices.gram24kSar)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
+    setText('equivalentGram22', `${formatMoney(prices.gram22kSar)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
+    setText('equivalentGram21', `${formatMoney(prices.gram21kSar)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
+    setText('equivalentGram18', `${formatMoney(prices.gram18kSar)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
+  }
+
+  function getPrice24k() {
+    const prices = core.deriveMarketPrices({
+      source: inputs.priceSource.value,
+      ouncePriceUsd: inputs.ouncePriceUSD.value,
+      ouncePriceSar: inputs.ouncePriceSAR.value,
+      gramPriceSar: inputs.gramPriceSAR.value,
+      gramKarat: inputs.gramInputKarat.value,
+    });
+
+    renderMarketEquivalents(prices);
+    return prices.gram24kSar;
   }
 
   function renderComparison(referenceTotal) {
@@ -481,8 +513,21 @@
     calculate();
   }
 
+  function setGramInputKarat(value) {
+    const karat = core.normalizeKarat(value);
+    inputs.gramInputKarat.value = karat;
+    document.querySelectorAll('.gram-karat-btn').forEach((button) => {
+      const active = Number(button.dataset.gramKarat) === karat;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    vibrate();
+    calculate();
+  }
+
   globalThis.adjust = adjust;
   globalThis.setKarat = setKarat;
+  globalThis.setGramInputKarat = setGramInputKarat;
   globalThis.setPriceSource = setPriceSource;
   globalThis.setTransactionMode = setTransactionMode;
   globalThis.fetchLiveGoldPrice = fetchLiveGoldPrice;
@@ -493,6 +538,10 @@
 
   document.querySelectorAll('.mode-btn').forEach((button) => {
     button.addEventListener('click', () => setTransactionMode(button.dataset.mode));
+  });
+
+  document.querySelectorAll('.gram-karat-btn').forEach((button) => {
+    button.addEventListener('click', () => setGramInputKarat(button.dataset.gramKarat));
   });
 
   inputs.liveRefresh?.addEventListener('click', () => {
@@ -509,12 +558,17 @@
   inputs.ouncePriceUSD.addEventListener('input', () => {
     if (inputs.priceSource.value === 'live') return;
     if (Number.parseFloat(inputs.ouncePriceUSD.value) < 0) inputs.ouncePriceUSD.value = '0';
-    calculate();
+    if (inputs.priceSource.value === 'ounce-usd') calculate();
   });
 
-  inputs.marketPrice.addEventListener('input', () => {
-    if (Number.parseFloat(inputs.marketPrice.value) < 0) inputs.marketPrice.value = '0';
-    if (inputs.priceSource.value === 'manual') calculate();
+  inputs.ouncePriceSAR.addEventListener('input', () => {
+    if (Number.parseFloat(inputs.ouncePriceSAR.value) < 0) inputs.ouncePriceSAR.value = '0';
+    if (inputs.priceSource.value === 'ounce-sar') calculate();
+  });
+
+  inputs.gramPriceSAR.addEventListener('input', () => {
+    if (Number.parseFloat(inputs.gramPriceSAR.value) < 0) inputs.gramPriceSAR.value = '0';
+    if (inputs.priceSource.value === 'gram-sar') calculate();
   });
 
   [inputs.weight, inputs.workmanship, inputs.profit, inputs.quotedTotal].forEach((el) => {
@@ -533,9 +587,19 @@
   });
 
   inputs.ouncePriceUSD.addEventListener('blur', () => {
-    if (inputs.priceSource.value !== 'live') sanitizeVisibleField(inputs.ouncePriceUSD, 2);
+    if (inputs.priceSource.value !== 'live') {
+      sanitizeVisibleField(inputs.ouncePriceUSD, 2);
+      calculate();
+    }
   });
-  inputs.marketPrice.addEventListener('blur', () => sanitizeVisibleField(inputs.marketPrice, 2));
+  inputs.ouncePriceSAR.addEventListener('blur', () => {
+    sanitizeVisibleField(inputs.ouncePriceSAR, 2);
+    calculate();
+  });
+  inputs.gramPriceSAR.addEventListener('blur', () => {
+    sanitizeVisibleField(inputs.gramPriceSAR, 2);
+    calculate();
+  });
   inputs.weight.addEventListener('blur', () => { sanitizeVisibleField(inputs.weight, 2); calculate(); });
   inputs.workmanship.addEventListener('blur', () => { sanitizeVisibleField(inputs.workmanship, 2); calculate(); });
   inputs.profit.addEventListener('blur', () => { sanitizeVisibleField(inputs.profit, 2); calculate(); });
