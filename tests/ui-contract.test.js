@@ -192,3 +192,14 @@ test('bootstrap exposes only the inline HTML action that still requires a global
   }
   assert.doesNotMatch(app, /let\s+liveQuote\b/);
 });
+
+test('transaction step buttons use module-bound events instead of inline global handlers', () => {
+  for (const html of [arabic, english]) {
+    assert.doesNotMatch(html, /\sonclick=/);
+    for (const target of ['weight', 'workmanship', 'profit']) {
+      assert.match(html, new RegExp(`data-adjust-target=["']${target}["']`));
+    }
+  }
+  assert.match(transactionUi, /data-adjust-target/);
+  assert.doesNotMatch(app, /globalThis\./);
+});
