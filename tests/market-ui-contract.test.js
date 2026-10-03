@@ -1,3 +1,4 @@
+const marketUiApi = require('../js/ui/market-ui.js');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -73,4 +74,8 @@ test('equivalent USD ounce output preserves the previous number-only display', (
     marketUi,
     /equivalentOunceUSD\.textContent = formatting\.formatMoney\(prices\.ounceUsd\);/
   );
+});
+
+test('market UI module exposes only its factory as public API', () => {
+  assert.deepEqual(Object.keys(marketUiApi).sort(), ['createMarketUI']);
 });
