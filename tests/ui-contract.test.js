@@ -5,6 +5,8 @@ const fs = require('node:fs');
 const arabic = fs.readFileSync('index.html', 'utf8');
 const english = fs.readFileSync('en.html', 'utf8');
 const app = fs.readFileSync('app.js', 'utf8');
+const priceCache = fs.readFileSync('js/market/price-cache.js', 'utf8');
+const livePriceClient = fs.readFileSync('js/market/live-price-client.js', 'utf8');
 const styles = fs.readFileSync('styles.css', 'utf8');
 
 const requiredIds = [
@@ -79,9 +81,9 @@ test('Arabic and English pages keep shared calculation and UI scripts', () => {
   }
 });
 
-test('UI includes a live price mode backed by the Vercel endpoint', () => {
+test('UI includes a live price mode backed by the extracted Vercel client', () => {
   assert.match(app, /fetchLiveGoldPrice/);
-  assert.match(app, /\/api\/gold-price/);
+  assert.match(livePriceClient, /\/api\/gold-price/);
   assert.match(app, /setPriceSource\(['"]live['"]\)/);
   assert.match(app, /data-source=["']live["']/);
 });
@@ -92,10 +94,11 @@ test('live UI exposes refresh, status, update time and all supported karat price
   }
 });
 
-test('live UI stores a short-lived cached quote and can fall back to manual pricing', () => {
-  assert.match(app, /localStorage/);
-  assert.match(app, /LIVE_CACHE_MAX_AGE_MS/);
-  assert.match(app, /useCachedLiveQuote/);
+test('live UI delegates short-lived caching and keeps manual fallback orchestration', () => {
+  assert.match(priceCache, /LIVE_CACHE_MAX_AGE_MS/);
+  assert.match(priceCache, /readCachedQuote/);
+  assert.match(priceCache, /writeCachedQuote/);
+  assert.match(app, /priceCache\.readCachedQuote\(\)/);
   assert.match(app, /fallbackToManualPrice/);
 });
 
