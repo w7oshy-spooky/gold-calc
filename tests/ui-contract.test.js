@@ -197,3 +197,49 @@ test('transaction step buttons use module-bound events instead of inline global 
   assert.match(transactionUi, /data-adjust-target/);
   assert.doesNotMatch(app, /globalThis\.\w+\s*=/);
 });
+
+test('approved desktop dashboard C has dedicated main and sidebar regions', () => {
+  for (const html of [arabic, english]) {
+    assert.match(html, /<main[^>]*class=["'][^"']*desktop-dashboard/);
+    assert.match(html, /class=["'][^"']*market-card/);
+    assert.match(html, /class=["'][^"']*market-summary-card/);
+    assert.match(html, /class=["'][^"']*transaction-card/);
+    assert.match(html, /class=["'][^"']*item-card/);
+    assert.match(html, /class=["'][^"']*comparison-card/);
+    assert.match(html, /class=["'][^"']*dashboard-result/);
+    assert.ok(
+      html.indexOf('class="bottom-receipt dashboard-result"') < html.indexOf('</main>'),
+      'result card must be part of the dashboard flow on desktop'
+    );
+  }
+});
+
+test('desktop dashboard C uses a wide main column, compact sidebar, and non-fixed result', () => {
+  assert.match(styles, /@media\(min-width:1100px\)/);
+  assert.match(styles, /\.desktop-dashboard\{[^}]*max-width:1440px!important;[^}]*display:grid;/);
+  assert.match(styles, /grid-template-columns:minmax\(0,1\.9fr\) minmax\(340px,0\.9fr\)/);
+  assert.match(styles, /\.market-card\{[^}]*grid-column:1;/);
+  assert.match(styles, /\.market-summary-card\{[^}]*grid-column:2;/);
+  assert.match(styles, /\.comparison-card\{[^}]*grid-column:2;/);
+  assert.match(styles, /\.dashboard-result\{[^}]*position:static;[^}]*grid-column:1;/);
+  assert.match(styles, /\.desktop-dashboard>\*\{direction:/);
+});
+
+test('desktop market controls and item fields become dense dashboard rows', () => {
+  assert.match(styles, /\.market-source-grid\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(styles, /\.item-card\{[^}]*display:grid;/);
+  for (const html of [arabic, english]) {
+    assert.match(html, /class=["'][^"']*market-source-grid/);
+  }
+});
+
+test('desktop dashboard starts below the header without overlap', () => {
+  assert.match(
+    styles,
+    /@media\(min-width:1100px\)[\s\S]*?\.desktop-dashboard\{[^}]*margin-top:1rem!important;/
+  );
+  assert.doesNotMatch(
+    styles,
+    /@media\(min-width:1100px\)[\s\S]*?\.desktop-dashboard\{[^}]*margin-top:-/
+  );
+});

@@ -25,11 +25,11 @@
     <p class="text-yellow-100 text-sm opacity-90">Calculate buy or sell value and compare a shop quote with the reference</p>
   </header>
 
-  <main class="page-content px-4 -mt-8 space-y-4 max-w-md mx-auto">
-    <section class="input-card" aria-labelledby="marketHeading">
+  <main class="page-content desktop-dashboard px-4 -mt-8 space-y-4 max-w-md mx-auto">
+    <section class="input-card market-card" aria-labelledby="marketHeading">
       <p id="marketHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">📈 Market Data</p>
 
-      <div class="grid grid-cols-2 gap-2 mb-4" role="group" aria-label="Gold price source">
+      <div class="market-source-grid grid grid-cols-2 gap-2 mb-4" role="group" aria-label="Gold price source">
         <button type="button" class="source-btn active" data-source="live" aria-pressed="true">LIVE</button>
         <button type="button" class="source-btn" data-source="ounce-usd" aria-pressed="false">Ounce USD</button>
         <button type="button" class="source-btn" data-source="ounce-sar" aria-pressed="false">Ounce SAR</button>
@@ -92,6 +92,11 @@
       <p id="priceModeHelp" class="status-note mt-2 text-[11px] leading-relaxed text-gray-400"></p>
       <p id="priceWarning" class="status-note text-[11px] font-bold" aria-live="polite"></p>
 
+    </section>
+
+    <aside class="input-card market-summary-card" aria-labelledby="marketSummaryHeading">
+      <p id="marketSummaryHeading" class="text-gray-900 text-sm font-black mb-1">📡 Current Gold Price</p>
+      <p class="text-gray-400 text-[11px] mb-2">Market reference calculated from the selected price source.</p>
       <div id="livePricePanel" class="live-price-panel mt-3" hidden>
         <div class="flex items-center justify-between gap-3">
           <div class="min-w-0">
@@ -122,9 +127,9 @@
           <div><span class="text-gray-400">18K/g</span><strong id="equivalentGram18" class="block text-gray-700">—</strong></div>
         </div>
       </div>
-    </section>
+    </aside>
 
-    <section class="input-card" aria-labelledby="transactionHeading">
+    <section class="input-card transaction-card" aria-labelledby="transactionHeading">
       <p id="transactionHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔄 Transaction Type</p>
       <div class="grid grid-cols-2 gap-2" role="group" aria-label="Transaction type">
         <button type="button" class="mode-btn active" data-mode="buy" aria-pressed="true">Buy Jewellery</button>
@@ -134,7 +139,7 @@
       <p id="transactionHelp" class="status-note mt-2 text-[11px] leading-relaxed text-gray-400"></p>
     </section>
 
-    <section class="input-card space-y-5" aria-labelledby="itemHeading">
+    <section class="input-card item-card space-y-5" aria-labelledby="itemHeading">
       <p id="itemHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">⚖️ Item Details</p>
 
       <div>
@@ -163,7 +168,7 @@
       </div>
     </section>
 
-    <section id="buyCostsPanel" class="input-card space-y-5" aria-labelledby="extrasHeading">
+    <section id="buyCostsPanel" class="input-card purchase-card space-y-5" aria-labelledby="extrasHeading">
       <p id="extrasHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">💼 Purchase Costs</p>
 
       <div>
@@ -191,7 +196,7 @@
       </div>
     </section>
 
-    <section id="vatPanel" class="input-card" aria-labelledby="vatHeading">
+    <section id="vatPanel" class="input-card vat-card" aria-labelledby="vatHeading">
       <p id="vatHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🧾 Value Added Tax</p>
       <div class="flex justify-between items-center mb-3">
         <span class="text-gray-600 text-sm font-bold">VAT rate</span>
@@ -202,7 +207,7 @@
       <div class="flex justify-between text-[10px] text-gray-400 mt-1 px-0.5"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%</span></div>
     </section>
 
-    <section id="sellDeductionPanel" class="input-card" aria-labelledby="sellHeading" hidden>
+    <section id="sellDeductionPanel" class="input-card sell-card" aria-labelledby="sellHeading" hidden>
       <p id="sellHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🏷️ Buyer Deduction</p>
       <div class="flex justify-between items-center mb-2">
         <label for="sellDeduction" class="text-gray-600 text-xs font-bold">Deduction from raw metal value</label>
@@ -212,7 +217,7 @@
       <p class="mt-2 text-[11px] leading-relaxed text-gray-400">Enter the percentage the buyer or shop deducts from raw metal value. Sell mode does not add workmanship or VAT.</p>
     </section>
 
-    <section id="comparisonPanel" class="input-card" aria-labelledby="compareHeading">
+    <section id="comparisonPanel" class="input-card comparison-card" aria-labelledby="compareHeading">
       <p id="compareHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔎 Shop Quote Comparison</p>
       <label id="quotedTotalLabel" for="quotedTotal" class="block text-gray-600 text-xs font-bold mb-2">Shop quoted total (SAR)</label>
       <input type="number" id="quotedTotal" min="0" step="0.01" placeholder="Enter the quote to compare" inputmode="decimal" autocomplete="off" class="num-input">
@@ -227,12 +232,11 @@
       <p class="mt-2 text-[10px] leading-relaxed text-gray-400">The comparison is a reference only. Shop quotes can differ because of workmanship, stones, promotions, commercial policy and tax treatment.</p>
     </section>
 
-    <aside class="input-card text-[11px] leading-relaxed text-gray-500" aria-label="Note">
+    <aside class="input-card note-card text-[11px] leading-relaxed text-gray-500" aria-label="Note">
       <strong class="text-gray-700">Note:</strong> LIVE uses an indicative XAU/USD raw-gold spot quote converted to Saudi riyals. Results are estimates; actual shop execution can differ because of bid/ask spreads, workmanship, stones, promotions and tax treatment.
     </aside>
-  </main>
 
-  <div class="bottom-receipt">
+  <div class="bottom-receipt dashboard-result">
     <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="Price summary">
       <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3">
         <div class="flex justify-between text-[11px]"><span id="summaryPrimaryLabel" class="text-slate-400">Gold cost</span><span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span></div>
@@ -252,6 +256,7 @@
       </div>
     </section>
   </div>
+  </main>
 
   <script src="js/core/price-converter.js"></script>
   <script src="gold-calculator.js"></script>
