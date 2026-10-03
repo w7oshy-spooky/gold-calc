@@ -98,22 +98,18 @@ test('sanitizes invalid market input and unsupported karat consistently', () => 
   });
 });
 
-test('resolves price source explicitly and does not guess unknown sources', () => {
+test('accepts only the four current market sources and rejects legacy aliases', () => {
+  assert.ok(Math.abs(resolvePrice24k({
+    source: 'live',
+    ouncePriceUsd: 4300,
+  }) - ounceUsdTo24kSar(4300)) < 1e-12);
+
   assert.ok(Math.abs(resolvePrice24k({
     source: 'ounce-usd',
     ouncePriceUsd: 4300,
-    manualPrice24k: 999,
   }) - ounceUsdTo24kSar(4300)) < 1e-12);
 
-  assert.equal(resolvePrice24k({
-    source: 'manual',
-    ouncePriceUsd: 4300,
-    manualPrice24k: 520.25,
-  }), 520.25);
-
-  assert.equal(resolvePrice24k({
-    source: 'other',
-    ouncePriceUsd: 4300,
-    manualPrice24k: 520,
-  }), 0);
+  assert.equal(resolvePrice24k({ source: 'ounce', ouncePriceUsd: 4300 }), 0);
+  assert.equal(resolvePrice24k({ source: 'manual', manualPrice24k: 520.25 }), 0);
+  assert.equal(resolvePrice24k({ source: 'other', ouncePriceUsd: 4300 }), 0);
 });
