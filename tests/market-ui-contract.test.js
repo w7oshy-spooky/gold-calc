@@ -4,7 +4,7 @@ const fs = require('node:fs');
 
 const arabic = fs.readFileSync('index.html', 'utf8');
 const english = fs.readFileSync('en.html', 'utf8');
-const app = fs.readFileSync('app.js', 'utf8');
+const app = fs.readFileSync('js/app.js', 'utf8');
 const marketUi = fs.readFileSync('js/ui/market-ui.js', 'utf8');
 
 const liveIds = [
