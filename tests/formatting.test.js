@@ -54,7 +54,6 @@ test('Arabic and English dynamic copy expose the same contract', () => {
     'buyQuoteLabel',
     'sellQuoteLabel',
     'comparePrompt',
-    'note',
   ]) {
     assert.equal(typeof ar[key], 'string');
     assert.equal(typeof en[key], 'string');
@@ -65,4 +64,13 @@ test('Arabic and English dynamic copy expose the same contract', () => {
 
 test('unsupported locale falls back to English dynamic copy', () => {
   assert.equal(getCopy('fr').liveReady, getCopy('en').liveReady);
+});
+
+test('dynamic copy excludes static or retired UI keys', () => {
+  for (const locale of ['ar', 'en']) {
+    const copy = getCopy(locale);
+    assert.equal('manualMode' in copy, false);
+    assert.equal('refresh' in copy, false);
+    assert.equal('note' in copy, false);
+  }
 });
