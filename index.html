@@ -149,10 +149,10 @@
       <div>
         <span class="block text-gray-600 text-xs font-bold mb-2">العيار</span>
         <div class="grid grid-cols-4 gap-2" role="group" aria-label="العيار">
-          <button type="button" onclick="setKarat(18)" class="karat-btn" data-val="18" aria-pressed="false">18</button>
-          <button type="button" onclick="setKarat(21)" class="karat-btn active" data-val="21" aria-pressed="true">21</button>
-          <button type="button" onclick="setKarat(22)" class="karat-btn" data-val="22" aria-pressed="false">22</button>
-          <button type="button" onclick="setKarat(24)" class="karat-btn" data-val="24" aria-pressed="false">24</button>
+          <button type="button" class="karat-btn" data-val="18" aria-pressed="false">18</button>
+          <button type="button" class="karat-btn active" data-val="21" aria-pressed="true">21</button>
+          <button type="button" class="karat-btn" data-val="22" aria-pressed="false">22</button>
+          <button type="button" class="karat-btn" data-val="24" aria-pressed="false">24</button>
           <input type="hidden" id="karat" value="21">
         </div>
       </div>
@@ -260,6 +260,9 @@
   <script src="js/market/price-cache.js"></script>
   <script src="js/market/live-price-client.js"></script>
   <script src="js/ui/market-ui.js"></script>
+  <script src="js/ui/transaction-ui.js"></script>
+  <script src="js/ui/quote-comparison-ui.js"></script>
+  <script src="js/ui/summary-ui.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
