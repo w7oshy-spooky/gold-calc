@@ -4,7 +4,7 @@ const fs = require('node:fs');
 
 const arabic = fs.readFileSync('index.html', 'utf8');
 const english = fs.readFileSync('en.html', 'utf8');
-const app = fs.readFileSync('app.js', 'utf8');
+const app = fs.readFileSync('js/app.js', 'utf8');
 const marketUi = fs.readFileSync('js/ui/market-ui.js', 'utf8');
 const transactionUi = fs.readFileSync('js/ui/transaction-ui.js', 'utf8');
 const quoteComparisonUi = fs.readFileSync('js/ui/quote-comparison-ui.js', 'utf8');
@@ -102,11 +102,40 @@ test('application delegates transaction calculation and presentation', () => {
   assert.doesNotMatch(app, /\$\(['"]finalTotalOutput['"]\)/);
 });
 
-test('Arabic and English pages keep shared calculation and UI scripts', () => {
+test('Arabic and English pages load the modular scripts in dependency order', () => {
   for (const html of [arabic, english]) {
-    assert.match(html, /src=["']gold-calculator\.js["']/);
-    assert.match(html, /src=["']app\.js["']/);
+    const order = [
+      'js/core/price-converter.js',
+      'gold-calculator.js',
+      'js/i18n/translations.js',
+      'js/ui/formatting.js',
+      'js/market/price-cache.js',
+      'js/market/live-price-client.js',
+      'js/ui/market-ui.js',
+      'js/ui/transaction-ui.js',
+      'js/ui/quote-comparison-ui.js',
+      'js/ui/summary-ui.js',
+      'js/app.js',
+    ];
+    let previous = -1;
+    for (const src of order) {
+      const index = html.indexOf(`src="${src}"`);
+      assert.ok(index > previous, `${src} must load after its dependencies`);
+      previous = index;
+    }
   }
+});
+
+test('root app.js is removed after the modular bootstrap migration', () => {
+  assert.equal(fs.existsSync('app.js'), false);
+});
+
+test('bootstrap is orchestration-only', () => {
+  assert.doesNotMatch(app, /localStorage/);
+  assert.doesNotMatch(app, /\bfetch\s*\(/);
+  assert.doesNotMatch(app, /insertAdjacentHTML/);
+  assert.doesNotMatch(app, /function\s+formatMoney/);
+  assert.doesNotMatch(app, /const\s+copy\s*=\s*\{/);
 });
 
 test('UI includes a live price mode backed by the extracted Vercel client', () => {
@@ -143,4 +172,11 @@ test('VAT slider fill follows page direction', () => {
     styles,
     /html\[dir=rtl\]\s+input\[type=range\]::\-webkit-slider-runnable-track\{[^}]*linear-gradient\(to left,/,
   );
+});
+
+test('LIVE failure checks recent cache before falling back to manual USD ounce', () => {
+  const cacheIndex = app.indexOf('priceCache.readCachedQuote()');
+  const manualIndex = app.indexOf("setPriceSource('ounce-usd'");
+  assert.ok(cacheIndex >= 0);
+  assert.ok(manualIndex > cacheIndex);
 });
