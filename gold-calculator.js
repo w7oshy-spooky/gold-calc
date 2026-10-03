@@ -1,23 +1,16 @@
 (function (root, factory) {
-  const api = factory();
+  const converter = typeof module === 'object' && module.exports
+    ? require('./js/core/price-converter.js')
+    : root.GoldPriceConverter;
+  const api = factory(converter);
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.GoldCalculator = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (converter) {
   'use strict';
 
-  const OUNCE_GRAMS = 31.1034768;
-  const USD_SAR_RATE = 3.75;
-  const SUPPORTED_KARATS = Object.freeze([18, 21, 22, 24]);
+  if (!converter) throw new Error('GoldPriceConverter is required.');
 
-  function sanitizeNonNegative(value) {
-    const n = Number.parseFloat(value);
-    return Number.isFinite(n) && n >= 0 ? n : 0;
-  }
-
-  function normalizeKarat(value) {
-    const n = Number.parseFloat(value);
-    return SUPPORTED_KARATS.includes(n) ? n : 21;
-  }
+  const { sanitizeNonNegative, normalizeKarat } = converter;
 
   function normalizeMode(value) {
     return value === 'sell' ? 'sell' : 'buy';
@@ -91,146 +84,9 @@
     const gram24kSar = resolvePrice24k(input);
     if (gram24kSar <= 0) {
       return {
-        ounceUsd: 0,
-        ounceSar: 0,
-        gram24kSar: 0,
-        gram22kSar: 0,
-        gram21kSar: 0,
-        gram18kSar: 0,
-      };
-    }
-
-    const ounceSar = gram24kSar * OUNCE_GRAMS;
-    return {
-      ounceUsd: ounceSar / USD_SAR_RATE,
-      ounceSar,
-      gram24kSar,
-      gram22kSar: gram24kSar * (22 / 24),
-      gram21kSar: gram24kSar * (21 / 24),
-      gram18kSar: gram24kSar * (18 / 24),
-    };
-  }
-
-  function calculateGoldPurchase(input = {}) {
-    const price24k = sanitizeNonNegative(input.price24k);
-    const weight = sanitizeNonNegative(input.weight);
-    const karat = normalizeKarat(input.karat);
-    const workmanshipPerGram = sanitizeNonNegative(input.workmanshipPerGram);
-    const profitPerGram = sanitizeNonNegative(input.profitPerGram);
-    const taxRate = clampTaxRate(input.taxRate);
-
-    const purity = karat / 24;
-    const gramPrice = price24k * purity;
-    const goldCost = gramPrice * weight;
-    const laborCost = (workmanshipPerGram + profitPerGram) * weight;
-    const subtotal = goldCost + laborCost;
-    const vat = subtotal * (taxRate / 100);
-    const total = subtotal + vat;
-
-    return {
-      price24k,
-      weight,
-      karat,
-      workmanshipPerGram,
-      profitPerGram,
-      taxRate,
-      purity,
-      gramPrice,
-      goldCost,
-      laborCost,
-      subtotal,
-      vat,
-      total,
-    };
-  }
-
-  function calculateGoldSale(input = {}) {
-    const price24k = sanitizeNonNegative(input.price24k);
-    const weight = sanitizeNonNegative(input.weight);
-    const karat = normalizeKarat(input.karat);
-    const deductionRate = clampPercent(input.deductionRate);
-
-    const purity = karat / 24;
-    const gramPrice = price24k * purity;
-    const rawMetalValue = gramPrice * weight;
-    const deductionValue = rawMetalValue * (deductionRate / 100);
-    const total = rawMetalValue - deductionValue;
-
-    return {
-      price24k,
-      weight,
-      karat,
-      deductionRate,
-      purity,
-      gramPrice,
-      rawMetalValue,
-      deductionValue,
-      total,
-    };
-  }
-
-  function calculateTransaction(input = {}) {
-    const mode = normalizeMode(input.mode);
-    if (mode === 'sell') return { mode, ...calculateGoldSale(input) };
-    return { mode, ...calculateGoldPurchase(input) };
-  }
-
-  function compareQuote({ mode, referenceTotal, quotedTotal } = {}) {
-    const safeMode = normalizeMode(mode);
-    const reference = sanitizeNonNegative(referenceTotal);
-    const quote = sanitizeNonNegative(quotedTotal);
-
-    if (reference <= 0 || quote <= 0) {
-      return {
-        available: false,
-        difference: 0,
-        differencePct: 0,
-        status: 'unavailable',
-      };
-    }
-
-    const difference = quote - reference;
-    const differencePct = (difference / reference) * 100;
-    const absDifferencePct = Math.abs(differencePct);
-    let status;
-
-    if (absDifferencePct <= 2) {
-      status = 'close';
-    } else if (safeMode === 'sell') {
-      if (differencePct < -5) status = 'low';
-      else if (differencePct < -2) status = 'moderate_low';
-      else status = 'above_reference';
-    } else {
-      if (differencePct > 5) status = 'high';
-      else if (differencePct > 2) status = 'moderate_high';
-      else status = 'below_reference';
-    }
-
-    return {
-      available: true,
-      difference,
-      differencePct,
-      status,
-    };
-  }
-
-  return {
-    OUNCE_GRAMS,
-    USD_SAR_RATE,
-    SUPPORTED_KARATS,
-    sanitizeNonNegative,
-    normalizeKarat,
     normalizeMode,
     clampTaxRate,
     clampPercent,
-    ounceUsdTo24kSar,
-    ounceSarToUsd,
-    ounceSarTo24kSar,
-    gramSarTo24kSar,
-    gramSarToOunceSar,
-    gramSarToOunceUsd,
-    resolvePrice24k,
-    deriveMarketPrices,
     calculateGoldPurchase,
     calculateGoldSale,
     calculateTransaction,
