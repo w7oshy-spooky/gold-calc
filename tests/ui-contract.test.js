@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const arabic = fs.readFileSync('index.html', 'utf8');
 const english = fs.readFileSync('en.html', 'utf8');
 const app = fs.readFileSync('app.js', 'utf8');
+const marketUi = fs.readFileSync('js/ui/market-ui.js', 'utf8');
 const priceCache = fs.readFileSync('js/market/price-cache.js', 'utf8');
 const livePriceClient = fs.readFileSync('js/market/live-price-client.js', 'utf8');
 const styles = fs.readFileSync('styles.css', 'utf8');
@@ -60,11 +61,11 @@ test('both pages expose all four market price source modes', () => {
   }
 });
 
-test('UI adapter supports SAR ounce and SAR gram market inputs', () => {
-  assert.match(app, /ounce-sar/);
-  assert.match(app, /gram-sar/);
+test('market UI adapter supports SAR ounce and SAR gram market inputs', () => {
+  assert.match(marketUi, /ounce-sar/);
+  assert.match(marketUi, /gram-sar/);
   assert.match(app, /deriveMarketPrices\s*\(/);
-  assert.match(app, /gramInputKarat/);
+  assert.match(marketUi, /gramInputKarat/);
 });
 
 test('UI adapter uses transaction and quote comparison core functions', () => {
@@ -85,12 +86,16 @@ test('UI includes a live price mode backed by the extracted Vercel client', () =
   assert.match(app, /fetchLiveGoldPrice/);
   assert.match(livePriceClient, /\/api\/gold-price/);
   assert.match(app, /setPriceSource\(['"]live['"]\)/);
-  assert.match(app, /data-source=["']live["']/);
+  for (const html of [arabic, english]) {
+    assert.match(html, /data-source=["']live["']/);
+  }
 });
 
-test('live UI exposes refresh, status, update time and all supported karat prices', () => {
-  for (const id of ['liveRefresh', 'livePriceStatus', 'liveUpdatedAt', 'liveKarat24', 'liveKarat22', 'liveKarat21', 'liveKarat18']) {
-    assert.match(app, new RegExp(id));
+test('live UI exposes refresh, status, update time and all supported karat prices in static pages', () => {
+  for (const html of [arabic, english]) {
+    for (const id of ['liveRefresh', 'livePriceStatus', 'liveUpdatedAt', 'liveKarat24', 'liveKarat22', 'liveKarat21', 'liveKarat18']) {
+      assert.match(html, new RegExp(`id=["']${id}["']`));
+    }
   }
 });
 
