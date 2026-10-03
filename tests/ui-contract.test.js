@@ -184,3 +184,11 @@ test('LIVE failure checks recent cache before falling back to manual USD ounce',
     /function fallbackToManualPrice\([\s\S]*?setPriceSource\('ounce-usd', \{ fetchLive: false \}\);/
   );
 });
+
+test('bootstrap exposes only the inline HTML action that still requires a global', () => {
+  assert.match(app, /globalThis\.adjust\s*=\s*adjust/);
+  for (const name of ['setKarat', 'setGramInputKarat', 'setPriceSource', 'setTransactionMode', 'fetchLiveGoldPrice']) {
+    assert.doesNotMatch(app, new RegExp(`globalThis\\.${name}\\s*=`));
+  }
+  assert.doesNotMatch(app, /let\s+liveQuote\b/);
+});
