@@ -62,14 +62,12 @@
     ouncePriceSar,
     gramPriceSar,
     gramKarat,
-    manualPrice24k,
   } = {}) {
-    if (source === 'live' || source === 'ounce' || source === 'ounce-usd') {
+    if (source === 'live' || source === 'ounce-usd') {
       return ounceUsdTo24kSar(ouncePriceUsd);
     }
     if (source === 'ounce-sar') return ounceSarTo24kSar(ouncePriceSar);
     if (source === 'gram-sar') return gramSarTo24kSar(gramPriceSar, gramKarat);
-    if (source === 'manual') return sanitizeNonNegative(manualPrice24k);
     return 0;
   }
 
