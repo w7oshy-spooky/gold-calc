@@ -268,5 +268,5 @@
     };
   }
 
-  return { SOURCES, createMarketUI };
+  return { createMarketUI };
 });
