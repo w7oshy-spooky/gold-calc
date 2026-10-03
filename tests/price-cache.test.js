@@ -92,3 +92,27 @@ test('storage failures are non-fatal', () => {
   assert.doesNotThrow(() => cache.writeCachedQuote({ priceUsdOunce: 4300 }));
   assert.doesNotThrow(() => cache.clearCachedQuote());
 });
+
+test('default localStorage access failures are non-fatal', () => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    get() {
+      throw new Error('storage access blocked');
+    },
+  });
+
+  try {
+    let cache;
+    assert.doesNotThrow(() => {
+      cache = createPriceCache({ now: () => 1 });
+    });
+    assert.equal(cache.readCachedQuote(), null);
+    assert.doesNotThrow(() => cache.writeCachedQuote({ priceUsdOunce: 4300 }));
+    assert.doesNotThrow(() => cache.clearCachedQuote());
+  } finally {
+    if (descriptor) Object.defineProperty(globalThis, 'localStorage', descriptor);
+    else delete globalThis.localStorage;
+  }
+});
