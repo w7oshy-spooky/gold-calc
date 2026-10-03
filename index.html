@@ -92,6 +92,25 @@
       <p id="priceModeHelp" class="status-note mt-2 text-[11px] leading-relaxed text-gray-400"></p>
       <p id="priceWarning" class="status-note text-[11px] font-bold" aria-live="polite"></p>
 
+      <div id="livePricePanel" class="live-price-panel mt-3" hidden>
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="live-dot" aria-hidden="true"></span>
+              <strong id="livePriceStatus" class="text-xs text-gray-700">جاري تحديث سعر الذهب…</strong>
+            </div>
+            <p id="liveUpdatedAt" class="text-[10px] text-gray-400 mt-1">—</p>
+          </div>
+          <button type="button" id="liveRefresh" class="live-refresh-btn" aria-label="تحديث">↻ تحديث</button>
+        </div>
+        <div class="live-karat-grid mt-3" aria-label="أسعار العيارات الحية">
+          <div><span>24K</span><strong id="liveKarat24">—</strong></div>
+          <div><span>22K</span><strong id="liveKarat22">—</strong></div>
+          <div><span>21K</span><strong id="liveKarat21">—</strong></div>
+          <div><span>18K</span><strong id="liveKarat18">—</strong></div>
+        </div>
+      </div>
+
       <div id="marketEquivalentPanel" class="mt-3 rounded-xl border border-gray-100 bg-slate-50 p-3" hidden>
         <p class="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">القيم المكافئة</p>
         <div class="grid grid-cols-2 gap-2 text-xs">
@@ -209,7 +228,7 @@
     </section>
 
     <aside class="input-card text-[11px] leading-relaxed text-gray-500" aria-label="ملاحظة">
-      <strong class="text-gray-700">ملاحظة:</strong> النتائج تقديرية وتعتمد على البيانات المدخلة. وضع الشراء يحسب المصنعية والضريبة المدخلة، بينما وضع البيع يعتمد قيمة الذهب الخام والخصم الذي تدخله للمشتري. لا يوجد سعر ذهب حي تلقائيًا في هذه المرحلة.
+      <strong class="text-gray-700">ملاحظة:</strong> سعر LIVE سعر فوري إرشادي للذهب الخام XAU/USD ويُحوّل إلى الريال السعودي. النتائج تقديرية، وقد يختلف سعر التنفيذ الفعلي لدى المحلات بسبب فرق الشراء والبيع والمصنعية والأحجار والعروض والمعاملة الضريبية.
     </aside>
   </main>
 
@@ -240,6 +259,7 @@
   <script src="js/ui/formatting.js"></script>
   <script src="js/market/price-cache.js"></script>
   <script src="js/market/live-price-client.js"></script>
+  <script src="js/ui/market-ui.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
