@@ -136,6 +136,7 @@ test('bootstrap is orchestration-only', () => {
   assert.doesNotMatch(app, /insertAdjacentHTML/);
   assert.doesNotMatch(app, /function\s+formatMoney/);
   assert.doesNotMatch(app, /const\s+copy\s*=\s*\{/);
+  assert.doesNotMatch(app, /let\s+liveQuote\b/);
 });
 
 test('UI includes a live price mode backed by the extracted Vercel client', () => {
@@ -185,13 +186,6 @@ test('LIVE failure checks recent cache before falling back to manual USD ounce',
   );
 });
 
-test('bootstrap exposes only the inline HTML action that still requires a global', () => {
-  assert.match(app, /globalThis\.adjust\s*=\s*adjust/);
-  for (const name of ['setKarat', 'setGramInputKarat', 'setPriceSource', 'setTransactionMode', 'fetchLiveGoldPrice']) {
-    assert.doesNotMatch(app, new RegExp(`globalThis\\.${name}\\s*=`));
-  }
-  assert.doesNotMatch(app, /let\s+liveQuote\b/);
-});
 
 test('transaction step buttons use module-bound events instead of inline global handlers', () => {
   for (const html of [arabic, english]) {
