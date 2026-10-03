@@ -27,7 +27,6 @@
   const priceCache = globalThis.GoldPriceCache.createPriceCache();
   const livePriceClient = globalThis.GoldLivePriceClient.createLivePriceClient();
 
-  let liveQuote = null;
   let liveFetchInFlight = false;
 
   function vibrate(ms = 8) {
@@ -75,7 +74,6 @@
   });
 
   function applyLiveQuote(quote, state = 'live') {
-    liveQuote = quote;
     marketUi.setLiveQuoteInput(Number(quote.priceUsdOunce));
     marketUi.renderLiveKaratPrices(Number(quote.priceUsdOunce));
     marketUi.renderLiveStatus(quote, state);
@@ -83,7 +81,6 @@
   }
 
   function fallbackToManualPrice() {
-    liveQuote = null;
     marketUi.renderLiveStatus(null, 'error');
     marketUi.clearLiveQuoteInput();
     setPriceSource('ounce-usd', { fetchLive: false });
@@ -94,7 +91,7 @@
     if (liveFetchInFlight) return;
     liveFetchInFlight = true;
     marketUi.setLiveRefreshDisabled(true);
-    marketUi.renderLiveStatus(liveQuote, 'loading');
+    marketUi.renderLiveStatus(null, 'loading');
 
     try {
       const quote = await livePriceClient.fetchQuote({ force });
@@ -173,26 +170,7 @@
     return value;
   }
 
-  function setKarat(value) {
-    const karat = transactionUi.setKarat(value);
-    vibrate();
-    calculate();
-    return karat;
-  }
-
-  function setGramInputKarat(value) {
-    const karat = marketUi.setGramInputKarat(value);
-    vibrate();
-    calculate();
-    return karat;
-  }
-
   globalThis.adjust = adjust;
-  globalThis.setKarat = setKarat;
-  globalThis.setGramInputKarat = setGramInputKarat;
-  globalThis.setPriceSource = setPriceSource;
-  globalThis.setTransactionMode = setTransactionMode;
-  globalThis.fetchLiveGoldPrice = fetchLiveGoldPrice;
 
   window.addEventListener('load', () => {
     setTransactionMode('buy');
