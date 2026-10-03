@@ -199,9 +199,13 @@ test('transaction step buttons use module-bound events instead of inline global 
 });
 
 test('desktop layout expands the calculator and moves the receipt into a side panel', () => {
-  assert.match(styles, /@media\(min-width:1100px\)/);
+  assert.match(styles, /@media\(min-width:1180px\)/);
   assert.match(styles, /\.page-content\{[^}]*max-width:1180px!important;[^}]*display:grid;/);
   assert.match(styles, /grid-template-columns:minmax\(0,720px\) minmax\(340px,380px\)/);
   assert.match(styles, /\.bottom-receipt\{[^}]*background:transparent;[^}]*width:380px;/);
   assert.match(styles, /html\[dir=rtl\] \.page-content>/);
+  for (const html of [arabic, english]) {
+    assert.match(html, /class=["'][^"']*market-source-grid/);
+  }
+  assert.match(styles, /\.market-source-grid\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
 });
