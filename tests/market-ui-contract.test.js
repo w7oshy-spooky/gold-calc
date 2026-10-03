@@ -67,3 +67,10 @@ test('application no longer injects the LIVE structure at runtime', () => {
   assert.doesNotMatch(app, /installLiveUi/);
   assert.doesNotMatch(app, /insertAdjacentHTML/);
 });
+
+test('equivalent USD ounce output preserves the previous number-only display', () => {
+  assert.match(
+    marketUi,
+    /equivalentOunceUSD\.textContent = formatting\.formatMoney\(prices\.ounceUsd\);/
+  );
+});
