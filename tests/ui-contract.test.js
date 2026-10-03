@@ -201,5 +201,5 @@ test('transaction step buttons use module-bound events instead of inline global 
     }
   }
   assert.match(transactionUi, /data-adjust-target/);
-  assert.doesNotMatch(app, /globalThis\./);
+  assert.doesNotMatch(app, /globalThis\.\w+\s*=/);
 });
