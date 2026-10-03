@@ -175,8 +175,12 @@ test('VAT slider fill follows page direction', () => {
 });
 
 test('LIVE failure checks recent cache before falling back to manual USD ounce', () => {
-  const cacheIndex = app.indexOf('priceCache.readCachedQuote()');
-  const manualIndex = app.indexOf("setPriceSource('ounce-usd'");
-  assert.ok(cacheIndex >= 0);
-  assert.ok(manualIndex > cacheIndex);
+  assert.match(
+    app,
+    /catch\s*\{[\s\S]*?const cachedQuote = priceCache\.readCachedQuote\(\);[\s\S]*?if \(cachedQuote\) applyLiveQuote\(cachedQuote, 'cached'\);[\s\S]*?else fallbackToManualPrice\(\);/
+  );
+  assert.match(
+    app,
+    /function fallbackToManualPrice\([\s\S]*?setPriceSource\('ounce-usd', \{ fetchLive: false \}\);/
+  );
 });
