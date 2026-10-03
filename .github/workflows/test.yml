@@ -15,8 +15,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --check gold-calculator.js
-      - run: node --check live-gold.js
-      - run: node --check api/gold-price.js
-      - run: node --check app.js
+      - run: |
+          node --check js/core/price-converter.js
+          node --check gold-calculator.js
+          node --check live-gold.js
+          node --check api/gold-price.js
+          node --check js/i18n/translations.js
+          node --check js/market/price-cache.js
+          node --check js/market/live-price-client.js
+          node --check js/ui/formatting.js
+          node --check js/ui/market-ui.js
+          node --check js/ui/transaction-ui.js
+          node --check js/ui/quote-comparison-ui.js
+          node --check js/ui/summary-ui.js
+          node --check js/app.js
       - run: node --test tests/*.test.js
