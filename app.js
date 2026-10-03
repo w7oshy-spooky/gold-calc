@@ -7,7 +7,8 @@
     !globalThis.GoldFormatting ||
     !globalThis.GoldTranslations ||
     !globalThis.GoldPriceCache ||
-    !globalThis.GoldLivePriceClient
+    !globalThis.GoldLivePriceClient ||
+    !globalThis.GoldMarketUI
   ) {
     console.error('Gold calculator dependencies are not loaded.');
     return;
@@ -18,62 +19,16 @@
   const $ = (id) => document.getElementById(id);
   const locale = document.documentElement.lang === 'ar' ? 'ar' : 'en';
   const copy = globalThis.GoldTranslations.getCopy(locale);
+  const formatting = globalThis.GoldFormatting.createFormatting(locale);
   const {
     formatMoney,
-    formatInput,
     formatSignedMoney,
     formatSignedPercent,
-    sourceDisplayName,
-    formatLiveTime,
-  } = globalThis.GoldFormatting.createFormatting(locale);
+  } = formatting;
   const priceCache = globalThis.GoldPriceCache.createPriceCache();
   const livePriceClient = globalThis.GoldLivePriceClient.createLivePriceClient();
 
-  function installLiveUi() {
-    const firstSourceButton = document.querySelector('.source-btn');
-    const sourceGroup = firstSourceButton?.parentElement;
-    if (sourceGroup && !sourceGroup.querySelector('[data-source="live"]')) {
-      sourceGroup.classList.remove('grid-cols-2');
-      sourceGroup.classList.add('grid-cols-3');
-      sourceGroup.insertAdjacentHTML('afterbegin', `<button type="button" class="source-btn" data-source="live" aria-pressed="false">LIVE</button>`);
-    }
-
-    const warning = $('priceWarning');
-    if (warning && !$('livePricePanel')) {
-      warning.insertAdjacentHTML('afterend', `
-        <div id="livePricePanel" class="live-price-panel mt-3" hidden>
-          <div class="flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="live-dot" aria-hidden="true"></span>
-                <strong id="livePriceStatus" class="text-xs text-gray-700">${copy.liveLoading}</strong>
-              </div>
-              <p id="liveUpdatedAt" class="text-[10px] text-gray-400 mt-1">—</p>
-            </div>
-            <button type="button" id="liveRefresh" class="live-refresh-btn" aria-label="${copy.refresh}">↻ ${copy.refresh}</button>
-          </div>
-          <div class="live-karat-grid mt-3" aria-label="Live karat prices">
-            <div><span>24K</span><strong id="liveKarat24">—</strong></div>
-            <div><span>22K</span><strong id="liveKarat22">—</strong></div>
-            <div><span>21K</span><strong id="liveKarat21">—</strong></div>
-            <div><span>18K</span><strong id="liveKarat18">—</strong></div>
-          </div>
-        </div>`);
-    }
-
-    const note = document.querySelector('main aside.input-card');
-    if (note) note.innerHTML = copy.note;
-  }
-
-  installLiveUi();
-
   const inputs = {
-    priceSource: $('priceSource'),
-    ouncePriceUSD: $('ouncePriceUSD'),
-    ouncePriceSAR: $('ouncePriceSAR'),
-    gramPriceSAR: $('gramPriceSAR'),
-    gramInputKarat: $('gramInputKarat'),
-    marketPrice: $('marketPrice'),
     transactionMode: $('transactionMode'),
     weight: $('weight'),
     karat: $('karat'),
@@ -83,11 +38,27 @@
     taxRange: $('taxRange'),
     sellDeduction: $('sellDeduction'),
     quotedTotal: $('quotedTotal'),
-    liveRefresh: $('liveRefresh'),
   };
 
   let liveQuote = null;
   let liveFetchInFlight = false;
+
+  const marketUi = globalThis.GoldMarketUI.createMarketUI({
+    document,
+    locale,
+    copy,
+    formatting,
+    priceConverter,
+    onChange(change) {
+      if (change.type === 'gram-karat') vibrate();
+      calculate();
+      if (change.type === 'source' && change.source === 'live') fetchLiveGoldPrice();
+    },
+    onRefresh() {
+      vibrate();
+      fetchLiveGoldPrice({ force: true });
+    },
+  });
 
   function vibrate(ms = 8) {
     if ('vibrate' in navigator) navigator.vibrate(ms);
@@ -109,66 +80,27 @@
     return value;
   }
 
-  function renderLiveKaratPrices(priceUsdOunce) {
-    const price24k = priceConverter.ounceUsdTo24kSar(priceUsdOunce);
-    setText('liveKarat24', `${formatMoney(price24k)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
-    setText('liveKarat22', `${formatMoney(price24k * 22 / 24)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
-    setText('liveKarat21', `${formatMoney(price24k * 21 / 24)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
-    setText('liveKarat18', `${formatMoney(price24k * 18 / 24)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
-  }
-
-  function renderLiveStatus(quote, state) {
-    const status = $('livePriceStatus');
-    const updated = $('liveUpdatedAt');
-    const dot = document.querySelector('.live-dot');
-    if (!status || !updated) return;
-
-    if (state === 'loading') {
-      status.textContent = copy.liveLoading;
-      status.dataset.state = 'loading';
-      updated.textContent = '—';
-    } else if (state === 'cached') {
-      status.textContent = copy.liveCached;
-      status.dataset.state = 'cached';
-      updated.textContent = `${copy.lastUpdated}: ${formatLiveTime(quote.updatedAt)} · ${copy.source}: ${sourceDisplayName(quote.source)}`;
-    } else if (state === 'error') {
-      status.textContent = copy.liveUnavailable;
-      status.dataset.state = 'error';
-      updated.textContent = '—';
-    } else {
-      status.textContent = quote?.stale ? copy.liveStale : copy.liveReady;
-      status.dataset.state = quote?.stale ? 'stale' : 'live';
-      updated.textContent = `${copy.lastUpdated}: ${formatLiveTime(quote.updatedAt)} · ${copy.source}: ${sourceDisplayName(quote.source)}`;
-    }
-
-    if (dot) dot.dataset.state = status.dataset.state;
-  }
-
   function applyLiveQuote(quote, state = 'live') {
     liveQuote = quote;
-    inputs.ouncePriceUSD.value = formatInput(Number(quote.priceUsdOunce), 2);
-    renderLiveKaratPrices(Number(quote.priceUsdOunce));
-    renderLiveStatus(quote, state);
+    marketUi.setLiveQuoteInput(Number(quote.priceUsdOunce));
+    marketUi.renderLiveKaratPrices(Number(quote.priceUsdOunce));
+    marketUi.renderLiveStatus(quote, state);
     calculate();
   }
 
   function fallbackToManualPrice() {
     liveQuote = null;
-    renderLiveStatus(null, 'error');
-    inputs.ouncePriceUSD.value = '';
+    marketUi.renderLiveStatus(null, 'error');
+    marketUi.clearLiveQuoteInput();
     setPriceSource('ounce-usd', { fetchLive: false });
-    const warning = $('priceWarning');
-    if (warning) {
-      warning.textContent = copy.liveUnavailable;
-      warning.classList.add('warning-text');
-    }
+    marketUi.showWarning(copy.liveUnavailable);
   }
 
   async function fetchLiveGoldPrice({ force = false } = {}) {
     if (liveFetchInFlight) return;
     liveFetchInFlight = true;
-    if (inputs.liveRefresh) inputs.liveRefresh.disabled = true;
-    renderLiveStatus(liveQuote, 'loading');
+    marketUi.setLiveRefreshDisabled(true);
+    marketUi.renderLiveStatus(liveQuote, 'loading');
 
     try {
       const quote = await livePriceClient.fetchQuote({ force });
@@ -180,44 +112,19 @@
       else fallbackToManualPrice();
     } finally {
       liveFetchInFlight = false;
-      if (inputs.liveRefresh) inputs.liveRefresh.disabled = false;
+      marketUi.setLiveRefreshDisabled(false);
     }
   }
 
   function setPriceSource(source, options = {}) {
-    const safeSource = ['live', 'ounce-usd', 'ounce-sar', 'gram-sar'].includes(source) ? source : 'live';
-    inputs.priceSource.value = safeSource;
-
-    document.querySelectorAll('.source-btn').forEach((button) => {
-      const active = button.dataset.source === safeSource;
-      button.classList.toggle('active', active);
-      button.setAttribute('aria-pressed', String(active));
-    });
-
-    const liveMode = safeSource === 'live';
-    const ounceUsdMode = safeSource === 'ounce-usd';
-    const ounceSarMode = safeSource === 'ounce-sar';
-    const gramSarMode = safeSource === 'gram-sar';
-
-    $('ounceUsdInputPanel').hidden = !(liveMode || ounceUsdMode);
-    $('ounceSarInputPanel').hidden = !ounceSarMode;
-    $('gramSarInputPanel').hidden = !gramSarMode;
-    inputs.ouncePriceUSD.readOnly = liveMode;
-    inputs.marketPrice.readOnly = true;
-    $('livePricePanel').hidden = !liveMode;
-    $('priceModeHelp').textContent = liveMode
-      ? copy.liveMode
-      : ounceUsdMode
-        ? copy.ounceMode
-        : ounceSarMode
-          ? copy.ounceSarMode
-          : copy.gramSarMode;
-
+    const safeSource = marketUi.setPriceSource(source);
     calculate();
 
-    if (liveMode && options.fetchLive !== false) {
+    if (safeSource === 'live' && options.fetchLive !== false) {
       fetchLiveGoldPrice();
     }
+
+    return safeSource;
   }
 
   function setTransactionMode(mode) {
@@ -241,34 +148,9 @@
     calculate();
   }
 
-  function renderMarketEquivalents(prices) {
-    const panel = $('marketEquivalentPanel');
-    const available = prices.gram24kSar > 0;
-    if (panel) panel.hidden = !available;
-    if (!available) {
-      inputs.marketPrice.value = '';
-      return;
-    }
-
-    inputs.marketPrice.value = formatInput(prices.gram24kSar, 2);
-    setText('equivalentOunceUSD', `${formatMoney(prices.ounceUsd)}`);
-    setText('equivalentOunceSAR', `${formatMoney(prices.ounceSar)} ${locale === 'ar' ? 'ر.س' : 'SAR'}`);
-    setText('equivalentGram24', `${formatMoney(prices.gram24kSar)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
-    setText('equivalentGram22', `${formatMoney(prices.gram22kSar)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
-    setText('equivalentGram21', `${formatMoney(prices.gram21kSar)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
-    setText('equivalentGram18', `${formatMoney(prices.gram18kSar)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
-  }
-
   function getPrice24k() {
-    const prices = priceConverter.deriveMarketPrices({
-      source: inputs.priceSource.value,
-      ouncePriceUsd: inputs.ouncePriceUSD.value,
-      ouncePriceSar: inputs.ouncePriceSAR.value,
-      gramPriceSar: inputs.gramPriceSAR.value,
-      gramKarat: inputs.gramInputKarat.value,
-    });
-
-    renderMarketEquivalents(prices);
+    const prices = priceConverter.deriveMarketPrices(marketUi.getMarketInput());
+    marketUi.renderMarketEquivalents(prices);
     return prices.gram24kSar;
   }
 
@@ -343,13 +225,11 @@
     setText('finalTotalOutput', formatMoney(result.total));
     renderComparison(result.total);
 
-    const warning = $('priceWarning');
-    if (warning) {
-      const needsPrice = price24k <= 0;
-      if (!needsPrice || inputs.priceSource.value !== 'live') {
-        warning.textContent = needsPrice ? copy.needPrice : '';
-        warning.classList.toggle('warning-text', needsPrice);
-      }
+    const needsPrice = price24k <= 0;
+    if (!needsPrice) {
+      marketUi.clearWarning();
+    } else if (marketUi.getPriceSource() !== 'live') {
+      marketUi.showWarning(copy.needPrice);
     }
   }
 
@@ -375,15 +255,10 @@
   }
 
   function setGramInputKarat(value) {
-    const karat = priceConverter.normalizeKarat(value);
-    inputs.gramInputKarat.value = karat;
-    document.querySelectorAll('.gram-karat-btn').forEach((button) => {
-      const active = Number(button.dataset.gramKarat) === karat;
-      button.classList.toggle('active', active);
-      button.setAttribute('aria-pressed', String(active));
-    });
+    const karat = marketUi.setGramInputKarat(value);
     vibrate();
     calculate();
+    return karat;
   }
 
   globalThis.adjust = adjust;
@@ -393,43 +268,14 @@
   globalThis.setTransactionMode = setTransactionMode;
   globalThis.fetchLiveGoldPrice = fetchLiveGoldPrice;
 
-  document.querySelectorAll('.source-btn').forEach((button) => {
-    button.addEventListener('click', () => setPriceSource(button.dataset.source));
-  });
-
   document.querySelectorAll('.mode-btn').forEach((button) => {
     button.addEventListener('click', () => setTransactionMode(button.dataset.mode));
-  });
-
-  document.querySelectorAll('.gram-karat-btn').forEach((button) => {
-    button.addEventListener('click', () => setGramInputKarat(button.dataset.gramKarat));
-  });
-
-  inputs.liveRefresh?.addEventListener('click', () => {
-    vibrate();
-    fetchLiveGoldPrice({ force: true });
   });
 
   inputs.taxRange.addEventListener('input', (event) => {
     const rate = core.clampTaxRate(event.target.value);
     inputs.tax.value = rate;
     calculate();
-  });
-
-  inputs.ouncePriceUSD.addEventListener('input', () => {
-    if (inputs.priceSource.value === 'live') return;
-    if (Number.parseFloat(inputs.ouncePriceUSD.value) < 0) inputs.ouncePriceUSD.value = '0';
-    if (inputs.priceSource.value === 'ounce-usd') calculate();
-  });
-
-  inputs.ouncePriceSAR.addEventListener('input', () => {
-    if (Number.parseFloat(inputs.ouncePriceSAR.value) < 0) inputs.ouncePriceSAR.value = '0';
-    if (inputs.priceSource.value === 'ounce-sar') calculate();
-  });
-
-  inputs.gramPriceSAR.addEventListener('input', () => {
-    if (Number.parseFloat(inputs.gramPriceSAR.value) < 0) inputs.gramPriceSAR.value = '0';
-    if (inputs.priceSource.value === 'gram-sar') calculate();
   });
 
   [inputs.weight, inputs.workmanship, inputs.profit, inputs.quotedTotal].forEach((el) => {
@@ -447,20 +293,6 @@
     calculate();
   });
 
-  inputs.ouncePriceUSD.addEventListener('blur', () => {
-    if (inputs.priceSource.value !== 'live') {
-      sanitizeVisibleField(inputs.ouncePriceUSD, 2);
-      calculate();
-    }
-  });
-  inputs.ouncePriceSAR.addEventListener('blur', () => {
-    sanitizeVisibleField(inputs.ouncePriceSAR, 2);
-    calculate();
-  });
-  inputs.gramPriceSAR.addEventListener('blur', () => {
-    sanitizeVisibleField(inputs.gramPriceSAR, 2);
-    calculate();
-  });
   inputs.weight.addEventListener('blur', () => { sanitizeVisibleField(inputs.weight, 2); calculate(); });
   inputs.workmanship.addEventListener('blur', () => { sanitizeVisibleField(inputs.workmanship, 2); calculate(); });
   inputs.profit.addEventListener('blur', () => { sanitizeVisibleField(inputs.profit, 2); calculate(); });
