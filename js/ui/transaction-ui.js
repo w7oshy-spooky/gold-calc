@@ -42,6 +42,7 @@
 
     const modeButtons = Array.from(document.querySelectorAll('.mode-btn'));
     const karatButtons = Array.from(document.querySelectorAll('.karat-btn'));
+    const adjustButtons = Array.from(document.querySelectorAll('[data-adjust-target][data-adjust-amount]'));
 
     function getTransactionInput() {
       return {
@@ -139,6 +140,16 @@
       });
     });
 
+    adjustButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const id = button.dataset.adjustTarget;
+        const amount = Number(button.dataset.adjustAmount);
+        if (!Number.isFinite(amount)) throw new Error(`Invalid adjustment amount for ${id}`);
+        const value = adjust(id, amount);
+        onChange({ type: 'adjust', id, value });
+      });
+    });
+
     elements.taxRange.addEventListener('input', (event) => {
       const rate = core.clampTaxRate(event.target.value);
       elements.tax.value = rate;
@@ -172,7 +183,6 @@
       getTransactionInput,
       setTransactionMode,
       setKarat,
-      adjust,
       renderInputLabels,
     };
   }
