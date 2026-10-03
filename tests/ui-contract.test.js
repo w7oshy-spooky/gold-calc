@@ -6,6 +6,9 @@ const arabic = fs.readFileSync('index.html', 'utf8');
 const english = fs.readFileSync('en.html', 'utf8');
 const app = fs.readFileSync('app.js', 'utf8');
 const marketUi = fs.readFileSync('js/ui/market-ui.js', 'utf8');
+const transactionUi = fs.readFileSync('js/ui/transaction-ui.js', 'utf8');
+const quoteComparisonUi = fs.readFileSync('js/ui/quote-comparison-ui.js', 'utf8');
+const summaryUi = fs.readFileSync('js/ui/summary-ui.js', 'utf8');
 const priceCache = fs.readFileSync('js/market/price-cache.js', 'utf8');
 const livePriceClient = fs.readFileSync('js/market/live-price-client.js', 'utf8');
 const styles = fs.readFileSync('styles.css', 'utf8');
@@ -68,11 +71,35 @@ test('market UI adapter supports SAR ounce and SAR gram market inputs', () => {
   assert.match(marketUi, /gramInputKarat/);
 });
 
-test('UI adapter uses transaction and quote comparison core functions', () => {
+test('transaction UI owns transaction input and mode presentation', () => {
+  assert.match(transactionUi, /createTransactionUI/);
+  assert.match(transactionUi, /getTransactionInput/);
+  assert.match(transactionUi, /setTransactionMode/);
+  assert.match(transactionUi, /setKarat/);
+  assert.match(transactionUi, /renderInputLabels/);
+  assert.match(transactionUi, /buyCostsPanel/);
+  assert.match(transactionUi, /sellDeductionPanel/);
+});
+
+test('quote comparison UI renders a supplied comparison without owning thresholds', () => {
+  assert.match(quoteComparisonUi, /createQuoteComparisonUI/);
+  assert.match(quoteComparisonUi, /render\s*\(/);
+  assert.doesNotMatch(quoteComparisonUi, /differencePct\s*[<>]=?\s*[25]/);
+  assert.doesNotMatch(quoteComparisonUi, /compareQuote\s*\(/);
+});
+
+test('summary UI renders supplied transaction results without calculating them', () => {
+  assert.match(summaryUi, /createSummaryUI/);
+  assert.match(summaryUi, /render\s*\(/);
+  assert.doesNotMatch(summaryUi, /calculateTransaction\s*\(/);
+});
+
+test('application delegates transaction calculation and presentation', () => {
   assert.match(app, /calculateTransaction\s*\(/);
   assert.match(app, /compareQuote\s*\(/);
-  assert.match(app, /setTransactionMode/);
-  assert.match(app, /renderComparison/);
+  assert.doesNotMatch(app, /\$\(['"]buyCostsPanel['"]\)/);
+  assert.doesNotMatch(app, /\$\(['"]comparisonStatus['"]\)/);
+  assert.doesNotMatch(app, /\$\(['"]finalTotalOutput['"]\)/);
 });
 
 test('Arabic and English pages keep shared calculation and UI scripts', () => {
