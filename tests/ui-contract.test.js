@@ -202,7 +202,7 @@ test('desktop layout expands the calculator and moves the receipt into a side pa
   assert.match(styles, /@media\(min-width:1180px\)/);
   assert.match(styles, /\.page-content\{[^}]*max-width:1180px!important;[^}]*display:grid;/);
   assert.match(styles, /grid-template-columns:minmax\(0,720px\) minmax\(340px,380px\)/);
-  assert.match(styles, /\.bottom-receipt\{[^}]*background:transparent;[^}]*width:380px;/);
+  assert.match(styles, /\.bottom-receipt\{[^}]*width:380px;[^}]*background:transparent;/);
   assert.match(styles, /html\[dir=rtl\] \.page-content>/);
   for (const html of [arabic, english]) {
     assert.match(html, /class=["'][^"']*market-source-grid/);
