@@ -232,3 +232,14 @@ test('desktop market controls and item fields become dense dashboard rows', () =
     assert.match(html, /class=["'][^"']*market-source-grid/);
   }
 });
+
+test('desktop dashboard starts below the header without overlap', () => {
+  assert.match(
+    styles,
+    /@media\(min-width:1100px\)[\s\S]*?\.desktop-dashboard\{[^}]*margin-top:1rem!important;/
+  );
+  assert.doesNotMatch(
+    styles,
+    /@media\(min-width:1100px\)[\s\S]*?\.desktop-dashboard\{[^}]*margin-top:-/
+  );
+});
