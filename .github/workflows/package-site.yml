@@ -17,14 +17,26 @@ jobs:
         run: |
           test -f index.html
           test -f en.html
-          test -f app.js
+          test ! -f app.js
+          test -f js/app.js
+          test -f js/core/price-converter.js
+          test -f js/market/price-cache.js
+          test -f js/market/live-price-client.js
+          test -f js/ui/market-ui.js
+          test -f js/ui/transaction-ui.js
+          test -f js/ui/quote-comparison-ui.js
+          test -f js/ui/summary-ui.js
+          test -f js/ui/formatting.js
+          test -f js/i18n/translations.js
           test -f gold-calculator.js
           test -f live-gold.js
           test -f api/gold-price.js
           test -f styles.css
           grep -q 'transactionMode' index.html
           grep -q 'comparisonPanel' index.html
-          grep -q '/api/gold-price' app.js
+          grep -q '/api/gold-price' js/market/live-price-client.js
+          grep -q 'src="js/app.js"' index.html
+          grep -q 'src="js/app.js"' en.html
       - name: Upload deployable site
         uses: actions/upload-artifact@v4
         with:
@@ -33,7 +45,7 @@ jobs:
           path: |
             index.html
             en.html
-            app.js
+            js/**
             gold-calculator.js
             live-gold.js
             api/gold-price.js

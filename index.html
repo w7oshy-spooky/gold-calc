@@ -92,6 +92,25 @@
       <p id="priceModeHelp" class="status-note mt-2 text-[11px] leading-relaxed text-gray-400"></p>
       <p id="priceWarning" class="status-note text-[11px] font-bold" aria-live="polite"></p>
 
+      <div id="livePricePanel" class="live-price-panel mt-3" hidden>
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="live-dot" aria-hidden="true"></span>
+              <strong id="livePriceStatus" class="text-xs text-gray-700">جاري تحديث سعر الذهب…</strong>
+            </div>
+            <p id="liveUpdatedAt" class="text-[10px] text-gray-400 mt-1">—</p>
+          </div>
+          <button type="button" id="liveRefresh" class="live-refresh-btn" aria-label="تحديث">↻ تحديث</button>
+        </div>
+        <div class="live-karat-grid mt-3" aria-label="أسعار العيارات الحية">
+          <div><span>24K</span><strong id="liveKarat24">—</strong></div>
+          <div><span>22K</span><strong id="liveKarat22">—</strong></div>
+          <div><span>21K</span><strong id="liveKarat21">—</strong></div>
+          <div><span>18K</span><strong id="liveKarat18">—</strong></div>
+        </div>
+      </div>
+
       <div id="marketEquivalentPanel" class="mt-3 rounded-xl border border-gray-100 bg-slate-50 p-3" hidden>
         <p class="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">القيم المكافئة</p>
         <div class="grid grid-cols-2 gap-2 text-xs">
@@ -121,19 +140,19 @@
       <div>
         <label for="weight" class="block text-gray-600 text-xs font-bold mb-2">الوزن (جرام)</label>
         <div class="flex items-center gap-2">
-          <button type="button" onclick="adjust('weight', -0.5)" class="step-btn text-xl" aria-label="إنقاص الوزن">−</button>
+          <button type="button" data-adjust-target="weight" data-adjust-amount="-0.5" class="step-btn text-xl" aria-label="إنقاص الوزن">−</button>
           <input type="number" id="weight" value="15" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input text-xl">
-          <button type="button" onclick="adjust('weight', 0.5)" class="step-btn text-xl" aria-label="زيادة الوزن">+</button>
+          <button type="button" data-adjust-target="weight" data-adjust-amount="0.5" class="step-btn text-xl" aria-label="زيادة الوزن">+</button>
         </div>
       </div>
 
       <div>
         <span class="block text-gray-600 text-xs font-bold mb-2">العيار</span>
         <div class="grid grid-cols-4 gap-2" role="group" aria-label="العيار">
-          <button type="button" onclick="setKarat(18)" class="karat-btn" data-val="18" aria-pressed="false">18</button>
-          <button type="button" onclick="setKarat(21)" class="karat-btn active" data-val="21" aria-pressed="true">21</button>
-          <button type="button" onclick="setKarat(22)" class="karat-btn" data-val="22" aria-pressed="false">22</button>
-          <button type="button" onclick="setKarat(24)" class="karat-btn" data-val="24" aria-pressed="false">24</button>
+          <button type="button" class="karat-btn" data-val="18" aria-pressed="false">18</button>
+          <button type="button" class="karat-btn active" data-val="21" aria-pressed="true">21</button>
+          <button type="button" class="karat-btn" data-val="22" aria-pressed="false">22</button>
+          <button type="button" class="karat-btn" data-val="24" aria-pressed="false">24</button>
           <input type="hidden" id="karat" value="21">
         </div>
       </div>
@@ -153,9 +172,9 @@
           <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="workmanshipLabel">35</span> ر.س</span>
         </div>
         <div class="flex items-center gap-2">
-          <button type="button" onclick="adjust('workmanship', -5)" class="step-btn text-xs font-black">−5</button>
+          <button type="button" data-adjust-target="workmanship" data-adjust-amount="-5" class="step-btn text-xs font-black">−5</button>
           <input type="number" id="workmanship" value="35" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input">
-          <button type="button" onclick="adjust('workmanship', 5)" class="step-btn text-xs font-black">+5</button>
+          <button type="button" data-adjust-target="workmanship" data-adjust-amount="5" class="step-btn text-xs font-black">+5</button>
         </div>
       </div>
 
@@ -165,9 +184,9 @@
           <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="profitLabel">0</span> ر.س</span>
         </div>
         <div class="flex items-center gap-2">
-          <button type="button" onclick="adjust('profit', -1)" class="step-btn text-xl">−</button>
+          <button type="button" data-adjust-target="profit" data-adjust-amount="-1" class="step-btn text-xl">−</button>
           <input type="number" id="profit" value="0" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input">
-          <button type="button" onclick="adjust('profit', 1)" class="step-btn text-xl">+</button>
+          <button type="button" data-adjust-target="profit" data-adjust-amount="1" class="step-btn text-xl">+</button>
         </div>
       </div>
     </section>
@@ -209,7 +228,7 @@
     </section>
 
     <aside class="input-card text-[11px] leading-relaxed text-gray-500" aria-label="ملاحظة">
-      <strong class="text-gray-700">ملاحظة:</strong> النتائج تقديرية وتعتمد على البيانات المدخلة. وضع الشراء يحسب المصنعية والضريبة المدخلة، بينما وضع البيع يعتمد قيمة الذهب الخام والخصم الذي تدخله للمشتري. لا يوجد سعر ذهب حي تلقائيًا في هذه المرحلة.
+      <strong class="text-gray-700">ملاحظة:</strong> سعر LIVE سعر فوري إرشادي للذهب الخام XAU/USD ويُحوّل إلى الريال السعودي. النتائج تقديرية، وقد يختلف سعر التنفيذ الفعلي لدى المحلات بسبب فرق الشراء والبيع والمصنعية والأحجار والعروض والمعاملة الضريبية.
     </aside>
   </main>
 
@@ -234,7 +253,16 @@
     </section>
   </div>
 
+  <script src="js/core/price-converter.js"></script>
   <script src="gold-calculator.js"></script>
-  <script src="app.js"></script>
+  <script src="js/i18n/translations.js"></script>
+  <script src="js/ui/formatting.js"></script>
+  <script src="js/market/price-cache.js"></script>
+  <script src="js/market/live-price-client.js"></script>
+  <script src="js/ui/market-ui.js"></script>
+  <script src="js/ui/transaction-ui.js"></script>
+  <script src="js/ui/quote-comparison-ui.js"></script>
+  <script src="js/ui/summary-ui.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

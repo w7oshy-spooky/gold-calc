@@ -2,72 +2,16 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const {
-  OUNCE_GRAMS,
-  USD_SAR_RATE,
-  ounceUsdTo24kSar,
-  ounceSarToUsd,
-  ounceSarTo24kSar,
-  gramSarTo24kSar,
-  gramSarToOunceSar,
-  gramSarToOunceUsd,
-  deriveMarketPrices,
   calculateGoldPurchase,
   calculateGoldSale,
   calculateTransaction,
   compareQuote,
-  sanitizeNonNegative,
-  normalizeKarat,
   normalizeMode,
   clampTaxRate,
   clampPercent,
 } = require('../gold-calculator.js');
 
-test('uses troy ounce grams and SAR peg constants', () => {
-  assert.equal(OUNCE_GRAMS, 31.1034768);
-  assert.equal(USD_SAR_RATE, 3.75);
-});
-
-test('converts ounce USD to 24K SAR per gram without early rounding', () => {
-  const result = ounceUsdTo24kSar(4300);
-  assert.ok(Math.abs(result - 518.4307884191262) < 1e-9);
-});
-
-test('converts SAR ounce price to USD ounce and 24K SAR per gram', () => {
-  assert.ok(Math.abs(ounceSarToUsd(16125) - 4300) < 1e-12);
-  assert.ok(Math.abs(ounceSarTo24kSar(16125) - 518.4307884191262) < 1e-9);
-});
-
-test('converts a known karat gram price back to 24K and ounce prices', () => {
-  const gram21 = 453.6269398667354;
-  assert.ok(Math.abs(gramSarTo24kSar(gram21, 21) - 518.4307884191262) < 1e-9);
-  assert.ok(Math.abs(gramSarToOunceSar(gram21, 21) - 16125) < 1e-8);
-  assert.ok(Math.abs(gramSarToOunceUsd(gram21, 21) - 4300) < 1e-8);
-});
-
-test('derives equivalent market prices from SAR ounce and SAR gram sources', () => {
-  const fromSarOunce = deriveMarketPrices({ source: 'ounce-sar', ouncePriceSar: 16125 });
-  assert.ok(Math.abs(fromSarOunce.ounceUsd - 4300) < 1e-9);
-  assert.ok(Math.abs(fromSarOunce.ounceSar - 16125) < 1e-9);
-  assert.ok(Math.abs(fromSarOunce.gram24kSar - 518.4307884191262) < 1e-9);
-  assert.ok(Math.abs(fromSarOunce.gram21kSar - 453.6269398667354) < 1e-9);
-
-  const fromGram = deriveMarketPrices({
-    source: 'gram-sar',
-    gramPriceSar: 453.6269398667354,
-    gramKarat: 21,
-  });
-  assert.ok(Math.abs(fromGram.ounceUsd - 4300) < 1e-8);
-  assert.ok(Math.abs(fromGram.ounceSar - 16125) < 1e-8);
-  assert.ok(Math.abs(fromGram.gram24kSar - 518.4307884191262) < 1e-8);
-  assert.ok(Math.abs(fromGram.gram21kSar - 453.6269398667354) < 1e-8);
-});
-
-test('invalid or non-positive ounce price converts to zero', () => {
-  assert.equal(ounceUsdTo24kSar(''), 0);
-  assert.equal(ounceUsdTo24kSar(0), 0);
-  assert.equal(ounceUsdTo24kSar(-10), 0);
-  assert.equal(ounceUsdTo24kSar('abc'), 0);
-});
+const { ounceUsdTo24kSar } = require('../js/core/price-converter.js');
 
 test('calculates a normal 21K purchase correctly', () => {
   const result = calculateGoldPurchase({
@@ -105,47 +49,11 @@ test('negative numeric inputs are sanitized to zero', () => {
   assert.equal(result.total, 0);
 });
 
-test('unsupported karat falls back to 21K', () => {
-  assert.equal(normalizeKarat(19), 21);
-  assert.equal(normalizeKarat('22'), 22);
-});
-
 test('tax rate is clamped to the supported 0-25 range', () => {
   assert.equal(clampTaxRate(-2), 0);
   assert.equal(clampTaxRate(15), 15);
   assert.equal(clampTaxRate(99), 25);
   assert.equal(clampTaxRate('abc'), 0);
-});
-
-test('sanitizeNonNegative handles blanks, NaN and valid decimals', () => {
-  assert.equal(sanitizeNonNegative(''), 0);
-  assert.equal(sanitizeNonNegative('abc'), 0);
-  assert.equal(sanitizeNonNegative(-1), 0);
-  assert.equal(sanitizeNonNegative('12.5'), 12.5);
-});
-
-test('price source is explicit: ounce mode ignores manual 24K input', () => {
-  const { resolvePrice24k } = require('../gold-calculator.js');
-  const result = resolvePrice24k({
-    source: 'ounce',
-    ouncePriceUsd: 4300,
-    manualPrice24k: 999,
-  });
-  assert.ok(Math.abs(result - ounceUsdTo24kSar(4300)) < 1e-12);
-});
-
-test('price source is explicit: manual mode ignores ounce input', () => {
-  const { resolvePrice24k } = require('../gold-calculator.js');
-  assert.equal(resolvePrice24k({
-    source: 'manual',
-    ouncePriceUsd: 4300,
-    manualPrice24k: 520.25,
-  }), 520.25);
-});
-
-test('unknown price source resolves to zero instead of guessing', () => {
-  const { resolvePrice24k } = require('../gold-calculator.js');
-  assert.equal(resolvePrice24k({ source: 'other', ouncePriceUsd: 4300, manualPrice24k: 520 }), 0);
 });
 
 test('normalizes transaction mode and clamps generic percentages', () => {

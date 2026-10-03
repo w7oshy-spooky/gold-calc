@@ -1,23 +1,16 @@
 (function (root, factory) {
-  const api = factory();
+  const converter = typeof module === 'object' && module.exports
+    ? require('./js/core/price-converter.js')
+    : root.GoldPriceConverter;
+  const api = factory(converter);
   if (typeof module === 'object' && module.exports) module.exports = api;
   root.GoldCalculator = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (converter) {
   'use strict';
 
-  const OUNCE_GRAMS = 31.1034768;
-  const USD_SAR_RATE = 3.75;
-  const SUPPORTED_KARATS = Object.freeze([18, 21, 22, 24]);
+  if (!converter) throw new Error('GoldPriceConverter is required.');
 
-  function sanitizeNonNegative(value) {
-    const n = Number.parseFloat(value);
-    return Number.isFinite(n) && n >= 0 ? n : 0;
-  }
-
-  function normalizeKarat(value) {
-    const n = Number.parseFloat(value);
-    return SUPPORTED_KARATS.includes(n) ? n : 21;
-  }
+  const { sanitizeNonNegative, normalizeKarat } = converter;
 
   function normalizeMode(value) {
     return value === 'sell' ? 'sell' : 'buy';
@@ -31,84 +24,6 @@
   function clampPercent(value) {
     const n = sanitizeNonNegative(value);
     return Math.min(100, n);
-  }
-
-  function ounceUsdTo24kSar(ouncePriceUsd) {
-    const price = sanitizeNonNegative(ouncePriceUsd);
-    if (price <= 0) return 0;
-    return (price / OUNCE_GRAMS) * USD_SAR_RATE;
-  }
-
-  function ounceSarToUsd(ouncePriceSar) {
-    const price = sanitizeNonNegative(ouncePriceSar);
-    if (price <= 0) return 0;
-    return price / USD_SAR_RATE;
-  }
-
-  function ounceSarTo24kSar(ouncePriceSar) {
-    const price = sanitizeNonNegative(ouncePriceSar);
-    if (price <= 0) return 0;
-    return price / OUNCE_GRAMS;
-  }
-
-  function gramSarTo24kSar(gramPriceSar, karat) {
-    const price = sanitizeNonNegative(gramPriceSar);
-    if (price <= 0) return 0;
-    const normalizedKarat = normalizeKarat(karat);
-    return price * (24 / normalizedKarat);
-  }
-
-  function gramSarToOunceSar(gramPriceSar, karat) {
-    const price24k = gramSarTo24kSar(gramPriceSar, karat);
-    if (price24k <= 0) return 0;
-    return price24k * OUNCE_GRAMS;
-  }
-
-  function gramSarToOunceUsd(gramPriceSar, karat) {
-    const ounceSar = gramSarToOunceSar(gramPriceSar, karat);
-    if (ounceSar <= 0) return 0;
-    return ounceSar / USD_SAR_RATE;
-  }
-
-  function resolvePrice24k({
-    source,
-    ouncePriceUsd,
-    ouncePriceSar,
-    gramPriceSar,
-    gramKarat,
-    manualPrice24k,
-  } = {}) {
-    if (source === 'live' || source === 'ounce' || source === 'ounce-usd') {
-      return ounceUsdTo24kSar(ouncePriceUsd);
-    }
-    if (source === 'ounce-sar') return ounceSarTo24kSar(ouncePriceSar);
-    if (source === 'gram-sar') return gramSarTo24kSar(gramPriceSar, gramKarat);
-    if (source === 'manual') return sanitizeNonNegative(manualPrice24k);
-    return 0;
-  }
-
-  function deriveMarketPrices(input = {}) {
-    const gram24kSar = resolvePrice24k(input);
-    if (gram24kSar <= 0) {
-      return {
-        ounceUsd: 0,
-        ounceSar: 0,
-        gram24kSar: 0,
-        gram22kSar: 0,
-        gram21kSar: 0,
-        gram18kSar: 0,
-      };
-    }
-
-    const ounceSar = gram24kSar * OUNCE_GRAMS;
-    return {
-      ounceUsd: ounceSar / USD_SAR_RATE,
-      ounceSar,
-      gram24kSar,
-      gram22kSar: gram24kSar * (22 / 24),
-      gram21kSar: gram24kSar * (21 / 24),
-      gram18kSar: gram24kSar * (18 / 24),
-    };
   }
 
   function calculateGoldPurchase(input = {}) {
@@ -215,22 +130,9 @@
   }
 
   return {
-    OUNCE_GRAMS,
-    USD_SAR_RATE,
-    SUPPORTED_KARATS,
-    sanitizeNonNegative,
-    normalizeKarat,
     normalizeMode,
     clampTaxRate,
     clampPercent,
-    ounceUsdTo24kSar,
-    ounceSarToUsd,
-    ounceSarTo24kSar,
-    gramSarTo24kSar,
-    gramSarToOunceSar,
-    gramSarToOunceUsd,
-    resolvePrice24k,
-    deriveMarketPrices,
     calculateGoldPurchase,
     calculateGoldSale,
     calculateTransaction,
