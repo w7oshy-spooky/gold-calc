@@ -56,7 +56,7 @@
     priceConverter,
     copy,
     onChange(change) {
-      if (change.type === 'karat') vibrate();
+      if (change.type === 'karat' || change.type === 'adjust') vibrate();
       calculate();
     },
   });
@@ -162,15 +162,6 @@
 
     return result;
   }
-
-  function adjust(id, amount) {
-    const value = transactionUi.adjust(id, amount);
-    vibrate();
-    calculate();
-    return value;
-  }
-
-  globalThis.adjust = adjust;
 
   window.addEventListener('load', () => {
     setTransactionMode('buy');
