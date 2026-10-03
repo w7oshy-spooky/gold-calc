@@ -133,7 +133,7 @@
       }
 
       elements.marketPrice.value = formatting.formatInput(prices.gram24kSar, 2);
-      elements.equivalentOunceUSD.textContent = `$${formatting.formatMoney(prices.ounceUsd)}`;
+      elements.equivalentOunceUSD.textContent = formatting.formatMoney(prices.ounceUsd);
       elements.equivalentOunceSAR.textContent = `${formatting.formatMoney(prices.ounceSar)} ${sarLabel}`;
       elements.equivalentGram24.textContent = `${formatting.formatMoney(prices.gram24kSar)} ${gramLabel}`;
       elements.equivalentGram22.textContent = `${formatting.formatMoney(prices.gram22kSar)} ${gramLabel}`;
