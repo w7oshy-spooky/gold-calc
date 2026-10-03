@@ -46,7 +46,6 @@ test('Arabic and English dynamic copy expose the same contract', () => {
     'liveStale',
     'liveCached',
     'liveUnavailable',
-    'refresh',
     'lastUpdated',
     'source',
     'buyHelp',
