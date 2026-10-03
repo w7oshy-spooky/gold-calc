@@ -5,7 +5,9 @@
     !globalThis.GoldPriceConverter ||
     !globalThis.GoldCalculator ||
     !globalThis.GoldFormatting ||
-    !globalThis.GoldTranslations
+    !globalThis.GoldTranslations ||
+    !globalThis.GoldPriceCache ||
+    !globalThis.GoldLivePriceClient
   ) {
     console.error('Gold calculator dependencies are not loaded.');
     return;
@@ -15,9 +17,6 @@
   const core = globalThis.GoldCalculator;
   const $ = (id) => document.getElementById(id);
   const locale = document.documentElement.lang === 'ar' ? 'ar' : 'en';
-  const LIVE_CACHE_KEY = 'gold-calc-live-quote-v1';
-  const LIVE_CACHE_MAX_AGE_MS = 15 * 60 * 1000;
-
   const copy = globalThis.GoldTranslations.getCopy(locale);
   const {
     formatMoney,
@@ -27,6 +26,8 @@
     sourceDisplayName,
     formatLiveTime,
   } = globalThis.GoldFormatting.createFormatting(locale);
+  const priceCache = globalThis.GoldPriceCache.createPriceCache();
+  const livePriceClient = globalThis.GoldLivePriceClient.createLivePriceClient();
 
   function installLiveUi() {
     const firstSourceButton = document.querySelector('.source-btn');
@@ -143,25 +144,6 @@
     if (dot) dot.dataset.state = status.dataset.state;
   }
 
-  function cacheLiveQuote(quote) {
-    try {
-      localStorage.setItem(LIVE_CACHE_KEY, JSON.stringify({ quote, storedAt: Date.now() }));
-    } catch {}
-  }
-
-  function useCachedLiveQuote() {
-    try {
-      const cached = JSON.parse(localStorage.getItem(LIVE_CACHE_KEY) || 'null');
-      if (!cached?.quote || !Number.isFinite(cached.storedAt)) return false;
-      if (Date.now() - cached.storedAt > LIVE_CACHE_MAX_AGE_MS) return false;
-      if (!Number.isFinite(Number(cached.quote.priceUsdOunce)) || Number(cached.quote.priceUsdOunce) <= 0) return false;
-      applyLiveQuote(cached.quote, 'cached');
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   function applyLiveQuote(quote, state = 'live') {
     liveQuote = quote;
     inputs.ouncePriceUSD.value = formatInput(Number(quote.priceUsdOunce), 2);
@@ -188,29 +170,15 @@
     if (inputs.liveRefresh) inputs.liveRefresh.disabled = true;
     renderLiveStatus(liveQuote, 'loading');
 
-    const controller = typeof AbortController === 'function' ? new AbortController() : null;
-    const timeout = controller ? setTimeout(() => controller.abort(), 8000) : null;
-
     try {
-      const url = force ? `/api/gold-price?refresh=${Date.now()}` : '/api/gold-price';
-      const response = await fetch(url, {
-        headers: { accept: 'application/json' },
-        cache: 'no-store',
-        ...(controller ? { signal: controller.signal } : {}),
-      });
-      if (!response.ok) throw new Error(`Live price HTTP ${response.status}`);
-      const quote = await response.json();
-      if (!Number.isFinite(Number(quote.priceUsdOunce)) || Number(quote.priceUsdOunce) <= 0) {
-        throw new Error('Invalid live quote');
-      }
-      if (Number.isNaN(new Date(quote.updatedAt).getTime())) throw new Error('Invalid live timestamp');
-
-      cacheLiveQuote(quote);
+      const quote = await livePriceClient.fetchQuote({ force });
+      priceCache.writeCachedQuote(quote);
       applyLiveQuote(quote, 'live');
-    } catch (error) {
-      if (!useCachedLiveQuote()) fallbackToManualPrice();
+    } catch {
+      const cachedQuote = priceCache.readCachedQuote();
+      if (cachedQuote) applyLiveQuote(cachedQuote, 'cached');
+      else fallbackToManualPrice();
     } finally {
-      if (timeout) clearTimeout(timeout);
       liveFetchInFlight = false;
       if (inputs.liveRefresh) inputs.liveRefresh.disabled = false;
     }
