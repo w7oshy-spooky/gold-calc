@@ -1,11 +1,12 @@
 (function () {
   'use strict';
 
-  if (!globalThis.GoldCalculator) {
-    console.error('GoldCalculator core is not loaded.');
+  if (!globalThis.GoldPriceConverter || !globalThis.GoldCalculator) {
+    console.error('Gold calculator dependencies are not loaded.');
     return;
   }
 
+  const priceConverter = globalThis.GoldPriceConverter;
   const core = globalThis.GoldCalculator;
   const $ = (id) => document.getElementById(id);
   const locale = document.documentElement.lang === 'ar' ? 'ar' : 'en';
@@ -190,7 +191,7 @@
   }
 
   function sanitizeVisibleField(el, decimals = null) {
-    const value = core.sanitizeNonNegative(el.value);
+    const value = priceConverter.sanitizeNonNegative(el.value);
     if (el.value !== '' && (Number.parseFloat(el.value) < 0 || !Number.isFinite(Number.parseFloat(el.value)))) {
       el.value = '0';
     }
@@ -216,7 +217,7 @@
   }
 
   function renderLiveKaratPrices(priceUsdOunce) {
-    const price24k = core.ounceUsdTo24kSar(priceUsdOunce);
+    const price24k = priceConverter.ounceUsdTo24kSar(priceUsdOunce);
     setText('liveKarat24', `${formatMoney(price24k)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
     setText('liveKarat22', `${formatMoney(price24k * 22 / 24)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
     setText('liveKarat21', `${formatMoney(price24k * 21 / 24)} ${locale === 'ar' ? 'ر.س/ج' : 'SAR/g'}`);
@@ -399,7 +400,7 @@
   }
 
   function getPrice24k() {
-    const prices = core.deriveMarketPrices({
+    const prices = priceConverter.deriveMarketPrices({
       source: inputs.priceSource.value,
       ouncePriceUsd: inputs.ouncePriceUSD.value,
       ouncePriceSar: inputs.ouncePriceSAR.value,
@@ -451,8 +452,8 @@
     setText('selectedKaratLabel', result.karat);
     setText('summaryWeight', result.weight);
     setText('summaryKarat', result.karat);
-    setText('workmanshipLabel', core.sanitizeNonNegative(inputs.workmanship.value));
-    setText('profitLabel', core.sanitizeNonNegative(inputs.profit.value));
+    setText('workmanshipLabel', priceConverter.sanitizeNonNegative(inputs.workmanship.value));
+    setText('profitLabel', priceConverter.sanitizeNonNegative(inputs.profit.value));
     setText('sellDeductionLabel', core.clampPercent(inputs.sellDeduction.value));
 
     const selling = mode === 'sell';
@@ -494,7 +495,7 @@
 
   function adjust(id, amount) {
     const el = $(id);
-    const current = core.sanitizeNonNegative(el.value);
+    const current = priceConverter.sanitizeNonNegative(el.value);
     const next = Math.max(0, current + amount);
     el.value = id === 'weight' ? Number(next.toFixed(2)) : Math.round(next);
     vibrate();
@@ -502,7 +503,7 @@
   }
 
   function setKarat(value) {
-    const karat = core.normalizeKarat(value);
+    const karat = priceConverter.normalizeKarat(value);
     inputs.karat.value = karat;
     document.querySelectorAll('.karat-btn').forEach((button) => {
       const active = Number(button.dataset.val) === karat;
@@ -514,7 +515,7 @@
   }
 
   function setGramInputKarat(value) {
-    const karat = core.normalizeKarat(value);
+    const karat = priceConverter.normalizeKarat(value);
     inputs.gramInputKarat.value = karat;
     document.querySelectorAll('.gram-karat-btn').forEach((button) => {
       const active = Number(button.dataset.gramKarat) === karat;
