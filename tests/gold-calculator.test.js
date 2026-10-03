@@ -56,9 +56,6 @@ test('tax rate is clamped to the supported 0-25 range', () => {
   assert.equal(clampTaxRate('abc'), 0);
 });
 
-  assert.ok(Math.abs(result - ounceUsdTo24kSar(4300)) < 1e-12);
-});
-
 test('normalizes transaction mode and clamps generic percentages', () => {
   assert.equal(normalizeMode('sell'), 'sell');
   assert.equal(normalizeMode('other'), 'buy');
