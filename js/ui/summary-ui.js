@@ -45,7 +45,8 @@
 
       if (selling) {
         elements.goldCostOutput.textContent = formatting.formatMoney(result.rawMetalValue);
-        elements.laborCostOutput.textContent = formatting.formatMoney(result.deductionValue);
+        const deduction = formatting.formatMoney(result.deductionValue);
+        elements.laborCostOutput.textContent = result.deductionValue > 0 ? `−${deduction}` : deduction;
         elements.subtotalOutput.textContent = formatting.formatMoney(result.total);
         elements.vatOutput.textContent = '0.00';
       } else {
