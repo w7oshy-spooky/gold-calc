@@ -28,5 +28,15 @@ jobs:
           node --check js/ui/transaction-ui.js
           node --check js/ui/quote-comparison-ui.js
           node --check js/ui/summary-ui.js
+          node --check js/ui/share-ui.js
+          node --check js/state/preferences-store.js
           node --check js/app.js
       - run: node --test tests/*.test.js
+      - name: Verify tailwind.css matches the classes used in the pages
+        run: |
+          npx --yes tailwindcss@3.4.17 -c tailwind.config.js -o "$RUNNER_TEMP/tailwind.css" --minify
+          diff -q tailwind.css "$RUNNER_TEMP/tailwind.css" || {
+            echo "tailwind.css is out of date. Regenerate it with:"
+            echo "  npx --yes tailwindcss@3.4.17 -c tailwind.config.js -o tailwind.css --minify"
+            exit 1
+          }

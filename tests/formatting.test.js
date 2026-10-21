@@ -16,6 +16,14 @@ test('formats money and signed values without changing current output', () => {
   assert.equal(ar.formatSignedMoney(30), '+30.00 ر.س');
   assert.equal(en.formatSignedPercent(3), '+3.00%');
   assert.equal(en.formatSignedPercent(-3), '−3.00%');
+  assert.equal(en.formatSar(1234.5), '1,234.50 SAR');
+  assert.equal(ar.formatSar(1234.5), '1,234.50 ر.س');
+});
+
+test('Arabic live timestamps use the Gregorian calendar and Latin digits', () => {
+  const formatted = createFormatting('ar').formatLiveTime('2026-10-21T12:00:00Z');
+  assert.match(formatted, /2026/);
+  assert.doesNotMatch(formatted, /[\u0660-\u0669]/);
 });
 
 test('formats source labels and invalid live timestamps consistently', () => {
@@ -34,6 +42,7 @@ test('Arabic and English dynamic copy expose the same contract', () => {
   assert.deepEqual(Object.keys(ar.statuses).sort(), Object.keys(en.statuses).sort());
   assert.deepEqual(Object.keys(ar.buyLabels).sort(), Object.keys(en.buyLabels).sort());
   assert.deepEqual(Object.keys(ar.sellLabels).sort(), Object.keys(en.sellLabels).sort());
+  assert.deepEqual(Object.keys(ar.shareLabels).sort(), Object.keys(en.shareLabels).sort());
 
   for (const key of [
     'liveMode',
@@ -53,6 +62,10 @@ test('Arabic and English dynamic copy expose the same contract', () => {
     'buyQuoteLabel',
     'sellQuoteLabel',
     'comparePrompt',
+    'shareNeedsPrice',
+    'shareCopied',
+    'shareFailed',
+    'resetDone',
   ]) {
     assert.equal(typeof ar[key], 'string');
     assert.equal(typeof en[key], 'string');

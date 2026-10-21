@@ -7,7 +7,7 @@
 
   const COPY = {
     ar: {
-      liveMode: 'يتم جلب سعر الأوقية الحي تلقائيًا ثم تحويله إلى سعر جرام 24 قيراط بالريال السعودي.',
+      liveMode: 'يتم جلب سعر الأوقية الحي تلقائيًا وتحديثه كل دقيقة، ثم تحويله إلى سعر جرام 24 قيراط بالريال السعودي.',
       ounceMode: 'أدخل سعر الأوقية بالدولار، وسيتم تحويله إلى الريال وأسعار الجرام تلقائيًا.',
       ounceSarMode: 'أدخل سعر الأوقية بالريال السعودي، وسيتم حساب السعر المكافئ بالدولار وأسعار الجرام.',
       gramSarMode: 'أدخل سعر جرام الذهب الخام بالريال وحدد عياره لحساب سعر الأوقية والقيم المكافئة.',
@@ -33,6 +33,22 @@
         low: 'عرض الشراء أقل من المرجع بأكثر من 5%.',
         above_reference: 'عرض الشراء أعلى من السعر المرجعي.',
       },
+      shareLabels: {
+        title: 'حاسبة الذهب',
+        buy: 'شراء مجوهرات',
+        sell: 'بيع ذهب مستعمل',
+        weight: 'الوزن (جرام)',
+        karat: 'العيار',
+        gramPrice: 'سعر الجرام للعيار المختار',
+        vat: 'ض.ق.م',
+        quote: 'عرض المحل',
+        price24k: 'سعر جرام 24 قيراط المرجعي',
+        disclaimer: 'تقدير إرشادي — قد يختلف سعر التنفيذ الفعلي لدى المحل.',
+      },
+      shareNeedsPrice: 'أدخل سعرًا صالحًا أولًا لمشاركة الملخص.',
+      shareCopied: 'تم نسخ الملخص ✓',
+      shareFailed: 'تعذر النسخ على هذا المتصفح.',
+      resetDone: 'تمت إعادة الضبط إلى القيم الافتراضية.',
       buyLabels: {
         primary: 'تكلفة الذهب',
         secondary: 'مصنعية + ربح',
@@ -47,7 +63,7 @@
       },
     },
     en: {
-      liveMode: 'The live troy-ounce price is fetched automatically and converted to the 24K gram price in Saudi riyals.',
+      liveMode: 'The live troy-ounce price is fetched automatically, refreshed every minute and converted to the 24K gram price in Saudi riyals.',
       ounceMode: 'Enter the ounce price in USD to calculate SAR ounce and gram equivalents automatically.',
       ounceSarMode: 'Enter the ounce price in SAR to calculate its USD and gram equivalents.',
       gramSarMode: 'Enter a raw gold gram price in SAR and choose its karat to calculate ounce and equivalent prices.',
@@ -73,6 +89,22 @@
         low: 'The buyback offer is more than 5% below the reference.',
         above_reference: 'The buyback offer is above the reference amount.',
       },
+      shareLabels: {
+        title: 'Gold Calculator',
+        buy: 'Buy jewellery',
+        sell: 'Sell used gold',
+        weight: 'Weight (g)',
+        karat: 'Karat',
+        gramPrice: 'Gram price for selected karat',
+        vat: 'VAT',
+        quote: 'Shop quote',
+        price24k: 'Reference 24K gram price',
+        disclaimer: 'Indicative estimate — the actual shop price may differ.',
+      },
+      shareNeedsPrice: 'Enter a valid price first to share the summary.',
+      shareCopied: 'Summary copied ✓',
+      shareFailed: 'Copying is not available in this browser.',
+      resetDone: 'Inputs were reset to their defaults.',
       buyLabels: {
         primary: 'Gold cost',
         secondary: 'Workmanship + margin',

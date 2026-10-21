@@ -114,3 +114,8 @@ test('API returns 502 when both live sources fail', async () => {
   assert.equal(res.statusCode, 502);
   assert.deepEqual(res.body, { error: 'live_price_unavailable' });
 });
+
+test('both upstream attempts fit inside the browser live-price timeout', () => {
+  const { LIVE_REQUEST_TIMEOUT_MS } = require('../js/market/live-price-client.js');
+  assert.ok(api.UPSTREAM_TIMEOUT_MS * 2 < LIVE_REQUEST_TIMEOUT_MS);
+});

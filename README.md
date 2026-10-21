@@ -15,6 +15,12 @@ Bilingual Arabic and English calculator for gold jewellery pricing and used-gold
 - Buy mode: metal value + workmanship + optional extra margin + configurable VAT
 - Sell mode: raw metal value minus an explicit buyer deduction percentage
 - Shop Quote Comparison: compares an entered quote with the calculated reference total and reports the SAR and percentage difference
+- LIVE prices refresh automatically every minute while the page is visible, without flashing a loading state
+- Inputs (mode, karat, weight, workmanship, VAT, deduction, price source and manual prices) are remembered on the device; **Reset** restores the defaults
+- **Share summary** sends the calculation through the native share sheet, or copies it to the clipboard
+- Installable as a home-screen web app (`manifest.webmanifest`, `icon.svg`)
+- Saved preferences: `js/state/preferences-store.js`
+- Share summary / reset actions: `js/ui/share-ui.js`
 - Market-price conversion: `js/core/price-converter.js`
 - Transaction calculation core: `gold-calculator.js`
 - Live quote normalization: `live-gold.js`
@@ -43,6 +49,8 @@ node --check js/ui/market-ui.js
 node --check js/ui/transaction-ui.js
 node --check js/ui/quote-comparison-ui.js
 node --check js/ui/summary-ui.js
+node --check js/ui/share-ui.js
+node --check js/state/preferences-store.js
 node --check js/app.js
 node --test tests/*.test.js
 ```
@@ -52,4 +60,9 @@ No live-price API key is required for the current providers. The Vercel Function
 
 ## Frontend architecture
 
-The browser app stays dependency-free and does not require a build step. Price conversion, network/cache behavior, formatting/translations, and DOM rendering are separated into focused modules; `js/app.js` coordinates them and keeps the existing static Vercel deployment model.
+The browser app stays dependency-free at runtime. Utility classes are served from the prebuilt `tailwind.css` instead of the Tailwind Play CDN script; after adding or changing Tailwind classes in the HTML or JS, regenerate it (CI fails if it is stale):
+
+```bash
+npx --yes tailwindcss@3.4.17 -c tailwind.config.js -o tailwind.css --minify
+```
+ Price conversion, network/cache behavior, formatting/translations, and DOM rendering are separated into focused modules; `js/app.js` coordinates them and keeps the existing static Vercel deployment model.

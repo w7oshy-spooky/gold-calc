@@ -109,6 +109,23 @@
       };
     }
 
+    function applyManualInput(values = {}) {
+      for (const [element, value] of [
+        [elements.ouncePriceUSD, values.ouncePriceUsd],
+        [elements.ouncePriceSAR, values.ouncePriceSar],
+        [elements.gramPriceSAR, values.gramPriceSar],
+      ]) {
+        if (value === undefined) continue;
+        const n = Number(value);
+        element.value = value === '' || !Number.isFinite(n) || n <= 0 ? '' : Number(n.toFixed(2)).toString();
+      }
+      if (values.gramKarat !== undefined) setGramInputKarat(values.gramKarat);
+    }
+
+    function resetManualInput() {
+      applyManualInput({ ouncePriceUsd: '', ouncePriceSar: '', gramPriceSar: '', gramKarat: 21 });
+    }
+
     function getPriceSource() {
       return elements.priceSource.value;
     }
@@ -257,6 +274,8 @@
       getPriceSource,
       setPriceSource,
       setGramInputKarat,
+      applyManualInput,
+      resetManualInput,
       renderMarketEquivalents,
       renderLiveStatus,
       renderLiveKaratPrices,

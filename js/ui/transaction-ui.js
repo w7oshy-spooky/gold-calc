@@ -98,8 +98,38 @@
 
       const current = priceConverter.sanitizeNonNegative(element.value);
       const next = Math.max(0, current + amount);
-      element.value = id === 'weight' ? Number(next.toFixed(2)) : Math.round(next);
+      element.value = Number(next.toFixed(2));
       return element.value;
+    }
+
+    function setNumericField(element, value) {
+      const n = Number(value);
+      if (value === undefined || value === null || !Number.isFinite(n) || n < 0) return;
+      element.value = Number(n.toFixed(2));
+    }
+
+    function applyInput(values = {}) {
+      if (values.mode !== undefined) setTransactionMode(values.mode);
+      if (values.karat !== undefined) setKarat(values.karat);
+      setNumericField(elements.weight, values.weight);
+      setNumericField(elements.workmanship, values.workmanshipPerGram);
+      setNumericField(elements.profit, values.profitPerGram);
+      if (values.taxRate !== undefined) {
+        const rate = core.clampTaxRate(values.taxRate);
+        elements.tax.value = rate;
+        elements.taxRange.value = rate;
+      }
+      if (values.deductionRate !== undefined) {
+        elements.sellDeduction.value = core.clampPercent(values.deductionRate);
+      }
+      if (values.quotedTotal !== undefined) elements.quotedTotal.value = values.quotedTotal;
+    }
+
+    // The static page markup carries the default values; capture them before any restore.
+    const defaults = getTransactionInput();
+
+    function resetInput() {
+      applyInput(defaults);
     }
 
     function renderInputLabels() {
@@ -183,6 +213,8 @@
       getTransactionInput,
       setTransactionMode,
       setKarat,
+      applyInput,
+      resetInput,
       renderInputLabels,
     };
   }

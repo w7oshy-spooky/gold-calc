@@ -21,6 +21,10 @@
       return value.toFixed(decimals);
     }
 
+    function formatSar(value) {
+      return `${formatMoney(value)} ${sarLabel}`;
+    }
+
     function formatSignedMoney(value) {
       const sign = value > 0 ? '+' : value < 0 ? '−' : '';
       return `${sign}${formatMoney(Math.abs(value))} ${sarLabel}`;
@@ -40,7 +44,8 @@
     function formatLiveTime(value) {
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return '—';
-      return new Intl.DateTimeFormat(safeLocale === 'ar' ? 'ar-SA' : 'en-US', {
+      // Gregorian calendar and Latin digits keep timestamps consistent with the money figures.
+      return new Intl.DateTimeFormat(safeLocale === 'ar' ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-US', {
         dateStyle: 'medium',
         timeStyle: 'short',
       }).format(date);
@@ -49,6 +54,7 @@
     return {
       formatMoney,
       formatInput,
+      formatSar,
       formatSignedMoney,
       formatSignedPercent,
       sourceDisplayName,

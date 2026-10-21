@@ -1,0 +1,15 @@
+{
+  "name": "حاسبة الذهب الذكية",
+  "short_name": "حاسبة الذهب",
+  "description": "حاسبة لشراء وبيع الذهب بالريال السعودي مع العيار والمصنعية والضريبة ومقارنة عرض المحل.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#d97706",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

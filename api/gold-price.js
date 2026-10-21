@@ -7,10 +7,12 @@ const {
 
 const GOLD_API_URL = 'https://api.gold-api.com/price/XAU';
 const XAUS_URL = 'https://xaus.com/api/v1/spot';
+// Both providers together must answer within the browser's 8s live-price timeout.
+const UPSTREAM_TIMEOUT_MS = 3500;
 
 async function fetchJson(fetchImpl, url) {
   const controller = typeof AbortController === 'function' ? new AbortController() : null;
-  const timeout = controller ? setTimeout(() => controller.abort(), 5000) : null;
+  const timeout = controller ? setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS) : null;
 
   try {
     const response = await fetchImpl(url, {
@@ -50,3 +52,4 @@ function createGoldPriceHandler({ fetchImpl = globalThis.fetch } = {}) {
 const handler = createGoldPriceHandler();
 module.exports = handler;
 module.exports.createGoldPriceHandler = createGoldPriceHandler;
+module.exports.UPSTREAM_TIMEOUT_MS = UPSTREAM_TIMEOUT_MS;

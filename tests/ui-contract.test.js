@@ -115,6 +115,8 @@ test('Arabic and English pages load the modular scripts in dependency order', ()
       'js/ui/transaction-ui.js',
       'js/ui/quote-comparison-ui.js',
       'js/ui/summary-ui.js',
+      'js/state/preferences-store.js',
+      'js/ui/share-ui.js',
       'js/app.js',
     ];
     let previous = -1;
@@ -242,4 +244,47 @@ test('desktop dashboard starts below the header without overlap', () => {
     styles,
     /@media\(min-width:1100px\)[\s\S]*?\.desktop-dashboard\{[^}]*margin-top:-/
   );
+});
+
+test('pages use the prebuilt stylesheet instead of runtime CDN styling', () => {
+  assert.ok(fs.existsSync('tailwind.css'), 'tailwind.css must be committed');
+  for (const html of [arabic, english]) {
+    assert.doesNotMatch(html, /cdn\.tailwindcss\.com/);
+    assert.doesNotMatch(html, /font-awesome/);
+    assert.ok(html.indexOf('href="tailwind.css"') < html.indexOf('href="styles.css"'));
+    assert.match(html, /rel="manifest" href="manifest\.webmanifest"/);
+    assert.match(html, /rel="icon" href="icon\.svg"/);
+  }
+  const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
+  assert.equal(manifest.start_url, 'index.html');
+  assert.ok(fs.existsSync(manifest.icons[0].src));
+});
+
+test('both pages expose the quick actions card', () => {
+  for (const html of [arabic, english]) {
+    for (const id of ['shareSummary', 'resetInputs', 'actionStatus']) {
+      assert.match(html, new RegExp(`id=["']${id}["']`));
+    }
+    assert.ok(html.indexOf('actions-card') < html.indexOf('class="bottom-receipt dashboard-result"'));
+  }
+  assert.match(styles, /\.actions-card\{grid-column:2;/);
+});
+
+test('a live quote that arrives after switching to manual entry is not applied', () => {
+  assert.match(
+    app,
+    /const quote = await livePriceClient\.fetchQuote\(\{ force \}\);[\s\S]*?if \(isLiveSource\(\)\) applyLiveQuote\(quote, 'live'\);/
+  );
+  assert.match(app, /catch \{\s*if \(!isLiveSource\(\)\) return;/);
+});
+
+test('live price refreshes in the background only while visible in LIVE mode', () => {
+  assert.match(app, /LIVE_AUTO_REFRESH_MS = 60 \* 1000/);
+  assert.match(app, /function refreshLiveInBackground\(\) \{\s*if \(!isLiveSource\(\) \|\| document\.visibilityState !== 'visible'\) return;/);
+  assert.match(app, /addEventListener\('visibilitychange', refreshLiveInBackground\)/);
+});
+
+test('an automatic LIVE fallback is not saved as the preferred source', () => {
+  assert.match(app, /liveFallbackActive = true;\s*setPriceSource\('ounce-usd', \{ fetchLive: false \}\);/);
+  assert.match(app, /const source = liveFallbackActive \? 'live' : market\.source;/);
 });
