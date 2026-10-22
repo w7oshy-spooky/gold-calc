@@ -4,49 +4,37 @@ const assert = require('node:assert/strict');
 const { buildSummaryText, createShareUI } = require('../js/ui/share-ui.js');
 const { createFormatting } = require('../js/ui/formatting.js');
 const { getCopy } = require('../js/i18n/translations.js');
-const { calculateTransaction, compareQuote } = require('../gold-calculator.js');
+const { calculateTransaction } = require('../gold-calculator.js');
 
 const price24k = 518.4307884191262;
 
-test('builds a buy summary with VAT and quote comparison', () => {
+test('builds a buy summary with VAT', () => {
   const result = calculateTransaction({
     mode: 'buy', price24k, weight: 15, karat: 21, workmanshipPerGram: 35, profitPerGram: 0, taxRate: 15,
   });
-  const comparison = compareQuote({ mode: 'buy', referenceTotal: result.total, quotedTotal: 9000 });
-  const text = buildSummaryText({
-    result, comparison, quotedTotal: '9000', price24k, copy: getCopy('en'), formatting: createFormatting('en'),
-  });
+  const text = buildSummaryText({ result, price24k, copy: getCopy('en'), formatting: createFormatting('en') });
 
   assert.equal(text, [
-    'Gold Calculator — Buy jewellery',
+    'Gold Calculator — Buy',
     'Weight (g): 15 · Karat: 21',
     'Gram price for selected karat: 453.63 SAR',
-    'Gold cost: 6,804.40 SAR',
-    'Workmanship + margin: 525.00 SAR',
+    'Gold: 6,804.40 SAR',
+    'Workmanship: 525.00 SAR',
     'VAT (15%): 1,099.41 SAR',
-    'Final amount: 8,428.81 SAR',
-    'Shop quote: 9,000.00 SAR (+571.19 SAR · +6.78%)',
-    'Reference 24K gram price: 518.43 SAR',
+    'Total to pay: 8,428.81 SAR',
+    '24K gram price: 518.43 SAR',
     'Indicative estimate — the actual shop price may differ.',
   ].join('\n'));
 });
 
 test('builds a sell summary with the buyer deduction and no VAT line', () => {
   const result = calculateTransaction({ mode: 'sell', price24k, weight: 15, karat: 21, deductionRate: 3 });
-  const text = buildSummaryText({
-    result,
-    comparison: { available: false },
-    quotedTotal: '',
-    price24k,
-    copy: getCopy('ar'),
-    formatting: createFormatting('ar'),
-  });
+  const text = buildSummaryText({ result, price24k, copy: getCopy('ar'), formatting: createFormatting('ar') });
 
-  assert.match(text, /^حاسبة الذهب — بيع ذهب مستعمل/);
-  assert.match(text, /خصم المشتري \(3%\): −204\.13 ر\.س/);
-  assert.match(text, /المبلغ المرجعي المتوقع: 6,600\.27 ر\.س/);
-  assert.doesNotMatch(text, /ض\.ق\.م/);
-  assert.doesNotMatch(text, /عرض المحل/);
+  assert.match(text, /^حاسبة الذهب — بيع/);
+  assert.match(text, /الخصم \(3%\): −204\.13 ر\.س/);
+  assert.match(text, /ستستلم: 6,600\.27 ر\.س/);
+  assert.doesNotMatch(text, /الضريبة/);
 });
 
 function fakeDocument() {
@@ -136,15 +124,15 @@ test('shares the whole invoice instead of the draft piece when it has items', ()
     ],
   });
   const text = buildSummaryText({
-    result, comparison: { available: false }, quotedTotal: '', price24k, invoice,
+    result, price24k, invoice,
     copy: getCopy('en'), formatting: createFormatting('en'),
   });
   assert.equal(text, [
     'Gold Calculator — Invoice (2)',
     '1. Buy · 15 g · Karat 21: 8,428.81 SAR',
-    '2. Sell/trade-in · 10 g · Karat 21: −4,536.27 SAR',
-    'Net amount to pay: 3,892.55 SAR',
-    'Reference 24K gram price: 518.43 SAR',
+    '2. Sell · 10 g · Karat 21: −4,536.27 SAR',
+    'Net to pay: 3,892.55 SAR',
+    '24K gram price: 518.43 SAR',
     'Indicative estimate — the actual shop price may differ.',
   ].join('\n'));
 });
@@ -152,5 +140,5 @@ test('shares the whole invoice instead of the draft piece when it has items', ()
 test('a 0% sell deduction is shared without a minus sign', () => {
   const result = calculateTransaction({ mode: 'sell', price24k, weight: 10, karat: 21, deductionRate: 0 });
   const text = buildSummaryText({ result, price24k, copy: getCopy('en'), formatting: createFormatting('en') });
-  assert.match(text, /Buyer deduction \(0%\): 0\.00 SAR/);
+  assert.match(text, /Deduction \(0%\): 0\.00 SAR/);
 });

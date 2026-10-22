@@ -26,7 +26,6 @@ jobs:
           node --check js/ui/formatting.js
           node --check js/ui/market-ui.js
           node --check js/ui/transaction-ui.js
-          node --check js/ui/quote-comparison-ui.js
           node --check js/ui/summary-ui.js
           node --check js/ui/share-ui.js
           node --check js/state/preferences-store.js

@@ -10,7 +10,6 @@
     'GoldLivePriceClient',
     'GoldMarketUI',
     'GoldTransactionUI',
-    'GoldQuoteComparisonUI',
     'GoldSummaryUI',
     'GoldPreferencesStore',
     'GoldShareUI',
@@ -39,7 +38,6 @@
   let liveFetchInFlight = false;
   let lastLiveFetchAt = 0;
   let lastResult = null;
-  let lastComparison = null;
   let restoring = true;
   // True while the page fell back to manual entry on its own because LIVE failed.
   let liveFallbackActive = false;
@@ -77,17 +75,10 @@
     document,
     core,
     priceConverter,
-    copy,
     onChange(change) {
-      if (change.type === 'karat' || change.type === 'adjust') vibrate();
+      if (change.type === 'karat' || change.type === 'adjust' || change.type === 'chip') vibrate();
       calculate();
     },
-  });
-
-  const quoteComparisonUi = globalThis.GoldQuoteComparisonUI.createQuoteComparisonUI({
-    document,
-    copy,
-    formatting,
   });
 
   const summaryUi = globalThis.GoldSummaryUI.createSummaryUI({
@@ -98,7 +89,6 @@
 
   function showLiveQuoteValues(quote) {
     marketUi.setLiveQuoteInput(Number(quote.priceUsdOunce));
-    marketUi.renderLiveKaratPrices(Number(quote.priceUsdOunce));
   }
 
   function applyLiveQuote(quote, state = 'live') {
@@ -107,7 +97,7 @@
     calculate();
   }
 
-  shareUiApi.createShareUI({
+  const shareUi = shareUiApi.createShareUI({
     document,
     copy,
     navigator,
@@ -115,8 +105,6 @@
       if (!lastResult || lastResult.price24k <= 0) return '';
       return shareUiApi.buildSummaryText({
         result: lastResult,
-        comparison: lastComparison,
-        quotedTotal: transactionUi.getTransactionInput().quotedTotal,
         price24k: lastResult.price24k,
         invoice: lastInvoice,
         copy,
@@ -145,7 +133,7 @@
       vibrate();
       invoiceItems = [];
       calculate();
-      invoiceUi.showStatus(copy.invoiceCleared);
+      shareUi.showStatus(copy.invoiceCleared);
     },
   });
 
@@ -158,17 +146,17 @@
   function addCurrentPieceToInvoice() {
     const item = preferencesApi.sanitizeInvoiceItem(transactionUi.getTransactionInput());
     if (!item) {
-      invoiceUi.showStatus(copy.invoiceNeedsWeight, 'error');
+      shareUi.showStatus(copy.invoiceNeedsWeight, 'error');
       return;
     }
     if (invoiceItems.length >= preferencesApi.MAX_INVOICE_ITEMS) {
-      invoiceUi.showStatus(copy.invoiceFull, 'error');
+      shareUi.showStatus(copy.invoiceFull, 'error');
       return;
     }
     vibrate();
     invoiceItems = [...invoiceItems, item];
     calculate();
-    invoiceUi.showStatus(copy.invoiceAdded);
+    shareUi.showStatus(copy.invoiceAdded);
   }
 
   function isLiveSource() {
@@ -179,8 +167,8 @@
     marketUi.renderLiveStatus(null, 'error');
     // Offline in a shop: start from the last known price (clearly dated) instead of an empty field.
     const lastKnownQuote = priceCache.readLastKnownQuote();
-    if (lastKnownQuote) marketUi.setLiveQuoteInput(Number(lastKnownQuote.priceUsdOunce));
-    else marketUi.clearLiveQuoteInput();
+    if (lastKnownQuote) marketUi.setManualValue('ouncePriceUsd', Number(lastKnownQuote.priceUsdOunce));
+    marketUi.clearLiveQuoteInput();
     liveFallbackActive = true;
     liveFallbackNotice = lastKnownQuote
       ? copy.liveOfflinePrefill.replace('{time}', formatting.formatLiveTime(lastKnownQuote.updatedAt))
@@ -236,7 +224,7 @@
 
   function getPrice24k() {
     const prices = priceConverter.deriveMarketPrices(marketUi.getMarketInput());
-    marketUi.renderMarketEquivalents(prices);
+    marketUi.renderMarketEquivalents(prices, transactionUi.getTransactionInput().karat);
     return prices.gram24kSar;
   }
 
@@ -244,7 +232,6 @@
     if (restoring) return;
     const market = marketUi.getMarketInput();
     const input = transactionUi.getTransactionInput();
-    const previous = preferencesStore.read();
     const source = liveFallbackActive ? 'live' : market.source;
     preferencesStore.write({
       mode: input.mode,
@@ -256,11 +243,7 @@
       deductionRate: input.deductionRate,
       // An automatic fallback is not the user's choice: keep LIVE as the saved source.
       source,
-      // In LIVE mode (or its automatic fallback) the USD field holds a feed value, so keep the last manual entry.
-      ouncePriceUsd: source === 'live' ? previous.ouncePriceUsd : market.ouncePriceUsd,
-      ouncePriceSar: market.ouncePriceSar,
-      gramPriceSar: market.gramPriceSar,
-      gramKarat: market.gramKarat,
+      ...marketUi.getManualValues(),
       invoice: invoiceItems,
     });
   }
@@ -280,28 +263,12 @@
       deductionRate: input.deductionRate,
     });
 
-    transactionUi.renderInputLabels(result);
     summaryUi.render(result);
 
     const invoice = core.calculateInvoice({ price24k, items: invoiceItems });
     invoiceUi.render(invoice);
-    transactionUi.setInvoiceActive(invoice.count > 0);
 
-    // A shop quotes one total for the whole invoice: a positive net is paid, a negative one received.
-    const comparison = invoice.count > 0
-      ? core.compareQuote({
-        mode: invoice.net >= 0 ? 'buy' : 'sell',
-        referenceTotal: Math.abs(invoice.net),
-        quotedTotal: input.quotedTotal,
-      })
-      : core.compareQuote({
-        mode: result.mode,
-        referenceTotal: result.total,
-        quotedTotal: input.quotedTotal,
-      });
-    quoteComparisonUi.render(comparison);
     lastResult = result;
-    lastComparison = comparison;
     lastInvoice = invoice;
 
     const needsPrice = price24k <= 0;
@@ -321,6 +288,7 @@
     preferencesStore.clear();
     liveFallbackActive = false;
     liveFallbackNotice = '';
+    invoiceItems = [];
     transactionUi.resetInput();
     marketUi.resetManualInput();
     setPriceSource('live');
@@ -328,11 +296,9 @@
 
   function restoreInputs() {
     const prefs = preferencesStore.read();
-    const { ouncePriceUsd, ...manualPrices } = prefs;
     invoiceItems = prefs.invoice || [];
     transactionUi.applyInput(prefs);
-    // The USD field doubles as the LIVE feed display, so only restore it for manual USD entry.
-    marketUi.applyManualInput(prefs.source === 'ounce-usd' ? prefs : manualPrices);
+    marketUi.applyManualInput(prefs);
     setTransactionMode(prefs.mode || 'buy');
     restoring = false;
     setPriceSource(prefs.source || 'live');

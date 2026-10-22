@@ -7,35 +7,18 @@ const english = fs.readFileSync('en.html', 'utf8');
 const app = fs.readFileSync('js/app.js', 'utf8');
 const marketUi = fs.readFileSync('js/ui/market-ui.js', 'utf8');
 const transactionUi = fs.readFileSync('js/ui/transaction-ui.js', 'utf8');
-const quoteComparisonUi = fs.readFileSync('js/ui/quote-comparison-ui.js', 'utf8');
 const summaryUi = fs.readFileSync('js/ui/summary-ui.js', 'utf8');
 const priceCache = fs.readFileSync('js/market/price-cache.js', 'utf8');
 const livePriceClient = fs.readFileSync('js/market/live-price-client.js', 'utf8');
 const styles = fs.readFileSync('styles.css', 'utf8');
 
 const requiredIds = [
-  'transactionMode',
-  'sellDeduction',
-  'sellDeductionPanel',
-  'buyCostsPanel',
-  'vatPanel',
-  'quotedTotal',
-  'comparisonPanel',
-  'comparisonStatus',
-  'comparisonDifference',
-  'comparisonPercent',
-  'summaryPrimaryLabel',
-  'summarySecondaryLabel',
-  'ouncePriceSAR',
-  'gramPriceSAR',
-  'gramInputKarat',
-  'marketEquivalentPanel',
-  'equivalentOunceUSD',
-  'equivalentOunceSAR',
-  'equivalentGram24',
-  'equivalentGram22',
-  'equivalentGram21',
-  'equivalentGram18',
+  'transactionMode', 'weight', 'karat', 'workmanship', 'profit', 'taxRange', 'taxValueLabel',
+  'sellDeduction', 'sellDeductionLabel', 'sellDeductionPanel', 'buyCostsPanel', 'vatPanel',
+  'finalAmountLabel', 'finalTotalOutput', 'summaryRows', 'summaryWeight', 'summaryKarat',
+  'addToInvoice', 'shareSummary', 'resetInputs', 'actionStatus',
+  'chartPrice', 'chartChange', 'chartSvg', 'chartArea', 'chartLine', 'chartCursor', 'chartDot',
+  'invoicePanel', 'invoiceCount', 'invoiceList', 'invoiceNetLabel', 'invoiceNet', 'clearInvoice',
 ];
 
 for (const id of requiredIds) {
@@ -47,6 +30,27 @@ for (const id of requiredIds) {
     assert.match(english, new RegExp(`id=["']${id}["']`));
   });
 }
+
+test('the removed features are gone from both pages and the scripts', () => {
+  for (const html of [arabic, english]) {
+    assert.doesNotMatch(html, /quotedTotal|comparisonPanel|bottom-receipt|market-card|ouncePriceUSD|gramPriceSAR/);
+    assert.doesNotMatch(html, /quote-comparison-ui/);
+  }
+  assert.doesNotMatch(app, /compareQuote|quoteComparison/);
+  assert.equal(fs.existsSync('js/ui/quote-comparison-ui.js'), false);
+});
+
+test('both pages follow the design layout: inputs card, result card, chart card and optional invoice', () => {
+  for (const html of [arabic, english]) {
+    const order = ['inputs-card', 'result-card', 'chart-card', 'invoice-card'].map((name) => html.indexOf(`class="card ${name}`));
+    assert.ok(order.every((index) => index > 0));
+    assert.ok(order[1] < order[2] && order[2] < order[3]);
+    assert.match(html, /id="invoicePanel" hidden/);
+    assert.match(html, /class="layout"/);
+  }
+  assert.match(styles, /\.result-card\{background:linear-gradient\(160deg,#f1cf6e,#d4a62f\)/);
+  assert.match(styles, /\.col-main\{flex:1\.5 1 440px/);
+});
 
 test('both pages expose buy and sell mode buttons', () => {
   for (const html of [arabic, english]) {
@@ -71,23 +75,6 @@ test('market UI adapter supports SAR ounce and SAR gram market inputs', () => {
   assert.match(marketUi, /gramInputKarat/);
 });
 
-test('transaction UI owns transaction input and mode presentation', () => {
-  assert.match(transactionUi, /createTransactionUI/);
-  assert.match(transactionUi, /getTransactionInput/);
-  assert.match(transactionUi, /setTransactionMode/);
-  assert.match(transactionUi, /setKarat/);
-  assert.match(transactionUi, /renderInputLabels/);
-  assert.match(transactionUi, /buyCostsPanel/);
-  assert.match(transactionUi, /sellDeductionPanel/);
-});
-
-test('quote comparison UI renders a supplied comparison without owning thresholds', () => {
-  assert.match(quoteComparisonUi, /createQuoteComparisonUI/);
-  assert.match(quoteComparisonUi, /render\s*\(/);
-  assert.doesNotMatch(quoteComparisonUi, /differencePct\s*[<>]=?\s*[25]/);
-  assert.doesNotMatch(quoteComparisonUi, /compareQuote\s*\(/);
-});
-
 test('summary UI renders supplied transaction results without calculating them', () => {
   assert.match(summaryUi, /createSummaryUI/);
   assert.match(summaryUi, /render\s*\(/);
@@ -96,9 +83,7 @@ test('summary UI renders supplied transaction results without calculating them',
 
 test('application delegates transaction calculation and presentation', () => {
   assert.match(app, /calculateTransaction\s*\(/);
-  assert.match(app, /compareQuote\s*\(/);
   assert.doesNotMatch(app, /\$\(['"]buyCostsPanel['"]\)/);
-  assert.doesNotMatch(app, /\$\(['"]comparisonStatus['"]\)/);
   assert.doesNotMatch(app, /\$\(['"]finalTotalOutput['"]\)/);
 });
 
@@ -113,7 +98,6 @@ test('Arabic and English pages load the modular scripts in dependency order', ()
       'js/market/live-price-client.js',
       'js/ui/market-ui.js',
       'js/ui/transaction-ui.js',
-      'js/ui/quote-comparison-ui.js',
       'js/ui/summary-ui.js',
       'js/state/preferences-store.js',
       'js/ui/share-ui.js',
@@ -151,31 +135,12 @@ test('UI includes a live price mode backed by the extracted Vercel client', () =
   }
 });
 
-test('live UI exposes refresh, status, update time and all supported karat prices in static pages', () => {
-  for (const html of [arabic, english]) {
-    for (const id of ['liveRefresh', 'livePriceStatus', 'liveUpdatedAt', 'liveKarat24', 'liveKarat22', 'liveKarat21', 'liveKarat18']) {
-      assert.match(html, new RegExp(`id=["']${id}["']`));
-    }
-  }
-});
-
 test('live UI delegates short-lived caching and keeps manual fallback orchestration', () => {
   assert.match(priceCache, /LIVE_CACHE_MAX_AGE_MS/);
   assert.match(priceCache, /readCachedQuote/);
   assert.match(priceCache, /writeCachedQuote/);
   assert.match(app, /priceCache\.readCachedQuote\(\)/);
   assert.match(app, /fallbackToManualPrice/);
-});
-
-test('VAT slider fill follows page direction', () => {
-  assert.match(
-    styles,
-    /html\[dir=ltr\]\s+input\[type=range\]::\-webkit-slider-runnable-track\{[^}]*linear-gradient\(to right,/,
-  );
-  assert.match(
-    styles,
-    /html\[dir=rtl\]\s+input\[type=range\]::\-webkit-slider-runnable-track\{[^}]*linear-gradient\(to left,/,
-  );
 });
 
 test('LIVE failure checks recent cache before falling back to manual USD ounce', () => {
@@ -187,6 +152,7 @@ test('LIVE failure checks recent cache before falling back to manual USD ounce',
     app,
     /function fallbackToManualPrice\([\s\S]*?setPriceSource\('ounce-usd', \{ fetchLive: false \}\);/
   );
+  assert.match(app, /invoice: invoiceItems,/);
 });
 
 
@@ -201,52 +167,6 @@ test('transaction step buttons use module-bound events instead of inline global 
   assert.doesNotMatch(app, /globalThis\.\w+\s*=/);
 });
 
-test('approved desktop dashboard C has dedicated main and sidebar regions', () => {
-  for (const html of [arabic, english]) {
-    assert.match(html, /<main[^>]*class=["'][^"']*desktop-dashboard/);
-    assert.match(html, /class=["'][^"']*market-card/);
-    assert.match(html, /class=["'][^"']*market-summary-card/);
-    assert.match(html, /class=["'][^"']*transaction-card/);
-    assert.match(html, /class=["'][^"']*item-card/);
-    assert.match(html, /class=["'][^"']*comparison-card/);
-    assert.match(html, /class=["'][^"']*dashboard-result/);
-    assert.ok(
-      html.indexOf('class="bottom-receipt dashboard-result"') < html.indexOf('</main>'),
-      'result card must be part of the dashboard flow on desktop'
-    );
-  }
-});
-
-test('desktop dashboard C uses a wide main column, compact sidebar, and non-fixed result', () => {
-  assert.match(styles, /@media\(min-width:1100px\)/);
-  assert.match(styles, /\.desktop-dashboard\{[^}]*max-width:1440px!important;[^}]*display:grid;/);
-  assert.match(styles, /grid-template-columns:minmax\(0,1\.9fr\) minmax\(340px,0\.9fr\)/);
-  assert.match(styles, /\.market-card\{[^}]*grid-column:1;/);
-  assert.match(styles, /\.market-summary-card\{[^}]*grid-column:2;/);
-  assert.match(styles, /\.comparison-card\{[^}]*grid-column:2;/);
-  assert.match(styles, /\.dashboard-result\{[^}]*position:static;[^}]*grid-column:1;/);
-  assert.match(styles, /\.desktop-dashboard>\*\{direction:/);
-});
-
-test('desktop market controls and item fields become dense dashboard rows', () => {
-  assert.match(styles, /\.market-source-grid\{[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
-  assert.match(styles, /\.item-card\{[^}]*display:grid;/);
-  for (const html of [arabic, english]) {
-    assert.match(html, /class=["'][^"']*market-source-grid/);
-  }
-});
-
-test('desktop dashboard starts below the header without overlap', () => {
-  assert.match(
-    styles,
-    /@media\(min-width:1100px\)[\s\S]*?\.desktop-dashboard\{[^}]*margin-top:1rem!important;/
-  );
-  assert.doesNotMatch(
-    styles,
-    /@media\(min-width:1100px\)[\s\S]*?\.desktop-dashboard\{[^}]*margin-top:-/
-  );
-});
-
 test('pages use the prebuilt stylesheet instead of runtime CDN styling', () => {
   assert.ok(fs.existsSync('tailwind.css'), 'tailwind.css must be committed');
   for (const html of [arabic, english]) {
@@ -259,16 +179,6 @@ test('pages use the prebuilt stylesheet instead of runtime CDN styling', () => {
   const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
   assert.equal(manifest.start_url, 'index.html');
   assert.ok(fs.existsSync(manifest.icons[0].src));
-});
-
-test('both pages expose the quick actions card', () => {
-  for (const html of [arabic, english]) {
-    for (const id of ['shareSummary', 'resetInputs', 'actionStatus']) {
-      assert.match(html, new RegExp(`id=["']${id}["']`));
-    }
-    assert.ok(html.indexOf('actions-card') < html.indexOf('class="bottom-receipt dashboard-result"'));
-  }
-  assert.match(styles, /\.actions-card\{grid-column:2;/);
 });
 
 test('a live quote that arrives after switching to manual entry is not applied', () => {
@@ -288,26 +198,6 @@ test('live price refreshes in the background only while visible in LIVE mode', (
 test('an automatic LIVE fallback is not saved as the preferred source', () => {
   assert.match(app, /liveFallbackActive = true;[\s\S]*?setPriceSource\('ounce-usd', \{ fetchLive: false \}\);/);
   assert.match(app, /const source = liveFallbackActive \? 'live' : market\.source;/);
-});
-
-test('both pages expose the invoice card and receipt row', () => {
-  for (const html of [arabic, english]) {
-    for (const id of [
-      'invoicePanel', 'addToInvoice', 'clearInvoice', 'invoiceStatus', 'invoiceCount', 'invoiceEmpty',
-      'invoiceList', 'invoiceTotals', 'invoiceBuyRow', 'invoiceBuyTotal', 'invoiceSellRow', 'invoiceSellTotal',
-      'invoiceNetLabel', 'invoiceNet', 'summaryInvoiceRow', 'summaryInvoiceLabel', 'summaryInvoiceNet',
-    ]) {
-      assert.match(html, new RegExp(`id=["']${id}["']`));
-    }
-    assert.ok(html.indexOf('id="invoicePanel"') < html.indexOf('id="comparisonPanel"'));
-  }
-  assert.match(styles, /\.invoice-card\{grid-column:2;/);
-});
-
-test('quote comparison follows the invoice net when the invoice has pieces', () => {
-  assert.match(app, /core\.calculateInvoice\(\{ price24k, items: invoiceItems \}\)/);
-  assert.match(app, /mode: invoice\.net >= 0 \? 'buy' : 'sell',\s*referenceTotal: Math\.abs\(invoice\.net\)/);
-  assert.match(app, /invoice: invoiceItems,/);
 });
 
 test('offline fallback pre-fills the last known quote with a dated notice', () => {

@@ -6,7 +6,6 @@ const {
   calculateGoldSale,
   calculateTransaction,
   calculateInvoice,
-  compareQuote,
   normalizeMode,
   clampTaxRate,
   clampPercent,
@@ -94,33 +93,6 @@ test('calculateTransaction dispatches by normalized mode', () => {
   assert.equal(sell.total, 450);
 });
 
-test('buy quote comparison uses close, moderate_high, high and below_reference bands', () => {
-  assert.equal(compareQuote({ mode: 'buy', referenceTotal: 1000, quotedTotal: 1020 }).status, 'close');
-  assert.equal(compareQuote({ mode: 'buy', referenceTotal: 1000, quotedTotal: 1050 }).status, 'moderate_high');
-  assert.equal(compareQuote({ mode: 'buy', referenceTotal: 1000, quotedTotal: 1051 }).status, 'high');
-  assert.equal(compareQuote({ mode: 'buy', referenceTotal: 1000, quotedTotal: 970 }).status, 'below_reference');
-});
-
-test('sell quote comparison is direction-aware for the seller', () => {
-  assert.equal(compareQuote({ mode: 'sell', referenceTotal: 1000, quotedTotal: 990 }).status, 'close');
-  assert.equal(compareQuote({ mode: 'sell', referenceTotal: 1000, quotedTotal: 970 }).status, 'moderate_low');
-  assert.equal(compareQuote({ mode: 'sell', referenceTotal: 1000, quotedTotal: 940 }).status, 'low');
-  assert.equal(compareQuote({ mode: 'sell', referenceTotal: 1000, quotedTotal: 1030 }).status, 'above_reference');
-});
-
-test('quote comparison reports difference values and handles unavailable inputs', () => {
-  const result = compareQuote({ mode: 'buy', referenceTotal: 1000, quotedTotal: 1030 });
-  assert.equal(result.available, true);
-  assert.equal(result.difference, 30);
-  assert.equal(result.differencePct, 3);
-
-  assert.deepEqual(compareQuote({ mode: 'buy', referenceTotal: 0, quotedTotal: 1030 }), {
-    available: false,
-    difference: 0,
-    differencePct: 0,
-    status: 'unavailable',
-  });
-});
 test('prices an invoice of purchases and trade-ins at one market price', () => {
   const price24k = ounceUsdTo24kSar(4300);
   const invoice = calculateInvoice({

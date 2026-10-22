@@ -13,53 +13,54 @@
     };
 
     const elements = {
-      karatPriceOutput: requireElement('karatPriceOutput'),
-      selectedKaratLabel: requireElement('selectedKaratLabel'),
+      finalAmountLabel: requireElement('finalAmountLabel'),
       summaryWeight: requireElement('summaryWeight'),
       summaryKarat: requireElement('summaryKarat'),
-      summaryPrimaryLabel: requireElement('summaryPrimaryLabel'),
-      summarySecondaryLabel: requireElement('summarySecondaryLabel'),
-      summarySubtotalLabel: requireElement('summarySubtotalLabel'),
-      finalAmountLabel: requireElement('finalAmountLabel'),
-      summaryTaxRow: requireElement('summaryTaxRow'),
-      goldCostOutput: requireElement('goldCostOutput'),
-      laborCostOutput: requireElement('laborCostOutput'),
-      subtotalOutput: requireElement('subtotalOutput'),
-      vatOutput: requireElement('vatOutput'),
       finalTotalOutput: requireElement('finalTotalOutput'),
+      summaryRows: requireElement('summaryRows'),
     };
 
-    function render(result) {
-      elements.karatPriceOutput.textContent = formatting.formatMoney(result.gramPrice);
-      elements.selectedKaratLabel.textContent = result.karat;
-      elements.summaryWeight.textContent = result.weight;
-      elements.summaryKarat.textContent = result.karat;
-
-      const selling = result.mode === 'sell';
-      const labels = selling ? copy.sellLabels : copy.buyLabels;
-      elements.summaryPrimaryLabel.textContent = labels.primary;
-      elements.summarySecondaryLabel.textContent = labels.secondary;
-      elements.summarySubtotalLabel.textContent = labels.subtotal;
-      elements.finalAmountLabel.textContent = labels.final;
-      elements.summaryTaxRow.hidden = selling;
-
-      if (selling) {
-        elements.goldCostOutput.textContent = formatting.formatMoney(result.rawMetalValue);
-        const deduction = formatting.formatMoney(result.deductionValue);
-        elements.laborCostOutput.textContent = result.deductionValue > 0 ? `−${deduction}` : deduction;
-        elements.subtotalOutput.textContent = formatting.formatMoney(result.total);
-        elements.vatOutput.textContent = '0.00';
-      } else {
-        elements.goldCostOutput.textContent = formatting.formatMoney(result.goldCost);
-        elements.laborCostOutput.textContent = formatting.formatMoney(result.laborCost);
-        elements.subtotalOutput.textContent = formatting.formatMoney(result.subtotal);
-        elements.vatOutput.textContent = formatting.formatMoney(result.vat);
+    function rowsFor(result) {
+      const money = formatting.formatMoney;
+      if (result.mode === 'sell') {
+        const labels = copy.sellLabels;
+        return [
+          [labels.primary, money(result.rawMetalValue)],
+          [`${labels.secondary} ${result.deductionRate}%`, `−${money(result.deductionValue)}`],
+        ];
       }
-
-      elements.finalTotalOutput.textContent = formatting.formatMoney(result.total);
+      const labels = copy.buyLabels;
+      return [
+        [labels.primary, money(result.goldCost)],
+        [labels.secondary, money(result.laborCost)],
+        [`${labels.vat} ${result.taxRate}%`, money(result.vat)],
+      ];
     }
 
-    return { render };
+    function render(result) {
+      const labels = result.mode === 'sell' ? copy.sellLabels : copy.buyLabels;
+      elements.finalAmountLabel.textContent = labels.final;
+      elements.summaryWeight.textContent = result.weight;
+      elements.summaryKarat.textContent = result.karat;
+      elements.finalTotalOutput.textContent = formatting.formatMoney(result.total);
+
+      elements.summaryRows.replaceChildren(
+        ...rowsFor(result).map(([label, value]) => {
+          const row = document.createElement('span');
+          row.className = 'result-row';
+          const name = document.createElement('span');
+          name.className = 'result-row-label';
+          name.textContent = label;
+          const amount = document.createElement('span');
+          amount.className = 'result-row-value ltr';
+          amount.textContent = value;
+          row.append(name, amount);
+          return row;
+        }),
+      );
+    }
+
+    return { render, rowsFor };
   }
 
   return { createSummaryUI };
