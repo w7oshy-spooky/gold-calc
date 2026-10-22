@@ -18,6 +18,10 @@ test('formats money and signed values without changing current output', () => {
   assert.equal(en.formatSignedPercent(-3), '−3.00%');
   assert.equal(en.formatSar(1234.5), '1,234.50 SAR');
   assert.equal(ar.formatSar(1234.5), '1,234.50 ر.س');
+  assert.equal(en.formatSignedMoney(0.0004), '0.00 SAR');
+  assert.equal(en.formatSignedMoney(-0.004), '0.00 SAR');
+  assert.equal(en.formatSignedMoney(0.005), '+0.01 SAR');
+  assert.equal(en.formatSignedPercent(-0.001), '0.00%');
 });
 
 test('Arabic live timestamps use the Gregorian calendar and Latin digits', () => {

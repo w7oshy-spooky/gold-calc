@@ -94,3 +94,20 @@ test('clear removes saved inputs', () => {
   assert.equal(storage.data.has(PREFERENCES_KEY), false);
   assert.deepEqual(store.read(), {});
 });
+
+test('keeps valid invoice pieces and drops broken ones', () => {
+  const { sanitizeInvoiceItem, MAX_INVOICE_ITEMS } = require('../js/state/preferences-store.js');
+  assert.deepEqual(
+    sanitizeInvoiceItem({ mode: 'sell', weight: '10', karat: '21', deductionRate: 150, extra: 1 }),
+    { mode: 'sell', karat: 21, weight: 10, workmanshipPerGram: 0, profitPerGram: 0, taxRate: 0, deductionRate: 100 },
+  );
+  assert.equal(sanitizeInvoiceItem({ weight: 0, karat: 21 }), null);
+  assert.equal(sanitizeInvoiceItem({ weight: 5, karat: 14 }), null);
+  assert.equal(sanitizeInvoiceItem(null), null);
+
+  const items = Array.from({ length: MAX_INVOICE_ITEMS + 5 }, () => ({ weight: 1, karat: 21 }));
+  const prefs = sanitizePreferences({ invoice: [...items, { weight: -1, karat: 21 }] });
+  assert.equal(prefs.invoice.length, MAX_INVOICE_ITEMS);
+  assert.equal(prefs.invoice[0].mode, 'buy');
+  assert.equal('invoice' in sanitizePreferences({ invoice: [] }), false);
+});

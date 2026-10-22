@@ -116,3 +116,23 @@ test('default localStorage access failures are non-fatal', () => {
     else delete globalThis.localStorage;
   }
 });
+
+test('offers an older quote as last known for up to seven days only', () => {
+  const now = 10 * 24 * 60 * 60 * 1000;
+  const quote = { priceUsdOunce: 4250, updatedAt: '2026-10-03T00:00:00Z', source: 'gold-api' };
+  const { LAST_KNOWN_MAX_AGE_MS } = require('../js/market/price-cache.js');
+  assert.equal(LAST_KNOWN_MAX_AGE_MS, 7 * 24 * 60 * 60 * 1000);
+
+  const twoHoursOld = createPriceCache({
+    storage: memoryStorage(JSON.stringify({ quote, storedAt: now - 2 * 60 * 60 * 1000 })),
+    now: () => now,
+  });
+  assert.equal(twoHoursOld.readCachedQuote(), null);
+  assert.deepEqual(twoHoursOld.readLastKnownQuote(), quote);
+
+  const tooOld = createPriceCache({
+    storage: memoryStorage(JSON.stringify({ quote, storedAt: now - LAST_KNOWN_MAX_AGE_MS - 1 })),
+    now: () => now,
+  });
+  assert.equal(tooOld.readLastKnownQuote(), null);
+});

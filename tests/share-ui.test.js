@@ -124,3 +124,33 @@ test('reset button calls the reset handler and confirms it', () => {
   assert.equal(resets, 1);
   assert.equal(status.textContent, getCopy('en').resetDone);
 });
+
+test('shares the whole invoice instead of the draft piece when it has items', () => {
+  const { calculateInvoice } = require('../gold-calculator.js');
+  const result = calculateTransaction({ mode: 'buy', price24k, weight: 15, karat: 21, workmanshipPerGram: 35, taxRate: 15 });
+  const invoice = calculateInvoice({
+    price24k,
+    items: [
+      { mode: 'buy', weight: 15, karat: 21, workmanshipPerGram: 35, profitPerGram: 0, taxRate: 15 },
+      { mode: 'sell', weight: 10, karat: 21, deductionRate: 0 },
+    ],
+  });
+  const text = buildSummaryText({
+    result, comparison: { available: false }, quotedTotal: '', price24k, invoice,
+    copy: getCopy('en'), formatting: createFormatting('en'),
+  });
+  assert.equal(text, [
+    'Gold Calculator — Invoice (2)',
+    '1. Buy · 15 g · Karat 21: 8,428.81 SAR',
+    '2. Sell/trade-in · 10 g · Karat 21: −4,536.27 SAR',
+    'Net amount to pay: 3,892.55 SAR',
+    'Reference 24K gram price: 518.43 SAR',
+    'Indicative estimate — the actual shop price may differ.',
+  ].join('\n'));
+});
+
+test('a 0% sell deduction is shared without a minus sign', () => {
+  const result = calculateTransaction({ mode: 'sell', price24k, weight: 10, karat: 21, deductionRate: 0 });
+  const text = buildSummaryText({ result, price24k, copy: getCopy('en'), formatting: createFormatting('en') });
+  assert.match(text, /Buyer deduction \(0%\): 0\.00 SAR/);
+});

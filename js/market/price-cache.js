@@ -7,6 +7,8 @@
 
   const LIVE_CACHE_KEY = 'gold-calc-live-quote-v1';
   const LIVE_CACHE_MAX_AGE_MS = 15 * 60 * 1000;
+  // Older quotes are only offered as a clearly dated manual starting point when offline.
+  const LAST_KNOWN_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
   function getDefaultStorage() {
     try {
@@ -23,18 +25,26 @@
   } = {}) {
     const cacheStorage = storage === undefined ? getDefaultStorage() : storage;
 
-    function readCachedQuote() {
+    function readEntry(entryMaxAgeMs) {
       try {
         if (!cacheStorage) return null;
         const cached = JSON.parse(cacheStorage.getItem(LIVE_CACHE_KEY) || 'null');
         if (!cached?.quote || !Number.isFinite(cached.storedAt)) return null;
-        if (now() - cached.storedAt > maxAgeMs) return null;
+        if (now() - cached.storedAt > entryMaxAgeMs) return null;
         const price = Number(cached.quote.priceUsdOunce);
         if (!Number.isFinite(price) || price <= 0) return null;
-        return cached.quote;
+        return cached;
       } catch {
         return null;
       }
+    }
+
+    function readCachedQuote() {
+      return readEntry(maxAgeMs)?.quote || null;
+    }
+
+    function readLastKnownQuote() {
+      return readEntry(LAST_KNOWN_MAX_AGE_MS)?.quote || null;
     }
 
     function writeCachedQuote(quote) {
@@ -51,12 +61,13 @@
       } catch {}
     }
 
-    return { readCachedQuote, writeCachedQuote, clearCachedQuote };
+    return { readCachedQuote, readLastKnownQuote, writeCachedQuote, clearCachedQuote };
   }
 
   return {
     LIVE_CACHE_KEY,
     LIVE_CACHE_MAX_AGE_MS,
+    LAST_KNOWN_MAX_AGE_MS,
     createPriceCache,
   };
 });

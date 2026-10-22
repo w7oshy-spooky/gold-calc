@@ -14,6 +14,7 @@
     'GoldSummaryUI',
     'GoldPreferencesStore',
     'GoldShareUI',
+    'GoldInvoiceUI',
   ];
 
   if (requiredGlobals.some((name) => !globalThis[name])) {
@@ -28,7 +29,8 @@
   const formatting = globalThis.GoldFormatting.createFormatting(locale);
   const priceCache = globalThis.GoldPriceCache.createPriceCache();
   const livePriceClient = globalThis.GoldLivePriceClient.createLivePriceClient();
-  const preferencesStore = globalThis.GoldPreferencesStore.createPreferencesStore();
+  const preferencesApi = globalThis.GoldPreferencesStore;
+  const preferencesStore = preferencesApi.createPreferencesStore();
   const shareUiApi = globalThis.GoldShareUI;
 
   const LIVE_AUTO_REFRESH_MS = 60 * 1000;
@@ -40,6 +42,9 @@
   let restoring = true;
   // True while the page fell back to manual entry on its own because LIVE failed.
   let liveFallbackActive = false;
+  let liveFallbackNotice = '';
+  let invoiceItems = [];
+  let lastInvoice = null;
 
   function vibrate(ms = 8) {
     if ('vibrate' in navigator) navigator.vibrate(ms);
@@ -55,6 +60,7 @@
       if (change.type === 'gram-karat') vibrate();
       if (change.type === 'source') {
         liveFallbackActive = false;
+        liveFallbackNotice = '';
         setPriceSource(change.source);
       } else {
         calculate();
@@ -111,6 +117,7 @@
         comparison: lastComparison,
         quotedTotal: transactionUi.getTransactionInput().quotedTotal,
         price24k: lastResult.price24k,
+        invoice: lastInvoice,
         copy,
         formatting,
       });
@@ -121,16 +128,57 @@
     },
   });
 
+  const invoiceUi = globalThis.GoldInvoiceUI.createInvoiceUI({
+    document,
+    copy,
+    formatting,
+    onAdd() {
+      addCurrentPieceToInvoice();
+    },
+    onRemove(index) {
+      vibrate();
+      invoiceItems = invoiceItems.filter((_, i) => i !== index);
+      calculate();
+    },
+    onClear() {
+      vibrate();
+      invoiceItems = [];
+      calculate();
+      invoiceUi.showStatus(copy.invoiceCleared);
+    },
+  });
+
+  function addCurrentPieceToInvoice() {
+    const item = preferencesApi.sanitizeInvoiceItem(transactionUi.getTransactionInput());
+    if (!item) {
+      invoiceUi.showStatus(copy.invoiceNeedsWeight, 'error');
+      return;
+    }
+    if (invoiceItems.length >= preferencesApi.MAX_INVOICE_ITEMS) {
+      invoiceUi.showStatus(copy.invoiceFull, 'error');
+      return;
+    }
+    vibrate();
+    invoiceItems = [...invoiceItems, item];
+    calculate();
+    invoiceUi.showStatus(copy.invoiceAdded);
+  }
+
   function isLiveSource() {
     return marketUi.getPriceSource() === 'live';
   }
 
   function fallbackToManualPrice() {
     marketUi.renderLiveStatus(null, 'error');
-    marketUi.clearLiveQuoteInput();
+    // Offline in a shop: start from the last known price (clearly dated) instead of an empty field.
+    const lastKnownQuote = priceCache.readLastKnownQuote();
+    if (lastKnownQuote) marketUi.setLiveQuoteInput(Number(lastKnownQuote.priceUsdOunce));
+    else marketUi.clearLiveQuoteInput();
     liveFallbackActive = true;
+    liveFallbackNotice = lastKnownQuote
+      ? copy.liveOfflinePrefill.replace('{time}', formatting.formatLiveTime(lastKnownQuote.updatedAt))
+      : copy.liveUnavailable;
     setPriceSource('ounce-usd', { fetchLive: false });
-    marketUi.showWarning(copy.liveUnavailable);
   }
 
   async function fetchLiveGoldPrice({ force = false, background = false } = {}) {
@@ -201,11 +249,12 @@
       deductionRate: input.deductionRate,
       // An automatic fallback is not the user's choice: keep LIVE as the saved source.
       source,
-      // In LIVE mode the USD field holds the feed value, so keep the last manual entry instead.
-      ouncePriceUsd: market.source === 'live' ? previous.ouncePriceUsd : market.ouncePriceUsd,
+      // In LIVE mode (or its automatic fallback) the USD field holds a feed value, so keep the last manual entry.
+      ouncePriceUsd: source === 'live' ? previous.ouncePriceUsd : market.ouncePriceUsd,
       ouncePriceSar: market.ouncePriceSar,
       gramPriceSar: market.gramPriceSar,
       gramKarat: market.gramKarat,
+      invoice: invoiceItems,
     });
   }
 
@@ -226,17 +275,31 @@
     transactionUi.renderInputLabels(result);
     summaryUi.render(result);
 
-    const comparison = core.compareQuote({
-      mode: result.mode,
-      referenceTotal: result.total,
-      quotedTotal: input.quotedTotal,
-    });
+    const invoice = core.calculateInvoice({ price24k, items: invoiceItems });
+    invoiceUi.render(invoice);
+    transactionUi.setInvoiceActive(invoice.count > 0);
+
+    // A shop quotes one total for the whole invoice: a positive net is paid, a negative one received.
+    const comparison = invoice.count > 0
+      ? core.compareQuote({
+        mode: invoice.net >= 0 ? 'buy' : 'sell',
+        referenceTotal: Math.abs(invoice.net),
+        quotedTotal: input.quotedTotal,
+      })
+      : core.compareQuote({
+        mode: result.mode,
+        referenceTotal: result.total,
+        quotedTotal: input.quotedTotal,
+      });
     quoteComparisonUi.render(comparison);
     lastResult = result;
     lastComparison = comparison;
+    lastInvoice = invoice;
 
     const needsPrice = price24k <= 0;
-    if (!needsPrice) {
+    if (liveFallbackNotice) {
+      marketUi.showWarning(liveFallbackNotice);
+    } else if (!needsPrice) {
       marketUi.clearWarning();
     } else if (marketUi.getPriceSource() !== 'live') {
       marketUi.showWarning(copy.needPrice);
@@ -249,6 +312,7 @@
   function resetInputs() {
     preferencesStore.clear();
     liveFallbackActive = false;
+    liveFallbackNotice = '';
     transactionUi.resetInput();
     marketUi.resetManualInput();
     setPriceSource('live');
@@ -257,6 +321,7 @@
   function restoreInputs() {
     const prefs = preferencesStore.read();
     const { ouncePriceUsd, ...manualPrices } = prefs;
+    invoiceItems = prefs.invoice || [];
     transactionUi.applyInput(prefs);
     // The USD field doubles as the LIVE feed display, so only restore it for manual USD entry.
     marketUi.applyManualInput(prefs.source === 'ounce-usd' ? prefs : manualPrices);
@@ -271,8 +336,14 @@
     fetchLiveGoldPrice({ background: true });
   }
 
+  function registerOfflineSupport() {
+    if (!('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+
   window.addEventListener('load', () => {
     restoreInputs();
+    registerOfflineSupport();
     setInterval(refreshLiveInBackground, 15 * 1000);
     document.addEventListener('visibilitychange', refreshLiveInBackground);
   });

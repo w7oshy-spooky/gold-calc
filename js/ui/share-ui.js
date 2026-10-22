@@ -7,7 +7,21 @@
 
   const STATUS_CLEAR_MS = 3000;
 
-  function buildSummaryText({ result, comparison, quotedTotal, price24k, copy, formatting }) {
+  function buildInvoiceLines(invoice, copy, formatting) {
+    const lines = [`${copy.shareLabels.title} — ${copy.invoiceTitle} (${invoice.count})`];
+    invoice.lines.forEach((line, index) => {
+      const modeLabel = line.mode === 'sell' ? copy.invoiceSell : copy.invoiceBuy;
+      const sign = line.mode === 'sell' ? '−' : '';
+      lines.push(
+        `${index + 1}. ${modeLabel} · ${line.weight} ${copy.invoiceGramUnit} · ${copy.invoiceKarat} ${line.karat}: ${sign}${formatting.formatSar(line.total)}`,
+      );
+    });
+    const netLabel = invoice.net >= 0 ? copy.invoiceNetPay : copy.invoiceNetReceive;
+    lines.push(`${netLabel}: ${formatting.formatSar(Math.abs(invoice.net))}`);
+    return lines;
+  }
+
+  function buildPieceLines(result, copy, formatting) {
     const labels = copy.shareLabels;
     const selling = result.mode === 'sell';
     const resultLabels = selling ? copy.sellLabels : copy.buyLabels;
@@ -18,8 +32,9 @@
     ];
 
     if (selling) {
+      const sign = result.deductionValue > 0 ? '−' : '';
       lines.push(`${resultLabels.primary}: ${formatting.formatSar(result.rawMetalValue)}`);
-      lines.push(`${resultLabels.secondary} (${result.deductionRate}%): −${formatting.formatSar(result.deductionValue)}`);
+      lines.push(`${resultLabels.secondary} (${result.deductionRate}%): ${sign}${formatting.formatSar(result.deductionValue)}`);
     } else {
       lines.push(`${resultLabels.primary}: ${formatting.formatSar(result.goldCost)}`);
       lines.push(`${resultLabels.secondary}: ${formatting.formatSar(result.laborCost)}`);
@@ -27,6 +42,15 @@
     }
 
     lines.push(`${resultLabels.final}: ${formatting.formatSar(result.total)}`);
+    return lines;
+  }
+
+  function buildSummaryText({ result, comparison, quotedTotal, price24k, invoice, copy, formatting }) {
+    const labels = copy.shareLabels;
+    // With invoice items the invoice is what gets shared; the current piece is only a draft.
+    const lines = invoice?.count > 0
+      ? buildInvoiceLines(invoice, copy, formatting)
+      : buildPieceLines(result, copy, formatting);
 
     if (comparison?.available) {
       lines.push(

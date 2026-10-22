@@ -19,6 +19,14 @@
     'gramPriceSar',
   ]);
   const NUMERIC_LIMITS = Object.freeze({ taxRate: 25, deductionRate: 100 });
+  const INVOICE_FIELDS = Object.freeze([
+    'weight',
+    'workmanshipPerGram',
+    'profitPerGram',
+    'taxRate',
+    'deductionRate',
+  ]);
+  const MAX_INVOICE_ITEMS = 50;
 
   function getDefaultStorage() {
     try {
@@ -26,6 +34,27 @@
     } catch {
       return null;
     }
+  }
+
+  function sanitizeNumber(value, limit) {
+    if (value === undefined || value === null || value === '') return undefined;
+    const n = Number(value);
+    if (!Number.isFinite(n) || n < 0) return undefined;
+    return limit === undefined ? n : Math.min(limit, n);
+  }
+
+  function sanitizeInvoiceItem(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const karat = Number(raw.karat);
+    const weight = sanitizeNumber(raw.weight);
+    if (!KARATS.includes(karat) || !(weight > 0)) return null;
+
+    const item = { mode: raw.mode === 'sell' ? 'sell' : 'buy', karat };
+    for (const field of INVOICE_FIELDS) {
+      const value = sanitizeNumber(raw[field], NUMERIC_LIMITS[field]);
+      item[field] = value === undefined ? 0 : value;
+    }
+    return item;
   }
 
   // Drops anything that is not a known field with a valid value, so a
@@ -43,11 +72,13 @@
     }
 
     for (const field of NUMERIC_FIELDS) {
-      if (raw[field] === undefined || raw[field] === null || raw[field] === '') continue;
-      const n = Number(raw[field]);
-      if (!Number.isFinite(n) || n < 0) continue;
-      const limit = NUMERIC_LIMITS[field];
-      prefs[field] = limit === undefined ? n : Math.min(limit, n);
+      const value = sanitizeNumber(raw[field], NUMERIC_LIMITS[field]);
+      if (value !== undefined) prefs[field] = value;
+    }
+
+    if (Array.isArray(raw.invoice)) {
+      const invoice = raw.invoice.map(sanitizeInvoiceItem).filter(Boolean).slice(0, MAX_INVOICE_ITEMS);
+      if (invoice.length > 0) prefs.invoice = invoice;
     }
 
     return prefs;
@@ -82,5 +113,11 @@
     return { read, write, clear };
   }
 
-  return { PREFERENCES_KEY, sanitizePreferences, createPreferencesStore };
+  return {
+    PREFERENCES_KEY,
+    MAX_INVOICE_ITEMS,
+    sanitizeInvoiceItem,
+    sanitizePreferences,
+    createPreferencesStore,
+  };
 });

@@ -90,6 +90,38 @@
     return { mode, ...calculateGoldPurchase(input) };
   }
 
+  // Prices every invoice line at the same market price. Buy lines add to what the
+  // customer pays and sell lines (old gold traded in) are subtracted from it.
+  function calculateInvoice({ price24k, items } = {}) {
+    const lines = (Array.isArray(items) ? items : []).map((item) =>
+      calculateTransaction({ ...item, price24k }),
+    );
+    let buyTotal = 0;
+    let sellTotal = 0;
+    let buyWeight = 0;
+    let sellWeight = 0;
+
+    for (const line of lines) {
+      if (line.mode === 'sell') {
+        sellTotal += line.total;
+        sellWeight += line.weight;
+      } else {
+        buyTotal += line.total;
+        buyWeight += line.weight;
+      }
+    }
+
+    return {
+      lines,
+      count: lines.length,
+      buyTotal,
+      sellTotal,
+      buyWeight,
+      sellWeight,
+      net: buyTotal - sellTotal,
+    };
+  }
+
   function compareQuote({ mode, referenceTotal, quotedTotal } = {}) {
     const safeMode = normalizeMode(mode);
     const reference = sanitizeNonNegative(referenceTotal);
@@ -136,6 +168,7 @@
     calculateGoldPurchase,
     calculateGoldSale,
     calculateTransaction,
+    calculateInvoice,
     compareQuote,
   };
 });

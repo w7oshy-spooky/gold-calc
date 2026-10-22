@@ -29,6 +29,8 @@ jobs:
           test -f js/ui/formatting.js
           test -f js/ui/share-ui.js
           test -f js/state/preferences-store.js
+          test -f js/ui/invoice-ui.js
+          test -f sw.js
           test -f js/i18n/translations.js
           test -f gold-calculator.js
           test -f live-gold.js
@@ -58,4 +60,5 @@ jobs:
             tailwind.css
             manifest.webmanifest
             icon.svg
+            sw.js
             README.md
