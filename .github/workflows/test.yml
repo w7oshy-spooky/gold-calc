@@ -31,6 +31,7 @@ jobs:
           node --check js/ui/share-ui.js
           node --check js/state/preferences-store.js
           node --check js/ui/invoice-ui.js
+          node --check js/ui/price-chart-ui.js
           node --check sw.js
           node --check js/app.js
       - run: node --test tests/*.test.js

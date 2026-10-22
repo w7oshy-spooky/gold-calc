@@ -119,6 +119,26 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;heigh
 #comparisonStatus[data-status=high],#comparisonStatus[data-status=low]{color:var(--bad)}
 #comparisonStatus[data-status=unavailable]{color:var(--muted)}
 
+/* ---- Price chart ---- */
+.chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;flex-wrap:wrap}
+.chart-price-row{display:flex;align-items:baseline;gap:.6rem;direction:ltr;justify-content:flex-start}
+html[dir=rtl] .chart-price-row{justify-content:flex-end}
+.chart-price{font-family:var(--font-num);font-weight:800;font-size:1.9rem;font-variant-numeric:tabular-nums;color:var(--text)}
+.chart-unit{font-size:.75rem;font-weight:700;color:var(--muted)}
+html[dir=rtl] .chart-unit{direction:rtl;unicode-bidi:isolate}
+.chart-change{margin-top:.15rem;min-height:1.1rem;font-size:.75rem;font-weight:800;direction:ltr;color:var(--muted)}
+html[dir=rtl] .chart-change{text-align:right}
+.chart-change[data-trend=up]{color:var(--good)}
+.chart-change[data-trend=down]{color:var(--bad)}
+.chart-ranges{display:flex;gap:4px;padding:3px;background:var(--bg);border-radius:10px}
+.chart-range-btn{min-height:32px;padding:0 .75rem;border:none;border-radius:8px;background:transparent;color:var(--muted);font-family:inherit;font-size:.75rem;font-weight:800;cursor:pointer}
+.chart-range-btn.active{background:var(--gold);color:var(--gold-ink)}
+.chart-range-btn:focus-visible{outline:3px solid #e8bf5580;outline-offset:2px}
+.chart-plot{position:relative;margin-top:.9rem;direction:ltr}
+.chart-plot svg{display:block;width:100%;height:180px;touch-action:pan-y;cursor:crosshair}
+.chart-dot{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--gold);border:3px solid var(--card);transform:translate(-50%,-50%);pointer-events:none}
+.chart-axis{display:flex;justify-content:space-between;margin-top:.4rem;font-size:.7rem;color:var(--muted);direction:ltr}
+
 /* ---- Bottom receipt (gold result card) ---- */
 .bottom-receipt{position:fixed;bottom:0;left:0;right:0;padding:.5rem 1rem calc(.75rem + env(safe-area-inset-bottom));z-index:50;background:linear-gradient(to top,#0d0f12 70%,transparent)}
 .bottom-receipt>section{
@@ -224,10 +244,11 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
   .purchase-card{grid-column:1;grid-row:4;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
   .vat-card{grid-column:1;grid-row:5}
   .sell-card{grid-column:1;grid-row:4/6}
-  .comparison-card{grid-column:2;grid-row:2/4}
-  .invoice-card{grid-column:2;grid-row:4/6}
-  .note-card{grid-column:2;grid-row:7}
-  .actions-card{grid-column:2;grid-row:6}
+  .chart-card{grid-column:2;grid-row:2/4}
+  .comparison-card{grid-column:2;grid-row:4/6}
+  .invoice-card{grid-column:2;grid-row:6/8}
+  .note-card{grid-column:2;grid-row:9}
+  .actions-card{grid-column:2;grid-row:8}
 
   .market-source-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
   .source-btn,.mode-btn{min-height:50px;font-size:.82rem}
@@ -241,6 +262,7 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
   .vat-card>p:first-child,
   .comparison-card>p:first-child,
   .sell-card>p:first-child,
+  #chartHeading,
   #invoiceHeading{
     color:#eceae4;
     font-size:.86rem;
