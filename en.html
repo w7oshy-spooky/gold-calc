@@ -128,6 +128,28 @@
       </div>
     </aside>
 
+    <section class="input-card chart-card" aria-labelledby="chartHeading">
+      <div class="chart-head">
+        <div>
+          <p id="chartHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">📊 Gold price movement</p>
+          <div class="chart-price-row"><span id="chartPrice" class="chart-price">—</span><span class="chart-unit">SAR / g · 24K</span></div>
+          <div id="chartChange" class="chart-change" aria-live="off"></div>
+        </div>
+        <div class="chart-ranges" role="group" aria-label="Chart time range"><button type="button" class="chart-range-btn active" data-chart-range="0" aria-pressed="true">1D</button><button type="button" class="chart-range-btn" data-chart-range="1" aria-pressed="false">1W</button><button type="button" class="chart-range-btn" data-chart-range="2" aria-pressed="false">1M</button><button type="button" class="chart-range-btn" data-chart-range="3" aria-pressed="false">1Y</button></div>
+      </div>
+      <div class="chart-plot">
+        <svg id="chartSvg" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="Gold price chart">
+          <defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8bf55" stop-opacity=".35"/><stop offset="1" stop-color="#e8bf55" stop-opacity="0"/></linearGradient></defs>
+          <path id="chartArea" d="" fill="url(#chartFill)"/>
+          <path id="chartLine" d="" fill="none" stroke="#e8bf55" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+          <line id="chartCursor" x1="0" x2="0" y1="0" y2="180" stroke="#8b94a3" stroke-dasharray="3 4" vector-effect="non-scaling-stroke" visibility="hidden"/>
+        </svg>
+        <div id="chartDot" class="chart-dot" hidden></div>
+      </div>
+      <div class="chart-axis"><span id="chartFirstLabel"></span><span id="chartLastLabel"></span></div>
+      <p class="mt-2 text-[10px] leading-relaxed text-gray-400">Illustrative chart only — not actual historical prices.</p>
+    </section>
+
     <section class="input-card transaction-card" aria-labelledby="transactionHeading">
       <p id="transactionHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔄 Transaction Type</p>
       <div class="grid grid-cols-2 gap-2" role="group" aria-label="Transaction type">
@@ -298,6 +320,7 @@
   <script src="js/state/preferences-store.js"></script>
   <script src="js/ui/share-ui.js"></script>
   <script src="js/ui/invoice-ui.js"></script>
+  <script src="js/ui/price-chart-ui.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
