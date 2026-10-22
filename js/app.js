@@ -15,6 +15,7 @@
     'GoldPreferencesStore',
     'GoldShareUI',
     'GoldInvoiceUI',
+    'GoldPriceChartUI',
   ];
 
   if (requiredGlobals.some((name) => !globalThis[name])) {
@@ -148,6 +149,12 @@
     },
   });
 
+  const priceChartUi = globalThis.GoldPriceChartUI.createPriceChartUI({
+    document,
+    locale,
+    formatting,
+  });
+
   function addCurrentPieceToInvoice() {
     const item = preferencesApi.sanitizeInvoiceItem(transactionUi.getTransactionInput());
     if (!item) {
@@ -260,6 +267,7 @@
 
   function calculate() {
     const price24k = getPrice24k();
+    priceChartUi.render(price24k);
     const input = transactionUi.getTransactionInput();
     const result = core.calculateTransaction({
       mode: input.mode,

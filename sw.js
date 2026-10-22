@@ -30,6 +30,7 @@ const APP_SHELL = [
   'js/state/preferences-store.js',
   'js/ui/share-ui.js',
   'js/ui/invoice-ui.js',
+  'js/ui/price-chart-ui.js',
   'js/app.js',
 ];
 
