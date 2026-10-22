@@ -43,6 +43,20 @@
     const modeButtons = Array.from(document.querySelectorAll('.mode-btn'));
     const karatButtons = Array.from(document.querySelectorAll('.karat-btn'));
     const adjustButtons = Array.from(document.querySelectorAll('[data-adjust-target][data-adjust-amount]'));
+    let invoiceActive = false;
+
+    function renderQuoteLabel() {
+      const selling = elements.transactionMode.value === 'sell';
+      elements.quotedTotalLabel.textContent = invoiceActive
+        ? copy.invoiceQuoteLabel
+        : selling ? copy.sellQuoteLabel : copy.buyQuoteLabel;
+    }
+
+    // With invoice items the shop quote is compared against the invoice net instead of one piece.
+    function setInvoiceActive(active) {
+      invoiceActive = Boolean(active);
+      renderQuoteLabel();
+    }
 
     function getTransactionInput() {
       return {
@@ -72,7 +86,7 @@
       elements.vatPanel.hidden = selling;
       elements.sellDeductionPanel.hidden = !selling;
       elements.transactionHelp.textContent = selling ? copy.sellHelp : copy.buyHelp;
-      elements.quotedTotalLabel.textContent = selling ? copy.sellQuoteLabel : copy.buyQuoteLabel;
+      renderQuoteLabel();
 
       return safeMode;
     }
@@ -215,6 +229,7 @@
       setKarat,
       applyInput,
       resetInput,
+      setInvoiceActive,
       renderInputLabels,
     };
   }

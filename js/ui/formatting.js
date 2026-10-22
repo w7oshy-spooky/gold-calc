@@ -25,13 +25,19 @@
       return `${formatMoney(value)} ${sarLabel}`;
     }
 
+    // The sign follows the rounded value, so a tiny difference shows as 0.00 rather than +0.00.
+    function signFor(value) {
+      const rounded = Math.round(value * 100) / 100;
+      return rounded > 0 ? '+' : rounded < 0 ? '−' : '';
+    }
+
     function formatSignedMoney(value) {
-      const sign = value > 0 ? '+' : value < 0 ? '−' : '';
+      const sign = signFor(value);
       return `${sign}${formatMoney(Math.abs(value))} ${sarLabel}`;
     }
 
     function formatSignedPercent(value) {
-      const sign = value > 0 ? '+' : value < 0 ? '−' : '';
+      const sign = signFor(value);
       return `${sign}${Math.abs(value).toFixed(2)}%`;
     }
 

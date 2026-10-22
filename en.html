@@ -219,6 +219,23 @@
       <p class="mt-2 text-[11px] leading-relaxed text-gray-400">Enter the percentage the buyer or shop deducts from raw metal value. Sell mode does not add workmanship or VAT.</p>
     </section>
 
+    <section id="invoicePanel" class="input-card invoice-card" aria-labelledby="invoiceHeading">
+      <div class="flex items-center justify-between gap-2 mb-3">
+        <p id="invoiceHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">🧾 Invoice <span id="invoiceCount" class="invoice-count">0</span></p>
+        <button type="button" id="clearInvoice" class="invoice-clear-btn" disabled>Clear invoice</button>
+      </div>
+      <button type="button" id="addToInvoice" class="action-btn action-btn-primary w-full">➕ Add current piece</button>
+      <p id="invoiceStatus" class="status-note mt-2 text-[11px] font-bold text-center text-emerald-700" aria-live="polite"></p>
+      <p id="invoiceEmpty" class="text-[11px] leading-relaxed text-gray-400">Add pieces one by one to price a full set. You can also add old gold in sell mode to deduct it from the total (trade-in).</p>
+      <ol id="invoiceList" class="invoice-list" aria-label="Invoice pieces"></ol>
+      <div id="invoiceTotals" class="invoice-totals mt-3" hidden>
+        <div id="invoiceBuyRow" class="flex justify-between text-xs"><span class="text-gray-500">Purchases</span><strong id="invoiceBuyTotal" class="invoice-num text-gray-800">—</strong></div>
+        <div id="invoiceSellRow" class="flex justify-between text-xs"><span class="text-gray-500">Trade-in value</span><strong id="invoiceSellTotal" class="invoice-num text-emerald-700">—</strong></div>
+        <div class="flex justify-between items-baseline pt-2 border-t border-gray-200"><span id="invoiceNetLabel" class="text-sm font-black text-gray-800">—</span><strong id="invoiceNet" class="invoice-num text-lg font-black text-amber-700">—</strong></div>
+      </div>
+      <p class="mt-2 text-[10px] leading-relaxed text-gray-400">Every piece is priced at the current market price and keeps its own karat, weight, workmanship and VAT.</p>
+    </section>
+
     <section id="comparisonPanel" class="input-card comparison-card" aria-labelledby="compareHeading">
       <p id="compareHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔎 Shop Quote Comparison</p>
       <label id="quotedTotalLabel" for="quotedTotal" class="block text-gray-600 text-xs font-bold mb-2">Shop quoted total (SAR)</label>
@@ -256,6 +273,7 @@
         <div id="summarySubtotalRow" class="flex justify-between text-[11px]"><span id="summarySubtotalLabel" class="text-slate-400">Before VAT</span><span class="text-slate-200 font-mono" id="subtotalOutput">0.00</span></div>
         <div id="summaryTaxRow" class="flex justify-between text-[11px]"><span class="text-red-400">VAT (<span id="taxValueLabel">15</span>%)</span><span class="text-red-300 font-mono">+<span id="vatOutput">0.00</span></span></div>
       </div>
+      <div id="summaryInvoiceRow" class="flex justify-between items-center text-[11px] mb-3 px-2 py-1.5 rounded-lg bg-slate-800" hidden><span id="summaryInvoiceLabel" class="text-amber-300 font-bold">—</span><span class="text-white font-mono font-bold" id="summaryInvoiceNet">0.00</span></div>
       <div class="border-t border-slate-700 pt-3 flex justify-between items-center">
         <div>
           <p id="finalAmountLabel" class="text-amber-500 text-[10px] uppercase font-bold tracking-widest mb-0.5">Final amount</p>
@@ -282,6 +300,7 @@
   <script src="js/ui/summary-ui.js"></script>
   <script src="js/state/preferences-store.js"></script>
   <script src="js/ui/share-ui.js"></script>
+  <script src="js/ui/invoice-ui.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

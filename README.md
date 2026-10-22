@@ -18,7 +18,10 @@ Bilingual Arabic and English calculator for gold jewellery pricing and used-gold
 - LIVE prices refresh automatically every minute while the page is visible, without flashing a loading state
 - Inputs (mode, karat, weight, workmanship, VAT, deduction, price source and manual prices) are remembered on the device; **Reset** restores the defaults
 - **Share summary** sends the calculation through the native share sheet, or copies it to the clipboard
+- **Invoice**: add several pieces (each keeps its own karat, weight, workmanship and VAT) and trade-in old gold in sell mode; the invoice shows purchases, trade-in value and the net to pay or receive, and the shop quote is compared against that net
 - Installable as a home-screen web app (`manifest.webmanifest`, `icon.svg`)
+- Works offline: `sw.js` serves the app files network-first (cached copy after 3s or when offline); without a live price, the last known quote (up to 7 days) is filled in as a dated manual price
+- Invoice UI: `js/ui/invoice-ui.js`
 - Saved preferences: `js/state/preferences-store.js`
 - Share summary / reset actions: `js/ui/share-ui.js`
 - Market-price conversion: `js/core/price-converter.js`
@@ -51,6 +54,8 @@ node --check js/ui/quote-comparison-ui.js
 node --check js/ui/summary-ui.js
 node --check js/ui/share-ui.js
 node --check js/state/preferences-store.js
+node --check js/ui/invoice-ui.js
+node --check sw.js
 node --check js/app.js
 node --test tests/*.test.js
 ```

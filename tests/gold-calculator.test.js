@@ -5,6 +5,7 @@ const {
   calculateGoldPurchase,
   calculateGoldSale,
   calculateTransaction,
+  calculateInvoice,
   compareQuote,
   normalizeMode,
   clampTaxRate,
@@ -119,4 +120,38 @@ test('quote comparison reports difference values and handles unavailable inputs'
     differencePct: 0,
     status: 'unavailable',
   });
+});
+test('prices an invoice of purchases and trade-ins at one market price', () => {
+  const price24k = ounceUsdTo24kSar(4300);
+  const invoice = calculateInvoice({
+    price24k,
+    items: [
+      { mode: 'buy', weight: 15, karat: 21, workmanshipPerGram: 35, profitPerGram: 0, taxRate: 15 },
+      { mode: 'buy', weight: 5, karat: 18, workmanshipPerGram: 35, profitPerGram: 0, taxRate: 15 },
+      { mode: 'sell', weight: 10, karat: 21, deductionRate: 0 },
+    ],
+  });
+
+  assert.equal(invoice.count, 3);
+  assert.equal(invoice.buyWeight, 20);
+  assert.equal(invoice.sellWeight, 10);
+  assert.ok(Math.abs(invoice.buyTotal - 10865.795) < 0.01);
+  assert.ok(Math.abs(invoice.sellTotal - 4536.2694) < 0.01);
+  assert.ok(Math.abs(invoice.net - (invoice.buyTotal - invoice.sellTotal)) < 1e-9);
+  assert.deepEqual(invoice.lines.map((line) => line.mode), ['buy', 'buy', 'sell']);
+});
+
+test('an empty or missing invoice totals zero and a larger trade-in gives a negative net', () => {
+  assert.deepEqual(
+    { ...calculateInvoice({ price24k: 500 }), lines: [] },
+    { lines: [], count: 0, buyTotal: 0, sellTotal: 0, buyWeight: 0, sellWeight: 0, net: 0 },
+  );
+  const invoice = calculateInvoice({
+    price24k: 480,
+    items: [
+      { mode: 'buy', weight: 2, karat: 21, workmanshipPerGram: 0, taxRate: 0 },
+      { mode: 'sell', weight: 10, karat: 21, deductionRate: 0 },
+    ],
+  });
+  assert.ok(invoice.net < 0);
 });

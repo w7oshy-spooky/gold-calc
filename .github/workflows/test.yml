@@ -30,6 +30,8 @@ jobs:
           node --check js/ui/summary-ui.js
           node --check js/ui/share-ui.js
           node --check js/state/preferences-store.js
+          node --check js/ui/invoice-ui.js
+          node --check sw.js
           node --check js/app.js
       - run: node --test tests/*.test.js
       - name: Verify tailwind.css matches the classes used in the pages

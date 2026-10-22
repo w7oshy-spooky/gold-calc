@@ -117,6 +117,7 @@ test('Arabic and English pages load the modular scripts in dependency order', ()
       'js/ui/summary-ui.js',
       'js/state/preferences-store.js',
       'js/ui/share-ui.js',
+      'js/ui/invoice-ui.js',
       'js/app.js',
     ];
     let previous = -1;
@@ -285,6 +286,44 @@ test('live price refreshes in the background only while visible in LIVE mode', (
 });
 
 test('an automatic LIVE fallback is not saved as the preferred source', () => {
-  assert.match(app, /liveFallbackActive = true;\s*setPriceSource\('ounce-usd', \{ fetchLive: false \}\);/);
+  assert.match(app, /liveFallbackActive = true;[\s\S]*?setPriceSource\('ounce-usd', \{ fetchLive: false \}\);/);
   assert.match(app, /const source = liveFallbackActive \? 'live' : market\.source;/);
+});
+
+test('both pages expose the invoice card and receipt row', () => {
+  for (const html of [arabic, english]) {
+    for (const id of [
+      'invoicePanel', 'addToInvoice', 'clearInvoice', 'invoiceStatus', 'invoiceCount', 'invoiceEmpty',
+      'invoiceList', 'invoiceTotals', 'invoiceBuyRow', 'invoiceBuyTotal', 'invoiceSellRow', 'invoiceSellTotal',
+      'invoiceNetLabel', 'invoiceNet', 'summaryInvoiceRow', 'summaryInvoiceLabel', 'summaryInvoiceNet',
+    ]) {
+      assert.match(html, new RegExp(`id=["']${id}["']`));
+    }
+    assert.ok(html.indexOf('id="invoicePanel"') < html.indexOf('id="comparisonPanel"'));
+  }
+  assert.match(styles, /\.invoice-card\{grid-column:2;/);
+});
+
+test('quote comparison follows the invoice net when the invoice has pieces', () => {
+  assert.match(app, /core\.calculateInvoice\(\{ price24k, items: invoiceItems \}\)/);
+  assert.match(app, /mode: invoice\.net >= 0 \? 'buy' : 'sell',\s*referenceTotal: Math\.abs\(invoice\.net\)/);
+  assert.match(app, /invoice: invoiceItems,/);
+});
+
+test('offline fallback pre-fills the last known quote with a dated notice', () => {
+  assert.match(app, /const lastKnownQuote = priceCache\.readLastKnownQuote\(\);/);
+  assert.match(app, /copy\.liveOfflinePrefill\.replace\('\{time\}'/);
+});
+
+test('service worker precaches every script and stylesheet the pages load', () => {
+  const sw = fs.readFileSync('sw.js', 'utf8');
+  for (const html of [arabic, english]) {
+    const assets = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css|svg|webmanifest))"/g)].map((m) => m[1]);
+    assert.ok(assets.length > 10);
+    for (const asset of assets) {
+      assert.ok(sw.includes(`'${asset}'`), `sw.js must precache ${asset}`);
+    }
+  }
+  assert.match(sw, /url\.pathname\.startsWith\('\/api\/'\)/);
+  assert.match(app, /navigator\.serviceWorker\.register\('sw\.js'\)/);
 });
