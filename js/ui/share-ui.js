@@ -32,31 +32,25 @@
     ];
 
     if (selling) {
-      const sign = result.deductionValue > 0 ? '−' : '';
       lines.push(`${resultLabels.primary}: ${formatting.formatSar(result.rawMetalValue)}`);
+      const sign = result.deductionValue > 0 ? '−' : '';
       lines.push(`${resultLabels.secondary} (${result.deductionRate}%): ${sign}${formatting.formatSar(result.deductionValue)}`);
     } else {
       lines.push(`${resultLabels.primary}: ${formatting.formatSar(result.goldCost)}`);
       lines.push(`${resultLabels.secondary}: ${formatting.formatSar(result.laborCost)}`);
-      lines.push(`${labels.vat} (${result.taxRate}%): ${formatting.formatSar(result.vat)}`);
+      lines.push(`${resultLabels.vat} (${result.taxRate}%): ${formatting.formatSar(result.vat)}`);
     }
 
     lines.push(`${resultLabels.final}: ${formatting.formatSar(result.total)}`);
     return lines;
   }
 
-  function buildSummaryText({ result, comparison, quotedTotal, price24k, invoice, copy, formatting }) {
+  function buildSummaryText({ result, price24k, invoice, copy, formatting }) {
     const labels = copy.shareLabels;
     // With invoice items the invoice is what gets shared; the current piece is only a draft.
     const lines = invoice?.count > 0
       ? buildInvoiceLines(invoice, copy, formatting)
       : buildPieceLines(result, copy, formatting);
-
-    if (comparison?.available) {
-      lines.push(
-        `${labels.quote}: ${formatting.formatSar(Number(quotedTotal))} (${formatting.formatSignedMoney(comparison.difference)} · ${formatting.formatSignedPercent(comparison.differencePct)})`,
-      );
-    }
 
     if (price24k > 0) lines.push(`${labels.price24k}: ${formatting.formatSar(price24k)}`);
     lines.push(labels.disclaimer);

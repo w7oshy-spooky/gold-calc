@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0d0f12">
-  <meta name="description" content="Gold buy and sell calculator in Saudi riyals with karat, workmanship, VAT and shop quote comparison.">
+  <meta name="description" content="Buy and sell gold in Saudi riyals with karat, workmanship, VAT and the live gold price.">
   <title>Gold Calculator</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
@@ -15,297 +15,159 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="gradient-bg header-wrap pb-14 px-5 text-white text-center rounded-b-[2.5rem] shadow-lg">
-    <a class="lang-switch" href="index.html" aria-label="Open Arabic version">العربية</a>
-    <div class="flex items-center justify-center gap-2 mb-1">
-      <svg class="header-icon text-yellow-200" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9" cy="6" rx="6" ry="3"/><path d="M3 6v4c0 1.66 2.69 3 6 3s6-1.34 6-3V6"/><path d="M9 16c-3.31 0-6-1.34-6-3"/><path d="M3 10v4c0 1.66 2.69 3 6 3 .7 0 1.37-.06 2-.17"/><ellipse cx="15" cy="15" rx="6" ry="3"/><path d="M9 15v4c0 1.66 2.69 3 6 3s6-1.34 6-3v-4"/></g></svg>
-      <h1 class="text-2xl font-bold">Smart Gold Calculator</h1>
-    </div>
-    <p class="text-yellow-100 text-sm opacity-90">Calculate buy or sell value and compare a shop quote with the reference</p>
-  </header>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand"><span class="logo" aria-hidden="true">Au</span><h1>Gold Calculator</h1></div>
+      <a class="lang-btn" href="index.html" aria-label="فتح النسخة العربية">العربية</a>
+    </header>
 
-  <main class="page-content desktop-dashboard px-4 -mt-8 space-y-4 max-w-md mx-auto">
-    <section class="input-card market-card" aria-labelledby="marketHeading">
-      <p id="marketHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">📈 Market Data</p>
-
-      <div class="market-source-grid grid grid-cols-2 gap-2 mb-4" role="group" aria-label="Gold price source">
-        <button type="button" class="source-btn active" data-source="live" aria-pressed="true">LIVE</button>
-        <button type="button" class="source-btn" data-source="ounce-usd" aria-pressed="false">Ounce USD</button>
-        <button type="button" class="source-btn" data-source="ounce-sar" aria-pressed="false">Ounce SAR</button>
-        <button type="button" class="source-btn" data-source="gram-sar" aria-pressed="false">Gram SAR</button>
-      </div>
-      <input type="hidden" id="priceSource" value="live">
-
-      <div id="ounceUsdInputPanel">
-        <label for="ouncePriceUSD" class="block text-gray-600 text-xs font-bold mb-2">Troy ounce price (USD)</label>
-        <div class="relative mb-3">
-          <input type="number" id="ouncePriceUSD" min="0" step="0.01" placeholder="Example: 4300"
-                 inputmode="decimal" autocomplete="off"
-                 class="market-input bg-blue-50 border-blue-200 text-blue-800"
-                 style="padding-inline-start:2.8rem;">
-          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-blue-400 font-bold text-sm pointer-events-none">$</span>
-        </div>
-      </div>
-
-      <div id="ounceSarInputPanel" hidden>
-        <label for="ouncePriceSAR" class="block text-gray-600 text-xs font-bold mb-2">Troy ounce price (SAR)</label>
-        <div class="relative mb-3">
-          <input type="number" id="ouncePriceSAR" min="0" step="0.01" placeholder="Example: 16125"
-                 inputmode="decimal" autocomplete="off"
-                 class="market-input bg-emerald-50 border-emerald-200 text-emerald-800"
-                 style="padding-inline-start:3.5rem;">
-          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-emerald-500 text-xs font-bold pointer-events-none">SAR</span>
-        </div>
-      </div>
-
-      <div id="gramSarInputPanel" hidden>
-        <label for="gramPriceSAR" class="block text-gray-600 text-xs font-bold mb-2">Raw gold gram price (SAR)</label>
-        <div class="relative mb-3">
-          <input type="number" id="gramPriceSAR" min="0" step="0.01" placeholder="Example: 453.63"
-                 inputmode="decimal" autocomplete="off"
-                 class="market-input bg-amber-50 border-amber-200 text-amber-800"
-                 style="padding-inline-start:3.5rem;">
-          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-amber-500 text-xs font-bold pointer-events-none">SAR</span>
-        </div>
-        <span class="block text-gray-600 text-xs font-bold mb-2">Karat of entered gram price</span>
-        <div class="grid grid-cols-4 gap-2 mb-2" role="group" aria-label="Karat of entered gram price">
-          <button type="button" class="gram-karat-btn" data-gram-karat="18" aria-pressed="false">18</button>
-          <button type="button" class="gram-karat-btn active" data-gram-karat="21" aria-pressed="true">21</button>
-          <button type="button" class="gram-karat-btn" data-gram-karat="22" aria-pressed="false">22</button>
-          <button type="button" class="gram-karat-btn" data-gram-karat="24" aria-pressed="false">24</button>
-        </div>
-        <input type="hidden" id="gramInputKarat" value="21">
-        <p class="text-[10px] leading-relaxed text-gray-400">Use the raw gold gram price, excluding workmanship and VAT.</p>
-      </div>
-
-      <div class="pt-3 border-t border-gray-100">
-        <label for="marketPrice" class="block text-gray-600 text-xs font-bold mb-2">Equivalent 24K gram price</label>
-        <div class="relative">
-          <input type="number" id="marketPrice" min="0" step="0.01" readonly
-                 class="market-input bg-slate-50 border-slate-200 text-slate-700"
-                 style="padding-inline-start:3.5rem;">
-          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-bold pointer-events-none">SAR</span>
-        </div>
-      </div>
-
-      <p id="priceModeHelp" class="status-note mt-2 text-[11px] leading-relaxed text-gray-400"></p>
-      <p id="priceWarning" class="status-note text-[11px] font-bold" aria-live="polite"></p>
-
-    </section>
-
-    <aside class="input-card market-summary-card" aria-labelledby="marketSummaryHeading">
-      <p id="marketSummaryHeading" class="text-gray-900 text-sm font-black mb-1">📡 Current Gold Price</p>
-      <p class="text-gray-400 text-[11px] mb-2">Market reference calculated from the selected price source.</p>
-      <div id="livePricePanel" class="live-price-panel mt-3" hidden>
-        <div class="flex items-center justify-between gap-3">
-          <div class="min-w-0">
-            <div class="flex items-center gap-2">
-              <span class="live-dot" aria-hidden="true"></span>
-              <strong id="livePriceStatus" class="text-xs text-gray-700">Updating live gold price…</strong>
-            </div>
-            <p id="liveUpdatedAt" class="text-[10px] text-gray-400 mt-1">—</p>
+    <main class="layout">
+      <div class="col col-inputs">
+        <section class="card inputs-card" aria-label="Gold Calculator">
+          <div class="seg" role="group" aria-label="Transaction type">
+            <button type="button" class="seg-btn mode-btn active" data-mode="buy" aria-pressed="true">Buy</button>
+            <button type="button" class="seg-btn mode-btn" data-mode="sell" aria-pressed="false">Sell</button>
           </div>
-          <button type="button" id="liveRefresh" class="live-refresh-btn" aria-label="Refresh">↻ Refresh</button>
-        </div>
-        <div class="live-karat-grid mt-3" aria-label="Live karat prices">
-          <div><span>24K</span><strong id="liveKarat24">—</strong></div>
-          <div><span>22K</span><strong id="liveKarat22">—</strong></div>
-          <div><span>21K</span><strong id="liveKarat21">—</strong></div>
-          <div><span>18K</span><strong id="liveKarat18">—</strong></div>
-        </div>
+          <input type="hidden" id="transactionMode" value="buy">
+
+          <div class="field">
+            <label class="field-label" for="weight">Weight (grams)</label>
+            <div class="stepper stepper-lg">
+              <button type="button" class="step-btn" data-adjust-target="weight" data-adjust-amount="-0.5" aria-label="Decrease">−</button>
+              <input type="text" inputmode="decimal" id="weight" class="num-input" autocomplete="off" aria-label="Weight (grams)">
+              <button type="button" class="step-btn" data-adjust-target="weight" data-adjust-amount="0.5" aria-label="Increase">+</button>
+            </div>
+            <div class="chips chips-tight"><button type="button" class="chip" data-set-target="weight" data-set-value="1" aria-pressed="false">1g</button><button type="button" class="chip" data-set-target="weight" data-set-value="2" aria-pressed="false">2g</button><button type="button" class="chip" data-set-target="weight" data-set-value="5" aria-pressed="false">5g</button><button type="button" class="chip" data-set-target="weight" data-set-value="10" aria-pressed="false">10g</button><button type="button" class="chip" data-set-target="weight" data-set-value="20" aria-pressed="false">20g</button><button type="button" class="chip" data-set-target="weight" data-set-value="50" aria-pressed="false">50g</button></div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">Karat</div>
+            <div class="karat-grid" role="group" aria-label="Karat">
+              <button type="button" class="karat-btn" data-val="18" aria-pressed="false">18K</button>
+              <button type="button" class="karat-btn active" data-val="21" aria-pressed="true">21K</button>
+              <button type="button" class="karat-btn" data-val="22" aria-pressed="false">22K</button>
+              <button type="button" class="karat-btn" data-val="24" aria-pressed="false">24K</button>
+            </div>
+            <input type="hidden" id="karat" value="21">
+          </div>
+
+          <div id="buyCostsPanel" class="panel">
+            <div class="field">
+              <label class="field-label" for="workmanship">Workmanship SAR/g</label>
+              <div class="stepper">
+              <button type="button" class="step-btn" data-adjust-target="workmanship" data-adjust-amount="-5" aria-label="Decrease">−</button>
+              <input type="text" inputmode="decimal" id="workmanship" class="num-input" autocomplete="off" aria-label="Workmanship SAR/g">
+              <button type="button" class="step-btn" data-adjust-target="workmanship" data-adjust-amount="5" aria-label="Increase">+</button>
+            </div>
+              <div class="chips"><button type="button" class="chip" data-set-target="workmanship" data-set-value="0" aria-pressed="false">0</button><button type="button" class="chip" data-set-target="workmanship" data-set-value="10" aria-pressed="false">10</button><button type="button" class="chip" data-set-target="workmanship" data-set-value="20" aria-pressed="false">20</button><button type="button" class="chip" data-set-target="workmanship" data-set-value="35" aria-pressed="false">35</button><button type="button" class="chip" data-set-target="workmanship" data-set-value="50" aria-pressed="false">50</button></div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="profit">Margin SAR/g</label>
+              <div class="stepper">
+              <button type="button" class="step-btn" data-adjust-target="profit" data-adjust-amount="-1" aria-label="Decrease">−</button>
+              <input type="text" inputmode="decimal" id="profit" class="num-input" autocomplete="off" aria-label="Margin SAR/g">
+              <button type="button" class="step-btn" data-adjust-target="profit" data-adjust-amount="1" aria-label="Increase">+</button>
+            </div>
+              <div class="chips"><button type="button" class="chip" data-set-target="profit" data-set-value="0" aria-pressed="false">0</button><button type="button" class="chip" data-set-target="profit" data-set-value="2" aria-pressed="false">2</button><button type="button" class="chip" data-set-target="profit" data-set-value="5" aria-pressed="false">5</button><button type="button" class="chip" data-set-target="profit" data-set-value="10" aria-pressed="false">10</button><button type="button" class="chip" data-set-target="profit" data-set-value="15" aria-pressed="false">15</button></div>
+            </div>
+            <div class="field" id="vatPanel">
+              <div class="field-head"><label class="field-label" for="taxRange">VAT</label><span class="field-value" id="taxValueLabel">15%</span></div>
+              <div class="chips chips-wide"><button type="button" class="chip" data-set-target="tax" data-set-value="0" aria-pressed="false">0%</button><button type="button" class="chip" data-set-target="tax" data-set-value="5" aria-pressed="false">5%</button><button type="button" class="chip" data-set-target="tax" data-set-value="10" aria-pressed="false">10%</button><button type="button" class="chip" data-set-target="tax" data-set-value="15" aria-pressed="false">15%</button></div>
+              <input type="range" id="taxRange" min="0" max="25" step="1" value="15" aria-label="VAT">
+            </div>
+          </div>
+
+          <div id="sellDeductionPanel" class="panel" hidden>
+            <div class="field">
+              <div class="field-head"><label class="field-label" for="sellDeduction">Buyer deduction</label><span class="field-value" id="sellDeductionLabel">0%</span></div>
+              <input type="range" id="sellDeduction" min="0" max="30" step="1" value="0" aria-label="Buyer deduction">
+            </div>
+          </div>
+        </section>
       </div>
 
-      <div id="marketEquivalentPanel" class="mt-3 rounded-xl border border-gray-100 bg-slate-50 p-3" hidden>
-        <p class="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Equivalent market values</p>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div><span class="text-gray-400">USD/oz</span><strong id="equivalentOunceUSD" class="block text-gray-700">—</strong></div>
-          <div><span class="text-gray-400">SAR/oz</span><strong id="equivalentOunceSAR" class="block text-gray-700">—</strong></div>
-          <div><span class="text-gray-400">24K/g</span><strong id="equivalentGram24" class="block text-gray-700">—</strong></div>
-          <div><span class="text-gray-400">22K/g</span><strong id="equivalentGram22" class="block text-gray-700">—</strong></div>
-          <div><span class="text-gray-400">21K/g</span><strong id="equivalentGram21" class="block text-gray-700">—</strong></div>
-          <div><span class="text-gray-400">18K/g</span><strong id="equivalentGram18" class="block text-gray-700">—</strong></div>
-        </div>
-      </div>
-    </aside>
+      <div class="col col-main">
+        <section class="card result-card" aria-live="polite">
+          <div class="result-head"><span id="finalAmountLabel">Total to pay</span><span class="ltr"><span id="summaryWeight">15</span>g · <span id="summaryKarat">21</span>K</span></div>
+          <div class="result-amount ltr"><span class="result-num" id="finalTotalOutput">0.00</span><span class="result-cur">SAR</span></div>
+          <div class="result-rows" id="summaryRows"></div>
+          <div class="result-actions">
+            <button type="button" class="btn btn-ink" id="addToInvoice">+ Add to invoice</button>
+            <button type="button" class="btn btn-outline" id="shareSummary">Share</button>
+            <button type="button" class="btn btn-soft" id="resetInputs">↺ Reset</button>
+          </div>
+          <div class="action-status" id="actionStatus" role="status"></div>
+        </section>
 
-    <section class="input-card chart-card" aria-labelledby="chartHeading">
-      <div class="chart-head">
-        <div>
-          <p id="chartHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">📊 Gold price movement</p>
-          <div class="chart-price-row"><span id="chartPrice" class="chart-price">—</span><span class="chart-unit">SAR / g · 24K</span></div>
-          <div id="chartChange" class="chart-change" aria-live="off"></div>
-        </div>
-        <div class="chart-ranges" role="group" aria-label="Chart time range"><button type="button" class="chart-range-btn active" data-chart-range="0" aria-pressed="true">1D</button><button type="button" class="chart-range-btn" data-chart-range="1" aria-pressed="false">1W</button><button type="button" class="chart-range-btn" data-chart-range="2" aria-pressed="false">1M</button><button type="button" class="chart-range-btn" data-chart-range="3" aria-pressed="false">1Y</button></div>
-      </div>
-      <div class="chart-plot">
-        <svg id="chartSvg" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="Gold price chart">
-          <defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8bf55" stop-opacity=".35"/><stop offset="1" stop-color="#e8bf55" stop-opacity="0"/></linearGradient></defs>
-          <path id="chartArea" d="" fill="url(#chartFill)"/>
-          <path id="chartLine" d="" fill="none" stroke="#e8bf55" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-          <line id="chartCursor" x1="0" x2="0" y1="0" y2="180" stroke="#8b94a3" stroke-dasharray="3 4" vector-effect="non-scaling-stroke" visibility="hidden"/>
-        </svg>
-        <div id="chartDot" class="chart-dot" hidden></div>
-      </div>
-      <div class="chart-axis"><span id="chartFirstLabel"></span><span id="chartLastLabel"></span></div>
-      <p class="mt-2 text-[10px] leading-relaxed text-gray-400">Illustrative chart only — not actual historical prices.</p>
-    </section>
+        <section class="card chart-card" aria-label="Gold price">
+          <div class="chart-top">
+            <div>
+              <div class="muted-label">Gold price</div>
+              <div class="chart-price ltr"><span id="chartPrice">—</span><span class="chart-unit">SAR / g · 24K</span></div>
+              <div class="chart-change ltr" id="chartChange"></div>
+            </div>
+            <div class="range-pills" role="group" aria-label="Time range">
+              <button type="button" class="pill active" data-chart-range="0" aria-pressed="true">1D</button>
+              <button type="button" class="pill" data-chart-range="1" aria-pressed="false">1W</button>
+              <button type="button" class="pill" data-chart-range="2" aria-pressed="false">1M</button>
+              <button type="button" class="pill" data-chart-range="3" aria-pressed="false">1Y</button>
+            </div>
+          </div>
+          <div class="chart-wrap ltr">
+            <svg id="chartSvg" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="Gold price">
+              <defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8bf55" stop-opacity=".35"/><stop offset="1" stop-color="#e8bf55" stop-opacity="0"/></linearGradient></defs>
+              <path id="chartArea" d="" fill="url(#gfill)"/>
+              <path id="chartLine" d="" fill="none" stroke="#e8bf55" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+              <line id="chartCursor" x1="0" x2="0" y1="0" y2="180" stroke="#8b94a3" stroke-dasharray="3 4" vector-effect="non-scaling-stroke" visibility="hidden"/>
+            </svg>
+            <div class="chart-dot" id="chartDot" hidden></div>
+            <div class="chart-labels"><span id="chartFirstLabel"></span><span id="chartLastLabel"></span></div>
+          </div>
 
-    <section class="input-card transaction-card" aria-labelledby="transactionHeading">
-      <p id="transactionHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔄 Transaction Type</p>
-      <div class="grid grid-cols-2 gap-2" role="group" aria-label="Transaction type">
-        <button type="button" class="mode-btn active" data-mode="buy" aria-pressed="true">Buy Jewellery</button>
-        <button type="button" class="mode-btn" data-mode="sell" aria-pressed="false">Sell Used Gold</button>
+          <div class="source-row">
+            <span class="muted-label inline">Price</span>
+            <div class="pills" role="group" aria-label="Price source">
+              <button type="button" class="pill pill-border source-btn active" data-source="live" aria-pressed="true">Live</button>
+              <button type="button" class="pill pill-border source-btn" data-source="ounce-usd" aria-pressed="false">$ / oz</button>
+              <button type="button" class="pill pill-border source-btn" data-source="ounce-sar" aria-pressed="false">SAR / oz</button>
+              <button type="button" class="pill pill-border source-btn" data-source="gram-sar" aria-pressed="false">SAR / g</button>
+            </div>
+            <input type="hidden" id="priceSource" value="live">
+          </div>
+
+          <div class="live-row" id="livePricePanel">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span class="live-text"><span id="livePriceStatus"></span> <span class="live-time" id="liveUpdatedAt"></span></span>
+            <button type="button" class="pill pill-border" id="liveRefresh">↻ Refresh</button>
+          </div>
+
+          <div class="manual" id="manualPanel" hidden>
+            <span class="manual-unit" id="manualUnit">$/oz</span>
+            <input type="text" inputmode="decimal" id="manualPrice" class="manual-input" autocomplete="off" data-placeholder="Gram price" aria-label="Price">
+          </div>
+          <div class="gram-karat" id="gramKaratPanel" hidden>
+            <span class="muted-label inline">Karat of entered price</span>
+            <button type="button" class="chip gram-karat-btn" data-gram-karat="18" aria-pressed="false">18K</button><button type="button" class="chip gram-karat-btn" data-gram-karat="21" aria-pressed="false">21K</button><button type="button" class="chip gram-karat-btn" data-gram-karat="22" aria-pressed="false">22K</button><button type="button" class="chip gram-karat-btn" data-gram-karat="24" aria-pressed="false">24K</button>
+            <input type="hidden" id="gramInputKarat" value="24">
+          </div>
+          <p class="price-warning" id="priceWarning" role="status"></p>
+
+          <div class="equiv" id="marketEquivalentPanel">
+            <div class="muted-label">Equivalent prices</div>
+            <div class="price-grid ltr"><div class="price-cell"><div class="cell-label">$ / oz</div><div class="cell-val" id="equivOunceUsd">—</div><div class="cell-unit">24K</div></div><div class="price-cell"><div class="cell-label">SAR / oz</div><div class="cell-val" id="equivOunceSar">—</div><div class="cell-unit">24K</div></div><div class="price-cell" data-karat="24"><div class="cell-label">24K</div><div class="cell-val" id="equivKarat24">—</div><div class="cell-unit">SAR / g</div></div><div class="price-cell" data-karat="22"><div class="cell-label">22K</div><div class="cell-val" id="equivKarat22">—</div><div class="cell-unit">SAR / g</div></div><div class="price-cell" data-karat="21"><div class="cell-label">21K</div><div class="cell-val" id="equivKarat21">—</div><div class="cell-unit">SAR / g</div></div><div class="price-cell" data-karat="18"><div class="cell-label">18K</div><div class="cell-val" id="equivKarat18">—</div><div class="cell-unit">SAR / g</div></div></div>
+          </div>
+        </section>
+
+        <section class="card invoice-card" id="invoicePanel" hidden>
+          <div class="invoice-head"><span class="muted-label"><span>Invoice</span> · <span id="invoiceCount">0</span></span><button type="button" class="btn-clear" id="clearInvoice">Clear</button></div>
+          <ul class="invoice-list" id="invoiceList"></ul>
+          <div class="invoice-net"><span id="invoiceNetLabel">Net to pay</span><span class="invoice-net-val ltr"><span id="invoiceNet">0.00</span> <small>SAR</small></span></div>
+        </section>
+
+        <p class="note">Indicative estimates; chart data is illustrative. Actual shop prices can differ.</p>
       </div>
-      <input type="hidden" id="transactionMode" value="buy">
-      <p id="transactionHelp" class="status-note mt-2 text-[11px] leading-relaxed text-gray-400"></p>
-    </section>
-
-    <section class="input-card item-card space-y-5" aria-labelledby="itemHeading">
-      <p id="itemHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">⚖️ Item Details</p>
-
-      <div>
-        <label for="weight" class="block text-gray-600 text-xs font-bold mb-2">Weight (grams)</label>
-        <div class="flex items-center gap-2">
-          <button type="button" data-adjust-target="weight" data-adjust-amount="-0.5" class="step-btn text-xl" aria-label="Decrease weight">−</button>
-          <input type="number" id="weight" value="15" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input text-xl">
-          <button type="button" data-adjust-target="weight" data-adjust-amount="0.5" class="step-btn text-xl" aria-label="Increase weight">+</button>
-        </div>
-      </div>
-
-      <div>
-        <span class="block text-gray-600 text-xs font-bold mb-2">Karat</span>
-        <div class="grid grid-cols-4 gap-2" role="group" aria-label="Karat">
-          <button type="button" class="karat-btn" data-val="18" aria-pressed="false">18</button>
-          <button type="button" class="karat-btn active" data-val="21" aria-pressed="true">21</button>
-          <button type="button" class="karat-btn" data-val="22" aria-pressed="false">22</button>
-          <button type="button" class="karat-btn" data-val="24" aria-pressed="false">24</button>
-          <input type="hidden" id="karat" value="21">
-        </div>
-      </div>
-
-      <div class="bg-gradient-to-l from-amber-50 to-yellow-50 rounded-xl p-3 border border-amber-100 flex justify-between items-center">
-        <span class="text-gray-500 text-xs font-bold">Gram price / <span id="selectedKaratLabel" class="text-amber-600 font-black">21</span>K</span>
-        <div><span class="text-amber-700 font-black text-base live-val" id="karatPriceOutput">0.00</span> <span class="text-amber-400 text-xs">SAR</span></div>
-      </div>
-    </section>
-
-    <section id="buyCostsPanel" class="input-card purchase-card space-y-5" aria-labelledby="extrasHeading">
-      <p id="extrasHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">💼 Purchase Costs</p>
-
-      <div>
-        <div class="flex justify-between items-center mb-2">
-          <label for="workmanship" class="text-gray-600 text-xs font-bold">Workmanship (SAR / gram)</label>
-          <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="workmanshipLabel">35</span> SAR</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <button type="button" data-adjust-target="workmanship" data-adjust-amount="-5" class="step-btn text-xs font-black">−5</button>
-          <input type="number" id="workmanship" value="35" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input">
-          <button type="button" data-adjust-target="workmanship" data-adjust-amount="5" class="step-btn text-xs font-black">+5</button>
-        </div>
-      </div>
-
-      <div>
-        <div class="flex justify-between items-center mb-2">
-          <label for="profit" class="text-gray-600 text-xs font-bold">Optional extra margin (SAR / gram)</label>
-          <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="profitLabel">0</span> SAR</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <button type="button" data-adjust-target="profit" data-adjust-amount="-1" class="step-btn text-xl">−</button>
-          <input type="number" id="profit" value="0" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input">
-          <button type="button" data-adjust-target="profit" data-adjust-amount="1" class="step-btn text-xl">+</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="vatPanel" class="input-card vat-card" aria-labelledby="vatHeading">
-      <p id="vatHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🧾 Value Added Tax</p>
-      <div class="flex justify-between items-center mb-3">
-        <span class="text-gray-600 text-sm font-bold">VAT rate</span>
-        <span class="bg-amber-100 text-amber-700 font-black text-xl px-4 py-1 rounded-xl"><span id="taxLabel">15</span>%</span>
-      </div>
-      <input type="range" id="taxRange" min="0" max="25" step="1" value="15" aria-label="VAT rate">
-      <input type="hidden" id="tax" value="15">
-      <div class="flex justify-between text-[10px] text-gray-400 mt-1 px-0.5"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%</span></div>
-    </section>
-
-    <section id="sellDeductionPanel" class="input-card sell-card" aria-labelledby="sellHeading" hidden>
-      <p id="sellHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🏷️ Buyer Deduction</p>
-      <div class="flex justify-between items-center mb-2">
-        <label for="sellDeduction" class="text-gray-600 text-xs font-bold">Deduction from raw metal value</label>
-        <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="sellDeductionLabel">0</span>%</span>
-      </div>
-      <input type="number" id="sellDeduction" value="0" min="0" max="100" step="0.1" inputmode="decimal" autocomplete="off" class="num-input">
-      <p class="mt-2 text-[11px] leading-relaxed text-gray-400">Enter the percentage the buyer or shop deducts from raw metal value. Sell mode does not add workmanship or VAT.</p>
-    </section>
-
-    <section id="invoicePanel" class="input-card invoice-card" aria-labelledby="invoiceHeading">
-      <div class="flex items-center justify-between gap-2 mb-3">
-        <p id="invoiceHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">🧾 Invoice <span id="invoiceCount" class="invoice-count">0</span></p>
-        <button type="button" id="clearInvoice" class="invoice-clear-btn" disabled>Clear invoice</button>
-      </div>
-      <button type="button" id="addToInvoice" class="action-btn action-btn-primary w-full">➕ Add current piece</button>
-      <p id="invoiceStatus" class="status-note mt-2 text-[11px] font-bold text-center text-emerald-700" aria-live="polite"></p>
-      <p id="invoiceEmpty" class="text-[11px] leading-relaxed text-gray-400">Add pieces one by one to price a full set. You can also add old gold in sell mode to deduct it from the total (trade-in).</p>
-      <ol id="invoiceList" class="invoice-list" aria-label="Invoice pieces"></ol>
-      <div id="invoiceTotals" class="invoice-totals mt-3" hidden>
-        <div id="invoiceBuyRow" class="flex justify-between text-xs"><span class="text-gray-500">Purchases</span><strong id="invoiceBuyTotal" class="invoice-num text-gray-800">—</strong></div>
-        <div id="invoiceSellRow" class="flex justify-between text-xs"><span class="text-gray-500">Trade-in value</span><strong id="invoiceSellTotal" class="invoice-num text-emerald-700">—</strong></div>
-        <div class="flex justify-between items-baseline pt-2 border-t border-gray-200"><span id="invoiceNetLabel" class="text-sm font-black text-gray-800">—</span><strong id="invoiceNet" class="invoice-num text-lg font-black text-amber-700">—</strong></div>
-      </div>
-      <p class="mt-2 text-[10px] leading-relaxed text-gray-400">Every piece is priced at the current market price and keeps its own karat, weight, workmanship and VAT.</p>
-    </section>
-
-    <section id="comparisonPanel" class="input-card comparison-card" aria-labelledby="compareHeading">
-      <p id="compareHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔎 Shop Quote Comparison</p>
-      <label id="quotedTotalLabel" for="quotedTotal" class="block text-gray-600 text-xs font-bold mb-2">Shop quoted total (SAR)</label>
-      <input type="number" id="quotedTotal" min="0" step="0.01" placeholder="Enter the quote to compare" inputmode="decimal" autocomplete="off" class="num-input">
-
-      <div class="comparison-result mt-3" aria-live="polite">
-        <p id="comparisonStatus" class="font-bold text-sm text-gray-700">Enter the quoted amount to start the comparison.</p>
-        <div class="grid grid-cols-2 gap-2 mt-2 text-xs">
-          <div class="comparison-metric"><span class="text-gray-400">Difference</span><strong id="comparisonDifference">—</strong></div>
-          <div class="comparison-metric"><span class="text-gray-400">Percentage</span><strong id="comparisonPercent">—</strong></div>
-        </div>
-      </div>
-      <p class="mt-2 text-[10px] leading-relaxed text-gray-400">The comparison is a reference only. Shop quotes can differ because of workmanship, stones, promotions, commercial policy and tax treatment.</p>
-    </section>
-
-    <aside class="input-card note-card text-[11px] leading-relaxed text-gray-500" aria-label="Note">
-      <strong class="text-gray-700">Note:</strong> LIVE uses an indicative XAU/USD raw-gold spot quote converted to Saudi riyals. Results are estimates; actual shop execution can differ because of bid/ask spreads, workmanship, stones, promotions and tax treatment.
-    </aside>
-
-    <section class="input-card actions-card" aria-labelledby="actionsHeading">
-      <p id="actionsHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">⚡ Quick actions</p>
-      <div class="grid grid-cols-2 gap-2">
-        <button type="button" id="shareSummary" class="action-btn action-btn-primary">📋 Share summary</button>
-        <button type="button" id="resetInputs" class="action-btn">↺ Reset</button>
-      </div>
-      <p id="actionStatus" class="status-note mt-2 text-[11px] font-bold text-center text-emerald-700" aria-live="polite"></p>
-      <p class="text-[10px] leading-relaxed text-gray-400 text-center">Your inputs are saved on this device only, so they are ready when you come back.</p>
-    </section>
-
-  <div class="bottom-receipt dashboard-result">
-    <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="Price summary">
-      <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3">
-        <div class="flex justify-between text-[11px]"><span id="summaryPrimaryLabel" class="text-slate-400">Gold cost</span><span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span></div>
-        <div class="flex justify-between text-[11px]"><span id="summarySecondaryLabel" class="text-slate-400">Workmanship + margin</span><span class="text-slate-200 font-mono" id="laborCostOutput">0.00</span></div>
-        <div id="summarySubtotalRow" class="flex justify-between text-[11px]"><span id="summarySubtotalLabel" class="text-slate-400">Before VAT</span><span class="text-slate-200 font-mono" id="subtotalOutput">0.00</span></div>
-        <div id="summaryTaxRow" class="flex justify-between text-[11px]"><span class="text-red-400">VAT (<span id="taxValueLabel">15</span>%)</span><span class="text-red-300 font-mono">+<span id="vatOutput">0.00</span></span></div>
-      </div>
-      <div id="summaryInvoiceRow" class="flex justify-between items-center text-[11px] mb-3 px-2 py-1.5 rounded-lg bg-slate-800" hidden><span id="summaryInvoiceLabel" class="text-amber-300 font-bold">—</span><span class="text-white font-mono font-bold" id="summaryInvoiceNet">0.00</span></div>
-      <div class="border-t border-slate-700 pt-3 flex justify-between items-center">
-        <div>
-          <p id="finalAmountLabel" class="text-amber-500 text-[10px] uppercase font-bold tracking-widest mb-0.5">Final amount</p>
-          <div class="flex items-baseline gap-1"><span class="text-3xl font-black font-mono live-val" id="finalTotalOutput">0.00</span><span class="text-sm text-slate-400">SAR</span></div>
-        </div>
-        <div class="bg-slate-800 px-3 py-2 rounded-xl text-center">
-          <p class="text-[10px] text-slate-500 mb-0.5">Weight / Karat</p>
-          <p class="text-sm font-bold text-amber-400"><span id="summaryWeight">15</span>g · <span id="summaryKarat">21</span>K</p>
-        </div>
-      </div>
-    </section>
+    </main>
   </div>
-  </main>
 
   <script src="js/core/price-converter.js"></script>
   <script src="gold-calculator.js"></script>
@@ -315,7 +177,6 @@
   <script src="js/market/live-price-client.js"></script>
   <script src="js/ui/market-ui.js"></script>
   <script src="js/ui/transaction-ui.js"></script>
-  <script src="js/ui/quote-comparison-ui.js"></script>
   <script src="js/ui/summary-ui.js"></script>
   <script src="js/state/preferences-store.js"></script>
   <script src="js/ui/share-ui.js"></script>

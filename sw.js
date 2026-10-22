@@ -1,7 +1,7 @@
 'use strict';
 
 // Bump the version when files are added to or removed from APP_SHELL.
-const CACHE_NAME = 'gold-calc-shell-v2';
+const CACHE_NAME = 'gold-calc-shell-v3';
 const NETWORK_TIMEOUT_MS = 3000;
 
 const APP_SHELL = [
@@ -25,7 +25,6 @@ const APP_SHELL = [
   'js/market/live-price-client.js',
   'js/ui/market-ui.js',
   'js/ui/transaction-ui.js',
-  'js/ui/quote-comparison-ui.js',
   'js/ui/summary-ui.js',
   'js/state/preferences-store.js',
   'js/ui/share-ui.js',

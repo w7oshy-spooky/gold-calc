@@ -43,16 +43,12 @@ test('Arabic and English dynamic copy expose the same contract', () => {
   const ar = getCopy('ar');
   const en = getCopy('en');
   assert.deepEqual(Object.keys(ar).sort(), Object.keys(en).sort());
-  assert.deepEqual(Object.keys(ar.statuses).sort(), Object.keys(en.statuses).sort());
+  assert.deepEqual(Object.keys(ar.units).sort(), Object.keys(en.units).sort());
   assert.deepEqual(Object.keys(ar.buyLabels).sort(), Object.keys(en.buyLabels).sort());
   assert.deepEqual(Object.keys(ar.sellLabels).sort(), Object.keys(en.sellLabels).sort());
   assert.deepEqual(Object.keys(ar.shareLabels).sort(), Object.keys(en.shareLabels).sort());
 
   for (const key of [
-    'liveMode',
-    'ounceMode',
-    'ounceSarMode',
-    'gramSarMode',
     'needPrice',
     'liveLoading',
     'liveReady',
@@ -61,11 +57,6 @@ test('Arabic and English dynamic copy expose the same contract', () => {
     'liveUnavailable',
     'lastUpdated',
     'source',
-    'buyHelp',
-    'sellHelp',
-    'buyQuoteLabel',
-    'sellQuoteLabel',
-    'comparePrompt',
     'shareNeedsPrice',
     'shareCopied',
     'shareFailed',

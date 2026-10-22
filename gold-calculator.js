@@ -122,45 +122,6 @@
     };
   }
 
-  function compareQuote({ mode, referenceTotal, quotedTotal } = {}) {
-    const safeMode = normalizeMode(mode);
-    const reference = sanitizeNonNegative(referenceTotal);
-    const quote = sanitizeNonNegative(quotedTotal);
-
-    if (reference <= 0 || quote <= 0) {
-      return {
-        available: false,
-        difference: 0,
-        differencePct: 0,
-        status: 'unavailable',
-      };
-    }
-
-    const difference = quote - reference;
-    const differencePct = (difference / reference) * 100;
-    const absDifferencePct = Math.abs(differencePct);
-    let status;
-
-    if (absDifferencePct <= 2) {
-      status = 'close';
-    } else if (safeMode === 'sell') {
-      if (differencePct < -5) status = 'low';
-      else if (differencePct < -2) status = 'moderate_low';
-      else status = 'above_reference';
-    } else {
-      if (differencePct > 5) status = 'high';
-      else if (differencePct > 2) status = 'moderate_high';
-      else status = 'below_reference';
-    }
-
-    return {
-      available: true,
-      difference,
-      differencePct,
-      status,
-    };
-  }
-
   return {
     normalizeMode,
     clampTaxRate,
@@ -169,6 +130,5 @@
     calculateGoldSale,
     calculateTransaction,
     calculateInvoice,
-    compareQuote,
   };
 });

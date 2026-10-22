@@ -5,13 +5,32 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  function createTransactionUI({
-    document,
-    core,
-    priceConverter,
-    copy,
-    onChange = () => {},
-  }) {
+  const DEFAULTS = Object.freeze({
+    mode: 'buy', karat: 21, weight: '15', workmanship: '35', profit: '0', tax: 15, deduction: 0,
+  });
+  // Chip and stepper targets map to the field that holds their value.
+  const TARGET_IDS = Object.freeze({ weight: 'weight', workmanship: 'workmanship', profit: 'profit', tax: 'taxRange' });
+
+  const ARABIC_DIGITS = '٠١٢٣٤٥٦٧٨٩';
+  const PERSIAN_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
+
+  // Accepts Arabic-Indic and Persian digits and Arabic separators, keeping a single decimal point.
+  function normalizeNumberText(value) {
+    const text = String(value ?? '')
+      .replace(/[٠-٩]/g, (d) => ARABIC_DIGITS.indexOf(d))
+      .replace(/[۰-۹]/g, (d) => PERSIAN_DIGITS.indexOf(d))
+      .replace(/[٫،,]/g, '.')
+      .replace(/[^0-9.]/g, '');
+    const [whole, ...rest] = text.split('.');
+    return rest.length ? `${whole}.${rest.join('')}` : whole;
+  }
+
+  function parseNumber(value) {
+    const n = Number.parseFloat(normalizeNumberText(value));
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  }
+
+  function createTransactionUI({ document, core, priceConverter, onChange = () => {} }) {
     const requireElement = (id) => {
       const element = document.getElementById(id);
       if (!element) throw new Error(`Missing required transaction UI element #${id}`);
@@ -24,215 +43,153 @@
       karat: requireElement('karat'),
       workmanship: requireElement('workmanship'),
       profit: requireElement('profit'),
-      tax: requireElement('tax'),
       taxRange: requireElement('taxRange'),
       sellDeduction: requireElement('sellDeduction'),
-      quotedTotal: requireElement('quotedTotal'),
       buyCostsPanel: requireElement('buyCostsPanel'),
-      vatPanel: requireElement('vatPanel'),
       sellDeductionPanel: requireElement('sellDeductionPanel'),
-      transactionHelp: requireElement('transactionHelp'),
-      quotedTotalLabel: requireElement('quotedTotalLabel'),
-      workmanshipLabel: requireElement('workmanshipLabel'),
-      profitLabel: requireElement('profitLabel'),
-      sellDeductionLabel: requireElement('sellDeductionLabel'),
-      taxLabel: requireElement('taxLabel'),
       taxValueLabel: requireElement('taxValueLabel'),
+      sellDeductionLabel: requireElement('sellDeductionLabel'),
     };
-
     const modeButtons = Array.from(document.querySelectorAll('.mode-btn'));
     const karatButtons = Array.from(document.querySelectorAll('.karat-btn'));
-    const adjustButtons = Array.from(document.querySelectorAll('[data-adjust-target][data-adjust-amount]'));
-    let invoiceActive = false;
+    const chipButtons = Array.from(document.querySelectorAll('[data-set-target]'));
+    const adjustButtons = Array.from(document.querySelectorAll('[data-adjust-target]'));
+    const fieldFor = (target) => elements[TARGET_IDS[target]];
+    const roundTwo = (n) => Math.round(n * 100) / 100;
 
-    function renderQuoteLabel() {
-      const selling = elements.transactionMode.value === 'sell';
-      elements.quotedTotalLabel.textContent = invoiceActive
-        ? copy.invoiceQuoteLabel
-        : selling ? copy.sellQuoteLabel : copy.buyQuoteLabel;
-    }
-
-    // With invoice items the shop quote is compared against the invoice net instead of one piece.
-    function setInvoiceActive(active) {
-      invoiceActive = Boolean(active);
-      renderQuoteLabel();
-    }
-
-    function getTransactionInput() {
-      return {
-        mode: elements.transactionMode.value,
-        weight: elements.weight.value,
-        karat: elements.karat.value,
-        workmanshipPerGram: elements.workmanship.value,
-        profitPerGram: elements.profit.value,
-        taxRate: elements.tax.value,
-        deductionRate: elements.sellDeduction.value,
-        quotedTotal: elements.quotedTotal.value,
-      };
-    }
-
-    function setTransactionMode(mode) {
+    function setMode(mode) {
       const safeMode = core.normalizeMode(mode);
       elements.transactionMode.value = safeMode;
-
+      const buying = safeMode === 'buy';
+      elements.buyCostsPanel.hidden = !buying;
+      elements.sellDeductionPanel.hidden = buying;
       modeButtons.forEach((button) => {
         const active = button.dataset.mode === safeMode;
         button.classList.toggle('active', active);
         button.setAttribute('aria-pressed', String(active));
       });
-
-      const selling = safeMode === 'sell';
-      elements.buyCostsPanel.hidden = selling;
-      elements.vatPanel.hidden = selling;
-      elements.sellDeductionPanel.hidden = !selling;
-      elements.transactionHelp.textContent = selling ? copy.sellHelp : copy.buyHelp;
-      renderQuoteLabel();
-
       return safeMode;
     }
 
-    function setKarat(value) {
-      const karat = priceConverter.normalizeKarat(value);
-      elements.karat.value = karat;
+    function setKarat(karat) {
+      const safeKarat = priceConverter.normalizeKarat(karat);
+      elements.karat.value = String(safeKarat);
       karatButtons.forEach((button) => {
-        const active = Number(button.dataset.val) === karat;
+        const active = Number(button.dataset.val) === safeKarat;
         button.classList.toggle('active', active);
         button.setAttribute('aria-pressed', String(active));
       });
-      return karat;
+      return safeKarat;
     }
 
-    function adjust(id, amount) {
-      const element = {
-        weight: elements.weight,
-        workmanship: elements.workmanship,
-        profit: elements.profit,
-      }[id];
-      if (!element) throw new Error(`Unsupported adjustable transaction field: ${id}`);
-
-      const current = priceConverter.sanitizeNonNegative(element.value);
-      const next = Math.max(0, current + amount);
-      element.value = Number(next.toFixed(2));
-      return element.value;
+    function getTransactionInput() {
+      return {
+        mode: core.normalizeMode(elements.transactionMode.value),
+        weight: parseNumber(elements.weight.value),
+        karat: priceConverter.normalizeKarat(elements.karat.value),
+        workmanshipPerGram: parseNumber(elements.workmanship.value),
+        profitPerGram: parseNumber(elements.profit.value),
+        taxRate: core.clampTaxRate(elements.taxRange.value),
+        deductionRate: Math.min(30, core.clampPercent(elements.sellDeduction.value)),
+      };
     }
 
-    function setNumericField(element, value) {
-      const n = Number(value);
-      if (value === undefined || value === null || !Number.isFinite(n) || n < 0) return;
-      element.value = Number(n.toFixed(2));
+    // Keeps the percent labels and the highlighted chips in step with the current values.
+    function renderInputLabels() {
+      const input = getTransactionInput();
+      elements.taxValueLabel.textContent = `${input.taxRate}%`;
+      elements.sellDeductionLabel.textContent = `${input.deductionRate}%`;
+      chipButtons.forEach((chip) => {
+        const field = fieldFor(chip.dataset.setTarget);
+        const active = parseNumber(field.value) === Number(chip.dataset.setValue);
+        chip.classList.toggle('active', active);
+        chip.setAttribute('aria-pressed', String(active));
+      });
     }
 
-    function applyInput(values = {}) {
-      if (values.mode !== undefined) setTransactionMode(values.mode);
-      if (values.karat !== undefined) setKarat(values.karat);
-      setNumericField(elements.weight, values.weight);
-      setNumericField(elements.workmanship, values.workmanshipPerGram);
-      setNumericField(elements.profit, values.profitPerGram);
-      if (values.taxRate !== undefined) {
-        const rate = core.clampTaxRate(values.taxRate);
-        elements.tax.value = rate;
-        elements.taxRange.value = rate;
-      }
-      if (values.deductionRate !== undefined) {
-        elements.sellDeduction.value = core.clampPercent(values.deductionRate);
-      }
-      if (values.quotedTotal !== undefined) elements.quotedTotal.value = values.quotedTotal;
+    function applyInput(input = {}) {
+      const has = (key) => input[key] !== undefined && input[key] !== null;
+      setMode(input.mode || DEFAULTS.mode);
+      setKarat(input.karat || DEFAULTS.karat);
+      if (has('weight')) elements.weight.value = String(roundTwo(Number(input.weight)));
+      if (has('workmanshipPerGram')) elements.workmanship.value = String(roundTwo(Number(input.workmanshipPerGram)));
+      if (has('profitPerGram')) elements.profit.value = String(roundTwo(Number(input.profitPerGram)));
+      if (has('taxRate')) elements.taxRange.value = String(core.clampTaxRate(input.taxRate));
+      if (has('deductionRate')) elements.sellDeduction.value = String(Math.min(30, core.clampPercent(input.deductionRate)));
+      renderInputLabels();
     }
-
-    // The static page markup carries the default values; capture them before any restore.
-    const defaults = getTransactionInput();
 
     function resetInput() {
-      applyInput(defaults);
-    }
-
-    function renderInputLabels() {
-      const workmanship = priceConverter.sanitizeNonNegative(elements.workmanship.value);
-      const profit = priceConverter.sanitizeNonNegative(elements.profit.value);
-      const deduction = core.clampPercent(elements.sellDeduction.value);
-      const taxRate = core.clampTaxRate(elements.tax.value);
-
-      elements.workmanshipLabel.textContent = workmanship;
-      elements.profitLabel.textContent = profit;
-      elements.sellDeductionLabel.textContent = deduction;
-      elements.taxLabel.textContent = taxRate;
-      elements.taxValueLabel.textContent = taxRate;
-      elements.taxRange.style.setProperty('--pct', `${((taxRate / 25) * 100).toFixed(1)}%`);
-    }
-
-    function sanitizeVisibleField(element, decimals = null) {
-      const value = priceConverter.sanitizeNonNegative(element.value);
-      if (element.value !== '') {
-        const parsed = Number.parseFloat(element.value);
-        if (!Number.isFinite(parsed) || parsed < 0) element.value = '0';
-        else if (decimals !== null) element.value = Number(value.toFixed(decimals)).toString();
-      }
-      return value;
+      applyInput({
+        mode: DEFAULTS.mode,
+        karat: DEFAULTS.karat,
+        weight: DEFAULTS.weight,
+        workmanshipPerGram: DEFAULTS.workmanship,
+        profitPerGram: DEFAULTS.profit,
+        taxRate: DEFAULTS.tax,
+        deductionRate: DEFAULTS.deduction,
+      });
     }
 
     modeButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        const mode = setTransactionMode(button.dataset.mode);
-        onChange({ type: 'mode', mode });
+        setMode(button.dataset.mode);
+        renderInputLabels();
+        onChange({ type: 'mode' });
       });
     });
-
     karatButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        const karat = setKarat(button.dataset.val);
-        onChange({ type: 'karat', karat });
+        setKarat(button.dataset.val);
+        onChange({ type: 'karat' });
       });
     });
-
+    chipButtons.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        fieldFor(chip.dataset.setTarget).value = chip.dataset.setValue;
+        renderInputLabels();
+        onChange({ type: 'chip' });
+      });
+    });
     adjustButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        const id = button.dataset.adjustTarget;
-        const amount = Number(button.dataset.adjustAmount);
-        if (!Number.isFinite(amount)) throw new Error(`Invalid adjustment amount for ${id}`);
-        const value = adjust(id, amount);
-        onChange({ type: 'adjust', id, value });
+        const field = fieldFor(button.dataset.adjustTarget);
+        const next = Math.max(0, roundTwo(parseNumber(field.value) + Number(button.dataset.adjustAmount)));
+        field.value = String(next);
+        renderInputLabels();
+        onChange({ type: 'adjust' });
       });
     });
-
-    elements.taxRange.addEventListener('input', (event) => {
-      const rate = core.clampTaxRate(event.target.value);
-      elements.tax.value = rate;
-      onChange({ type: 'tax', rate });
-    });
-
-    for (const element of [elements.weight, elements.workmanship, elements.profit, elements.quotedTotal]) {
-      element.addEventListener('input', () => {
-        if (Number.parseFloat(element.value) < 0) element.value = '0';
-        onChange({ type: 'input', id: element.id });
+    for (const id of ['weight', 'workmanship', 'profit']) {
+      const field = elements[id];
+      field.addEventListener('input', () => {
+        const cleaned = normalizeNumberText(field.value);
+        if (cleaned !== field.value) field.value = cleaned;
+        renderInputLabels();
+        onChange({ type: 'input' });
       });
-      element.addEventListener('blur', () => {
-        sanitizeVisibleField(element, 2);
-        onChange({ type: 'blur', id: element.id });
+      field.addEventListener('focus', () => {
+        if (typeof field.select === 'function') field.select();
+      });
+    }
+    for (const id of ['taxRange', 'sellDeduction']) {
+      elements[id].addEventListener('input', () => {
+        renderInputLabels();
+        onChange({ type: 'input' });
       });
     }
 
-    elements.sellDeduction.addEventListener('input', () => {
-      const rate = core.clampPercent(elements.sellDeduction.value);
-      const parsed = Number.parseFloat(elements.sellDeduction.value);
-      if (parsed < 0 || parsed > 100) elements.sellDeduction.value = rate;
-      onChange({ type: 'deduction', rate });
-    });
-
-    elements.sellDeduction.addEventListener('blur', () => {
-      elements.sellDeduction.value = core.clampPercent(elements.sellDeduction.value);
-      onChange({ type: 'deduction-blur', rate: Number(elements.sellDeduction.value) });
-    });
+    resetInput();
 
     return {
       getTransactionInput,
-      setTransactionMode,
+      setTransactionMode: setMode,
       setKarat,
       applyInput,
       resetInput,
-      setInvoiceActive,
       renderInputLabels,
     };
   }
 
-  return { createTransactionUI };
+  return { DEFAULTS, normalizeNumberText, parseNumber, createTransactionUI };
 });
