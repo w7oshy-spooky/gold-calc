@@ -64,10 +64,11 @@
       elements.stoneWeightInput.addEventListener('input', () => onChange({ type: 'stone-weight' }));
     }
 
-    function render({ price24k = 0, karat } = {}) {
+    function render({ price24k = 0, karat, taxRate } = {}) {
       if (!elements.panel) return null;
 
       const effectiveKarat = karat !== undefined ? Number(karat) : currentKarat;
+      const effectiveTaxRate = taxRate !== undefined ? Number(taxRate) : 15;
       const weight = Number(elements.weight?.value) || 0;
       const quotedTotal = Number(elements.quotedTotal?.value) || 0;
       const hasStones = Boolean(elements.hasStonesToggle?.checked);
@@ -78,7 +79,7 @@
         karat: effectiveKarat,
         weight,
         quotedTotal,
-        taxRate: 15,
+        taxRate: effectiveTaxRate,
       });
 
       if (!audit.available) {
@@ -113,7 +114,7 @@
             price24k,
             karat: effectiveKarat,
             workmanshipPerGram: audit.available ? audit.laborPerGram : 30,
-            taxRate: 15,
+            taxRate: effectiveTaxRate,
           });
 
           elements.stoneLossCallout.hidden = false;

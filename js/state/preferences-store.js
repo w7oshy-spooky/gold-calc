@@ -56,6 +56,13 @@
       const value = sanitizeNumber(raw[field], NUMERIC_LIMITS[field]);
       item[field] = value === undefined ? 0 : value;
     }
+    if (raw.laborTaxMode === 'inclusive' || raw.laborTaxMode === 'exclusive') {
+      item.laborTaxMode = raw.laborTaxMode;
+      item.workmanshipTaxInclusive = raw.laborTaxMode === 'inclusive';
+    } else if (raw.workmanshipTaxInclusive) {
+      item.laborTaxMode = 'inclusive';
+      item.workmanshipTaxInclusive = true;
+    }
     return item;
   }
 

@@ -147,6 +147,10 @@
         btn.classList.toggle('bg-amber-400', active);
         btn.classList.toggle('text-slate-900', active);
         btn.classList.toggle('text-gray-400', !active);
+        btn.classList.toggle('hover:text-white', !active);
+        if (typeof btn.setAttribute === 'function') {
+          btn.setAttribute('aria-pressed', String(active));
+        }
       });
       return currentLaborTaxMode;
     }

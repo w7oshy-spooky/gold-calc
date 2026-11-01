@@ -80,7 +80,7 @@
     priceConverter,
     copy,
     onChange(change) {
-      if (change.type === 'karat' || change.type === 'adjust') vibrate();
+      if (change.type === 'karat' || change.type === 'adjust' || change.type === 'labor-tax-mode') vibrate();
       calculate();
     },
   });
@@ -308,6 +308,8 @@
       profitPerGram: input.profitPerGram,
       taxRate: input.taxRate,
       deductionRate: input.deductionRate,
+      laborTaxMode: input.laborTaxMode,
+      workmanshipTaxInclusive: input.workmanshipTaxInclusive,
     });
 
     transactionUi.renderInputLabels(result);
@@ -332,7 +334,7 @@
     quoteComparisonUi.render(comparison);
 
     if (auditorUi) {
-      auditorUi.render({ price24k, karat: input.karat });
+      auditorUi.render({ price24k, karat: input.karat, taxRate: input.taxRate });
     }
 
     lastResult = result;

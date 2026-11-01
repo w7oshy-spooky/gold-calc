@@ -198,3 +198,116 @@ test('transaction UI sets Saudi Arabia as the default country and handles 24K bu
   assert.equal(jewelryInput.country, 'sa');
   assert.equal(jewelryInput.taxRate, 15);
 });
+
+test('calculateTransaction respects laborTaxMode and workmanshipTaxInclusive', () => {
+  const excl = core.calculateTransaction({
+    mode: 'buy',
+    price24k: 400,
+    weight: 10,
+    karat: 21,
+    workmanshipPerGram: 46,
+    taxRate: 15,
+    laborTaxMode: 'exclusive',
+  });
+
+  const incl = core.calculateTransaction({
+    mode: 'buy',
+    price24k: 400,
+    weight: 10,
+    karat: 21,
+    workmanshipPerGram: 46,
+    taxRate: 15,
+    laborTaxMode: 'inclusive',
+  });
+
+  assert.equal(excl.laborTaxMode, 'exclusive');
+  assert.equal(incl.laborTaxMode, 'inclusive');
+  assert.equal(excl.workmanshipPerGram, 46);
+  assert.ok(Math.abs(incl.workmanshipPerGram - 40) < 1e-4);
+  assert.ok(incl.laborCost < excl.laborCost);
+  assert.ok(incl.total < excl.total);
+});
+
+test('sanitizeInvoiceItem preserves laborTaxMode and workmanshipTaxInclusive', () => {
+  const { sanitizeInvoiceItem } = require('../js/state/preferences-store.js');
+
+  const inclItem = sanitizeInvoiceItem({
+    mode: 'buy',
+    weight: 10,
+    karat: 21,
+    workmanshipPerGram: 46,
+    laborTaxMode: 'inclusive',
+    workmanshipTaxInclusive: true,
+  });
+
+  assert.equal(inclItem.laborTaxMode, 'inclusive');
+  assert.equal(inclItem.workmanshipTaxInclusive, true);
+
+  const exclItem = sanitizeInvoiceItem({
+    mode: 'buy',
+    weight: 10,
+    karat: 21,
+    workmanshipPerGram: 46,
+    laborTaxMode: 'exclusive',
+  });
+
+  assert.equal(exclItem.laborTaxMode, 'exclusive');
+  assert.equal(exclItem.workmanshipTaxInclusive, false);
+});
+
+test('transactionUI setLaborTaxMode updates state and class toggles', () => {
+  const { createTransactionUI } = require('../js/ui/transaction-ui.js');
+  const priceConverter = require('../js/core/price-converter.js');
+  const { getCopy } = require('../js/i18n/translations.js');
+
+  const elements = {};
+  for (const id of [
+    'transactionMode', 'weight', 'karat', 'workmanship', 'profit', 'tax', 'taxRange', 'sellDeduction',
+    'quotedTotal', 'buyCostsPanel', 'vatPanel', 'sellDeductionPanel', 'transactionHelp', 'quotedTotalLabel',
+    'workmanshipLabel', 'profitLabel', 'sellDeductionLabel', 'taxLabel', 'taxValueLabel',
+  ]) {
+    elements[id] = {
+      value: '0',
+      hidden: false,
+      textContent: '',
+      dataset: {},
+      style: { setProperty() {} },
+      classList: { toggle() {} },
+      setAttribute() {},
+      addEventListener() {},
+    };
+  }
+
+  const exclToggles = [];
+  const inclToggles = [];
+  const taxButtons = [
+    {
+      dataset: { laborTax: 'exclusive' },
+      classList: { toggle: (cls, val) => exclToggles.push([cls, val]) },
+      setAttribute: () => {},
+      addEventListener: () => {},
+    },
+    {
+      dataset: { laborTax: 'inclusive' },
+      classList: { toggle: (cls, val) => inclToggles.push([cls, val]) },
+      setAttribute: () => {},
+      addEventListener: () => {},
+    },
+  ];
+
+  const document = {
+    getElementById: (id) => elements[id],
+    querySelectorAll: (sel) => {
+      if (sel === '.tax-mode-btn') return taxButtons;
+      return [];
+    },
+  };
+
+  const ui = createTransactionUI({ document, core, priceConverter, copy: getCopy('ar') });
+  assert.equal(ui.getTransactionInput().laborTaxMode, 'exclusive');
+  assert.equal(ui.getTransactionInput().workmanshipTaxInclusive, false);
+
+  ui.setLaborTaxMode('inclusive');
+  assert.equal(ui.getTransactionInput().laborTaxMode, 'inclusive');
+  assert.equal(ui.getTransactionInput().workmanshipTaxInclusive, true);
+});
