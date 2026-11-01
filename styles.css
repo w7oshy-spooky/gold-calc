@@ -286,8 +286,9 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
     border-color:#232a34;
   }
   .market-summary-card #marketEquivalentPanel{
-    background:#0d0f12;
-    border-color:#232a34;
+    background:#0f172a;
+    border:1px solid #1e293b;
+    border-radius:0.75rem;
   }
   .market-summary-card .live-karat-grid>div{
     min-height:68px;
