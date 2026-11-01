@@ -311,3 +311,78 @@ test('transactionUI setLaborTaxMode updates state and class toggles', () => {
   assert.equal(ui.getTransactionInput().laborTaxMode, 'inclusive');
   assert.equal(ui.getTransactionInput().workmanshipTaxInclusive, true);
 });
+
+test('tax mode buttons update tax slider between 0% and 15%', () => {
+  const { createTransactionUI } = require('../js/ui/transaction-ui.js');
+  const priceConverter = require('../js/core/price-converter.js');
+  const { getCopy } = require('../js/i18n/translations.js');
+
+  const elements = {};
+  for (const id of [
+    'transactionMode', 'weight', 'karat', 'workmanship', 'profit', 'tax', 'taxRange', 'sellDeduction',
+    'quotedTotal', 'buyCostsPanel', 'vatPanel', 'sellDeductionPanel', 'transactionHelp', 'quotedTotalLabel',
+    'workmanshipLabel', 'profitLabel', 'sellDeductionLabel', 'taxLabel', 'taxValueLabel',
+  ]) {
+    elements[id] = {
+      value: id === 'tax' || id === 'taxRange' ? '15' : '0',
+      hidden: false,
+      textContent: '',
+      dataset: {},
+      style: { setProperty() {} },
+      classList: { toggle() {} },
+      setAttribute() {},
+      addEventListener() {},
+    };
+  }
+
+  const taxListeners = {};
+  const taxButtons = [
+    {
+      dataset: { laborTax: 'exclusive' },
+      classList: { toggle() {} },
+      setAttribute: () => {},
+      addEventListener: (evt, fn) => { taxListeners['exclusive'] = fn; },
+    },
+    {
+      dataset: { laborTax: 'inclusive' },
+      classList: { toggle() {} },
+      setAttribute: () => {},
+      addEventListener: (evt, fn) => { taxListeners['inclusive'] = fn; },
+    },
+  ];
+
+  const document = {
+    getElementById: (id) => elements[id],
+    querySelectorAll: (sel) => {
+      if (sel === '.tax-mode-btn') return taxButtons;
+      return [];
+    },
+  };
+
+  const changes = [];
+  const ui = createTransactionUI({
+    document,
+    core,
+    priceConverter,
+    copy: getCopy('ar'),
+    onChange: (change) => changes.push(change),
+  });
+
+  // Initially at 15%
+  assert.equal(ui.getTransactionInput().taxRate, '15');
+  assert.equal(ui.getTransactionInput().laborTaxMode, 'inclusive');
+
+  // Click exclusive (بدون ضريبة): slider moves from 15 to 0
+  taxListeners['exclusive']();
+  assert.equal(elements.tax.value, 0);
+  assert.equal(elements.taxRange.value, 0);
+  assert.equal(ui.getTransactionInput().taxRate, 0);
+  assert.equal(ui.getTransactionInput().laborTaxMode, 'exclusive');
+
+  // Click inclusive (شامل الضريبة): slider moves back from 0 to 15
+  taxListeners['inclusive']();
+  assert.equal(elements.tax.value, 15);
+  assert.equal(elements.taxRange.value, 15);
+  assert.equal(ui.getTransactionInput().taxRate, 15);
+  assert.equal(ui.getTransactionInput().laborTaxMode, 'inclusive');
+});

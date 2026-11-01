@@ -232,8 +232,8 @@
           <label for="workmanship" class="text-gray-600 text-xs font-bold">المصنعية (ر.س / جرام)</label>
           <div class="flex items-center gap-2">
             <div class="labor-tax-toggle flex items-center bg-slate-800 p-0.5 rounded-lg border border-slate-700 text-[10px] font-bold">
-              <button type="button" id="laborTaxExclBtn" class="tax-mode-btn active px-2 py-0.5 rounded bg-amber-400 text-slate-900 font-bold" data-labor-tax="exclusive">قبل الضريبة</button>
-              <button type="button" id="laborTaxInclBtn" class="tax-mode-btn px-2 py-0.5 rounded text-gray-400 hover:text-white" data-labor-tax="inclusive">شامل الضريبة</button>
+              <button type="button" id="laborTaxExclBtn" class="tax-mode-btn px-2 py-0.5 rounded text-gray-400 hover:text-white font-bold" data-labor-tax="exclusive" aria-pressed="false">بدون الضريبة</button>
+              <button type="button" id="laborTaxInclBtn" class="tax-mode-btn active px-2 py-0.5 rounded bg-amber-400 text-slate-900 font-bold" data-labor-tax="inclusive" aria-pressed="true">شامل الضريبة</button>
             </div>
             <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="workmanshipLabel">35</span> ر.س</span>
           </div>

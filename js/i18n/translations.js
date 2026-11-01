@@ -64,7 +64,7 @@
       invoiceQuoteLabel: 'صافي المبلغ الذي عرضه المحل للفاتورة (ر.س)',
       liveOfflinePrefill: 'تعذر جلب السعر الحي. تمت تعبئة آخر سعر معروف ({time}) — تحقق منه أو عدّله.',
       laborTaxInclusive: 'شامل الضريبة',
-      laborTaxExclusive: 'قبل الضريبة',
+      laborTaxExclusive: 'بدون الضريبة',
       bullionNotice: '✨ سبيكة 24 قيراط استثمارية معفاة من الضريبة (0%)',
       buyLabels: {
         primary: 'تكلفة الذهب',

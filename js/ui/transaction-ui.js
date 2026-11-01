@@ -48,8 +48,8 @@
     const bullionNotice = document.getElementById ? document.getElementById('bullionNotice') : null;
     let invoiceActive = false;
     let currentCountry = 'sa';
-    let lastJewelryTaxRate = 15;
-    let currentLaborTaxMode = 'exclusive';
+    let lastJewelryTaxRate = Number(elements.tax.value) > 0 ? Number(elements.tax.value) : 15;
+    let currentLaborTaxMode = Number(elements.tax.value) === 0 ? 'exclusive' : 'inclusive';
 
     function renderQuoteLabel() {
       const selling = elements.transactionMode.value === 'sell';
@@ -131,10 +131,13 @@
       return currentCountry;
     }
 
-    function setTaxRate(rate) {
+    function setTaxRate(rate, { syncLaborTax = true } = {}) {
       const clamped = core.clampTaxRate(rate);
       elements.tax.value = clamped;
       elements.taxRange.value = clamped;
+      if (syncLaborTax) {
+        setLaborTaxMode(clamped === 0 ? 'exclusive' : 'inclusive');
+      }
       renderInputLabels();
       return clamped;
     }
@@ -283,7 +286,7 @@
 
     elements.taxRange.addEventListener('input', (event) => {
       const rate = core.clampTaxRate(event.target.value);
-      elements.tax.value = rate;
+      setTaxRate(rate);
       if (Number(elements.karat.value) !== 24 && rate > 0) lastJewelryTaxRate = rate;
       onChange({ type: 'tax', rate });
     });
@@ -298,7 +301,17 @@
 
     laborTaxButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        setLaborTaxMode(button.dataset.laborTax);
+        const targetMode = button.dataset.laborTax;
+        if (targetMode === 'exclusive') {
+          if (Number(elements.tax.value) > 0) {
+            lastJewelryTaxRate = Number(elements.tax.value);
+          }
+          setTaxRate(0);
+        } else {
+          const restoreRate = lastJewelryTaxRate > 0 ? lastJewelryTaxRate : 15;
+          setTaxRate(restoreRate);
+        }
+        onChange({ type: 'tax', rate: Number(elements.tax.value) });
         onChange({ type: 'labor-tax-mode', mode: currentLaborTaxMode });
       });
     });
