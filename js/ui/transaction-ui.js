@@ -47,6 +47,7 @@
     const laborTaxButtons = Array.from(document.querySelectorAll('.tax-mode-btn'));
     const bullionNotice = document.getElementById ? document.getElementById('bullionNotice') : null;
     let invoiceActive = false;
+    let currentCountry = 'sa';
     let lastJewelryTaxRate = 15;
     let currentLaborTaxMode = 'exclusive';
 
@@ -73,6 +74,7 @@
         taxRate: elements.tax.value,
         deductionRate: elements.sellDeduction.value,
         quotedTotal: elements.quotedTotal.value,
+        country: currentCountry,
         laborTaxMode: currentLaborTaxMode,
         workmanshipTaxInclusive: currentLaborTaxMode === 'inclusive',
       };
@@ -98,9 +100,9 @@
       return safeMode;
     }
 
-    function syncCountryButtons(rate) {
+    function syncCountryButtons(activeCountry) {
       countryVatButtons.forEach((btn) => {
-        const active = Number(btn.dataset.vat) === rate;
+        const active = btn.dataset.country === activeCountry;
         btn.classList.toggle('active', active);
         btn.classList.toggle('border-amber-400', active);
         btn.classList.toggle('bg-amber-400/10', active);
@@ -111,11 +113,28 @@
       });
     }
 
+    function setCountry(countryCode) {
+      currentCountry = (countryCode || 'sa').toLowerCase();
+      const matchedBtn = countryVatButtons.find((btn) => btn.dataset.country === currentCountry);
+      const rates = core.COUNTRY_VAT_RATES || { sa: 15, ae: 5, bh: 10, om: 5, kw: 0, qa: 0, eg: 14 };
+      const rate = matchedBtn ? Number(matchedBtn.dataset.vat) : (rates[currentCountry] ?? 15);
+
+      if (rate > 0) lastJewelryTaxRate = rate;
+
+      if (Number(elements.karat.value) === 24) {
+        setTaxRate(0);
+        if (bullionNotice) bullionNotice.hidden = false;
+      } else {
+        setTaxRate(rate);
+      }
+      syncCountryButtons(currentCountry);
+      return currentCountry;
+    }
+
     function setTaxRate(rate) {
       const clamped = core.clampTaxRate(rate);
       elements.tax.value = clamped;
       elements.taxRange.value = clamped;
-      syncCountryButtons(clamped);
       renderInputLabels();
       return clamped;
     }
@@ -154,6 +173,7 @@
           setTaxRate(lastJewelryTaxRate || 15);
         }
       }
+      syncCountryButtons(currentCountry);
 
       return karat;
     }
@@ -184,12 +204,16 @@
       setNumericField(elements.weight, values.weight);
       setNumericField(elements.workmanship, values.workmanshipPerGram);
       setNumericField(elements.profit, values.profitPerGram);
+      if (values.country !== undefined) {
+        setCountry(values.country);
+      } else {
+        syncCountryButtons(currentCountry);
+      }
       if (values.taxRate !== undefined) {
         const rate = core.clampTaxRate(values.taxRate);
         elements.tax.value = rate;
         elements.taxRange.value = rate;
         if (Number(elements.karat.value) !== 24 && rate > 0) lastJewelryTaxRate = rate;
-        syncCountryButtons(rate);
       }
       if (values.laborTaxMode !== undefined) setLaborTaxMode(values.laborTaxMode);
       if (values.deductionRate !== undefined) {
@@ -257,23 +281,14 @@
       const rate = core.clampTaxRate(event.target.value);
       elements.tax.value = rate;
       if (Number(elements.karat.value) !== 24 && rate > 0) lastJewelryTaxRate = rate;
-      syncCountryButtons(rate);
       onChange({ type: 'tax', rate });
     });
 
     countryVatButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        const rate = Number(button.dataset.vat);
-        if (Number.isFinite(rate)) {
-          lastJewelryTaxRate = rate > 0 ? rate : lastJewelryTaxRate;
-          if (Number(elements.karat.value) === 24) {
-            setTaxRate(0);
-            if (bullionNotice) bullionNotice.hidden = false;
-          } else {
-            setTaxRate(rate);
-          }
-          onChange({ type: 'tax', rate: Number(elements.tax.value), country: button.dataset.country });
-        }
+        const country = button.dataset.country || 'sa';
+        setCountry(country);
+        onChange({ type: 'country', country: currentCountry, rate: Number(elements.tax.value) });
       });
     });
 
@@ -311,6 +326,7 @@
       getTransactionInput,
       setTransactionMode,
       setKarat,
+      setCountry,
       setTaxRate,
       setLaborTaxMode,
       applyInput,

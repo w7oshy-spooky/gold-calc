@@ -280,6 +280,7 @@
       profitPerGram: input.profitPerGram,
       taxRate: input.taxRate,
       laborTaxMode: input.laborTaxMode,
+      country: input.country || 'sa',
       deductionRate: input.deductionRate,
       // An automatic fallback is not the user's choice: keep LIVE as the saved source.
       source,

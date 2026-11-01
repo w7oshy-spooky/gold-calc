@@ -141,3 +141,60 @@ test('preferences store serializes and validates laborTaxMode and country', () =
   const readInvalid = store.read();
   assert.equal(readInvalid.laborTaxMode, undefined);
 });
+test('transaction UI sets Saudi Arabia as the default country and handles 24K bullion without switching country', () => {
+  const { createTransactionUI } = require('../js/ui/transaction-ui.js');
+  const priceConverter = require('../js/core/price-converter.js');
+  const { getCopy } = require('../js/i18n/translations.js');
+
+  const values = {
+    transactionMode: 'buy', weight: '10', karat: '21', workmanship: '35', profit: '0',
+    tax: '15', taxRange: '15', sellDeduction: '0', quotedTotal: '',
+  };
+  const elements = {};
+  for (const id of [
+    'transactionMode', 'weight', 'karat', 'workmanship', 'profit', 'tax', 'taxRange', 'sellDeduction',
+    'quotedTotal', 'buyCostsPanel', 'vatPanel', 'sellDeductionPanel', 'transactionHelp', 'quotedTotalLabel',
+    'workmanshipLabel', 'profitLabel', 'sellDeductionLabel', 'taxLabel', 'taxValueLabel',
+  ]) {
+    elements[id] = {
+      value: values[id] ?? '',
+      hidden: false,
+      textContent: '',
+      dataset: {},
+      style: { setProperty() {} },
+      classList: { toggle() {} },
+      setAttribute() {},
+      addEventListener() {},
+    };
+  }
+
+  const countryButtons = [
+    { dataset: { country: 'sa', vat: '15' }, classList: { toggle() {} }, addEventListener() {} },
+    { dataset: { country: 'ae', vat: '5' }, classList: { toggle() {} }, addEventListener() {} },
+  ];
+
+  const document = {
+    getElementById: (id) => elements[id],
+    querySelectorAll: (sel) => {
+      if (sel === '.country-vat-btn') return countryButtons;
+      return [];
+    },
+  };
+
+  const ui = createTransactionUI({ document, core, priceConverter, copy: getCopy('ar') });
+  const input = ui.getTransactionInput();
+  assert.equal(input.country, 'sa');
+  assert.equal(input.taxRate, '15');
+
+  // Switch to 24K bullion -> tax becomes 0, country remains sa
+  ui.setKarat(24);
+  const bullionInput = ui.getTransactionInput();
+  assert.equal(bullionInput.country, 'sa');
+  assert.equal(bullionInput.taxRate, 0);
+
+  // Switch back to 21K -> tax restores to 15%
+  ui.setKarat(21);
+  const jewelryInput = ui.getTransactionInput();
+  assert.equal(jewelryInput.country, 'sa');
+  assert.equal(jewelryInput.taxRate, 15);
+});
