@@ -158,15 +158,27 @@
       elements.equivalentGram18.textContent = `${formatting.formatMoney(prices.gram18kSar)} ${gramLabel}`;
     }
 
-    function renderLiveKaratPrices(priceUsdOunce) {
-      const prices = priceConverter.deriveMarketPrices({
-        source: 'ounce-usd',
-        ouncePriceUsd: priceUsdOunce,
-      });
-      elements.liveKarat24.textContent = `${formatting.formatMoney(prices.gram24kSar)} ${gramLabel}`;
-      elements.liveKarat22.textContent = `${formatting.formatMoney(prices.gram22kSar)} ${gramLabel}`;
-      elements.liveKarat21.textContent = `${formatting.formatMoney(prices.gram21kSar)} ${gramLabel}`;
-      elements.liveKarat18.textContent = `${formatting.formatMoney(prices.gram18kSar)} ${gramLabel}`;
+    function renderLiveKaratPrices(priceUsdOunceOrPrices) {
+      const prices =
+        typeof priceUsdOunceOrPrices === "object" && priceUsdOunceOrPrices !== null
+          ? priceUsdOunceOrPrices
+          : priceConverter.deriveMarketPrices({
+              source: "ounce-usd",
+              ouncePriceUsd: priceUsdOunceOrPrices,
+            });
+
+      if (!prices || !Number.isFinite(prices.gram24kSar)) {
+        elements.liveKarat24.textContent = "—";
+        elements.liveKarat22.textContent = "—";
+        elements.liveKarat21.textContent = "—";
+        elements.liveKarat18.textContent = "—";
+        return;
+      }
+
+      elements.liveKarat24.textContent = formatting.formatMoney(prices.gram24kSar);
+      elements.liveKarat22.textContent = formatting.formatMoney(prices.gram22kSar);
+      elements.liveKarat21.textContent = formatting.formatMoney(prices.gram21kSar);
+      elements.liveKarat18.textContent = formatting.formatMoney(prices.gram18kSar);
     }
 
     function renderLiveStatus(quote, state) {
@@ -279,6 +291,7 @@
       renderMarketEquivalents,
       renderLiveStatus,
       renderLiveKaratPrices,
+      renderLiveQuoteKaratPrices: renderLiveKaratPrices,
       setLiveQuoteInput,
       clearLiveQuoteInput,
       setLiveRefreshDisabled,

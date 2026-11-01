@@ -109,6 +109,7 @@
   function applyLiveQuote(quote, status = 'ready') {
     marketUi.setLiveQuoteInput(Number(quote.priceUsdOunce));
     marketUi.renderLiveStatus(quote, status);
+    marketUi.renderLiveKaratPrices(Number(quote.priceUsdOunce));
     calculate();
   }
 
@@ -253,6 +254,9 @@
   function getPrice24k() {
     const prices = priceConverter.deriveMarketPrices(marketUi.getMarketInput());
     marketUi.renderMarketEquivalents(prices);
+    if (isLiveSource()) {
+      marketUi.renderLiveKaratPrices(prices);
+    }
     return prices.gram24kSar;
   }
 
