@@ -82,6 +82,14 @@
       prefs.hasStones = raw.hasStones;
     }
 
+    if (raw.laborTaxMode === 'inclusive' || raw.laborTaxMode === 'exclusive') {
+      prefs.laborTaxMode = raw.laborTaxMode;
+    }
+
+    if (typeof raw.country === 'string' && raw.country.length <= 4) {
+      prefs.country = raw.country;
+    }
+
     if (Array.isArray(raw.invoice)) {
       const invoice = raw.invoice.map(sanitizeInvoiceItem).filter(Boolean).slice(0, MAX_INVOICE_ITEMS);
       if (invoice.length > 0) prefs.invoice = invoice;

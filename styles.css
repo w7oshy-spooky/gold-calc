@@ -354,3 +354,4 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
 .benchmark-luxury{background:#2a1b38;color:#c084fc;border:1px solid #583377}
 .stone-callout{background:#2a1d0f;border:1px solid #85531b;border-radius:0.75rem;padding:0.75rem}
 .sharia-badge{display:inline-flex;align-items:center;gap:0.35rem;background:#10281e;color:#5fd49a;border:1px solid #1c523b;border-radius:0.5rem;padding:0.25rem 0.5rem;font-size:0.65rem;font-weight:700}
+.country-vat-btn{cursor:pointer;transition:all 0.15s ease}.country-vat-btn:active{transform:scale(0.96)}.tax-mode-btn{cursor:pointer;transition:all 0.15s ease}.tax-mode-btn:active{transform:scale(0.96)}

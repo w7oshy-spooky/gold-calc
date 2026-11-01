@@ -43,7 +43,12 @@
     const modeButtons = Array.from(document.querySelectorAll('.mode-btn'));
     const karatButtons = Array.from(document.querySelectorAll('.karat-btn'));
     const adjustButtons = Array.from(document.querySelectorAll('[data-adjust-target][data-adjust-amount]'));
+    const countryVatButtons = Array.from(document.querySelectorAll('.country-vat-btn'));
+    const laborTaxButtons = Array.from(document.querySelectorAll('.tax-mode-btn'));
+    const bullionNotice = document.getElementById ? document.getElementById('bullionNotice') : null;
     let invoiceActive = false;
+    let lastJewelryTaxRate = 15;
+    let currentLaborTaxMode = 'exclusive';
 
     function renderQuoteLabel() {
       const selling = elements.transactionMode.value === 'sell';
@@ -68,6 +73,8 @@
         taxRate: elements.tax.value,
         deductionRate: elements.sellDeduction.value,
         quotedTotal: elements.quotedTotal.value,
+        laborTaxMode: currentLaborTaxMode,
+        workmanshipTaxInclusive: currentLaborTaxMode === 'inclusive',
       };
     }
 
@@ -91,14 +98,63 @@
       return safeMode;
     }
 
+    function syncCountryButtons(rate) {
+      countryVatButtons.forEach((btn) => {
+        const active = Number(btn.dataset.vat) === rate;
+        btn.classList.toggle('active', active);
+        btn.classList.toggle('border-amber-400', active);
+        btn.classList.toggle('bg-amber-400/10', active);
+        btn.classList.toggle('text-amber-300', active);
+        btn.classList.toggle('border-slate-700', !active);
+        btn.classList.toggle('bg-slate-800', !active);
+        btn.classList.toggle('text-slate-300', !active);
+      });
+    }
+
+    function setTaxRate(rate) {
+      const clamped = core.clampTaxRate(rate);
+      elements.tax.value = clamped;
+      elements.taxRange.value = clamped;
+      syncCountryButtons(clamped);
+      renderInputLabels();
+      return clamped;
+    }
+
+    function setLaborTaxMode(mode) {
+      currentLaborTaxMode = mode === 'inclusive' ? 'inclusive' : 'exclusive';
+      laborTaxButtons.forEach((btn) => {
+        const active = btn.dataset.laborTax === currentLaborTaxMode;
+        btn.classList.toggle('active', active);
+        btn.classList.toggle('bg-amber-400', active);
+        btn.classList.toggle('text-slate-900', active);
+        btn.classList.toggle('text-gray-400', !active);
+      });
+      return currentLaborTaxMode;
+    }
+
     function setKarat(value) {
       const karat = priceConverter.normalizeKarat(value);
+      const previousKarat = Number(elements.karat.value);
       elements.karat.value = karat;
       karatButtons.forEach((button) => {
         const active = Number(button.dataset.val) === karat;
         button.classList.toggle('active', active);
         button.setAttribute('aria-pressed', String(active));
       });
+
+      if (karat === 24) {
+        if (Number(elements.tax.value) > 0) {
+          lastJewelryTaxRate = Number(elements.tax.value);
+        }
+        setTaxRate(0);
+        if (bullionNotice) bullionNotice.hidden = false;
+      } else {
+        if (bullionNotice) bullionNotice.hidden = true;
+        if (previousKarat === 24 && Number(elements.tax.value) === 0) {
+          setTaxRate(lastJewelryTaxRate || 15);
+        }
+      }
+
       return karat;
     }
 
@@ -132,7 +188,10 @@
         const rate = core.clampTaxRate(values.taxRate);
         elements.tax.value = rate;
         elements.taxRange.value = rate;
+        if (Number(elements.karat.value) !== 24 && rate > 0) lastJewelryTaxRate = rate;
+        syncCountryButtons(rate);
       }
+      if (values.laborTaxMode !== undefined) setLaborTaxMode(values.laborTaxMode);
       if (values.deductionRate !== undefined) {
         elements.sellDeduction.value = core.clampPercent(values.deductionRate);
       }
@@ -197,7 +256,32 @@
     elements.taxRange.addEventListener('input', (event) => {
       const rate = core.clampTaxRate(event.target.value);
       elements.tax.value = rate;
+      if (Number(elements.karat.value) !== 24 && rate > 0) lastJewelryTaxRate = rate;
+      syncCountryButtons(rate);
       onChange({ type: 'tax', rate });
+    });
+
+    countryVatButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const rate = Number(button.dataset.vat);
+        if (Number.isFinite(rate)) {
+          lastJewelryTaxRate = rate > 0 ? rate : lastJewelryTaxRate;
+          if (Number(elements.karat.value) === 24) {
+            setTaxRate(0);
+            if (bullionNotice) bullionNotice.hidden = false;
+          } else {
+            setTaxRate(rate);
+          }
+          onChange({ type: 'tax', rate: Number(elements.tax.value), country: button.dataset.country });
+        }
+      });
+    });
+
+    laborTaxButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        setLaborTaxMode(button.dataset.laborTax);
+        onChange({ type: 'labor-tax-mode', mode: currentLaborTaxMode });
+      });
     });
 
     for (const element of [elements.weight, elements.workmanship, elements.profit, elements.quotedTotal]) {
@@ -227,6 +311,8 @@
       getTransactionInput,
       setTransactionMode,
       setKarat,
+      setTaxRate,
+      setLaborTaxMode,
       applyInput,
       resetInput,
       setInvoiceActive,

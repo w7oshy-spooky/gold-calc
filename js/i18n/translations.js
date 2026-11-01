@@ -63,6 +63,9 @@
       invoiceNetReceive: 'الصافي المستحق لك',
       invoiceQuoteLabel: 'صافي المبلغ الذي عرضه المحل للفاتورة (ر.س)',
       liveOfflinePrefill: 'تعذر جلب السعر الحي. تمت تعبئة آخر سعر معروف ({time}) — تحقق منه أو عدّله.',
+      laborTaxInclusive: 'شامل الضريبة',
+      laborTaxExclusive: 'قبل الضريبة',
+      bullionNotice: '✨ سبيكة 24 قيراط استثمارية معفاة من الضريبة (0%)',
       buyLabels: {
         primary: 'تكلفة الذهب',
         secondary: 'مصنعية + ربح',
@@ -165,6 +168,9 @@
       invoiceNetReceive: 'Net amount you receive',
       invoiceQuoteLabel: 'Net amount the shop quoted for the invoice (SAR)',
       liveOfflinePrefill: 'Live pricing is unavailable. The last known price ({time}) was filled in — check or edit it.',
+      laborTaxInclusive: 'Incl. VAT',
+      laborTaxExclusive: 'Excl. VAT',
+      bullionNotice: '✨ 24K investment bullion is tax-exempt (0% VAT)',
       buyLabels: {
         primary: 'Gold cost',
         secondary: 'Workmanship + margin',

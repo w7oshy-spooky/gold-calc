@@ -26,13 +26,37 @@
     return Math.min(100, n);
   }
 
+  const COUNTRY_VAT_RATES = Object.freeze({
+    sa: 15,
+    ae: 5,
+    bh: 10,
+    om: 5,
+    kw: 0,
+    qa: 0,
+    eg: 14,
+  });
+
+  function defaultTaxRateForKarat(karat, baseRate = 15) {
+    if (normalizeKarat(karat) === 24) return 0;
+    return clampTaxRate(baseRate);
+  }
+
   function calculateGoldPurchase(input = {}) {
     const price24k = sanitizeNonNegative(input.price24k);
     const weight = sanitizeNonNegative(input.weight);
     const karat = normalizeKarat(input.karat);
-    const workmanshipPerGram = sanitizeNonNegative(input.workmanshipPerGram);
-    const profitPerGram = sanitizeNonNegative(input.profitPerGram);
-    const taxRate = clampTaxRate(input.taxRate);
+    const rawWorkmanship = sanitizeNonNegative(input.workmanshipPerGram);
+    const rawProfit = sanitizeNonNegative(input.profitPerGram);
+    const isLaborInclusive = Boolean(input.workmanshipTaxInclusive || input.laborTaxMode === 'inclusive');
+
+    const resolvedTax = input.taxRate !== undefined && input.taxRate !== null && input.taxRate !== ''
+      ? clampTaxRate(input.taxRate)
+      : defaultTaxRateForKarat(karat, 15);
+    const taxRate = clampTaxRate(resolvedTax);
+
+    const vatFactor = 1 + (taxRate / 100);
+    const workmanshipPerGram = isLaborInclusive && taxRate > 0 ? (rawWorkmanship / vatFactor) : rawWorkmanship;
+    const profitPerGram = isLaborInclusive && taxRate > 0 ? (rawProfit / vatFactor) : rawProfit;
 
     const purity = karat / 24;
     const gramPrice = price24k * purity;
@@ -48,6 +72,9 @@
       karat,
       workmanshipPerGram,
       profitPerGram,
+      rawWorkmanshipPerGram: rawWorkmanship,
+      rawProfitPerGram: rawProfit,
+      laborTaxMode: isLaborInclusive ? 'inclusive' : 'exclusive',
       taxRate,
       purity,
       gramPrice,
@@ -161,7 +188,7 @@
     };
   }
 
-  function auditCounterQuote({ price24k, karat, weight, quotedTotal, taxRate = 15 } = {}) {
+  function auditCounterQuote({ price24k, karat, weight, quotedTotal, taxRate = 15, quoteIncludesVat = true } = {}) {
     const safePrice24k = sanitizeNonNegative(price24k);
     const safeKarat = normalizeKarat(karat);
     const safeWeight = sanitizeNonNegative(weight);
@@ -172,8 +199,9 @@
       return { available: false, reason: 'insufficient_inputs' };
     }
 
-    const subtotal = safeQuote / (1 + safeTaxRate / 100);
-    const vat = safeQuote - subtotal;
+    const subtotal = quoteIncludesVat ? safeQuote / (1 + safeTaxRate / 100) : safeQuote;
+    const vat = quoteIncludesVat ? (safeQuote - subtotal) : (subtotal * (safeTaxRate / 100));
+    const grossTotal = quoteIncludesVat ? safeQuote : (subtotal + vat);
     const purity = safeKarat / 24;
     const gramPrice = safePrice24k * purity;
     const rawMetalCost = gramPrice * safeWeight;
@@ -192,7 +220,7 @@
       price24k: safePrice24k,
       karat: safeKarat,
       weight: safeWeight,
-      quotedTotal: safeQuote,
+      quotedTotal: grossTotal, quoteIncludesVat,
       taxRate: safeTaxRate,
       purity,
       gramPrice,
@@ -291,5 +319,7 @@
     auditCounterQuote,
     calculateStoneDeduction,
     calculateTradeIn,
+    COUNTRY_VAT_RATES,
+    defaultTaxRateForKarat,
   };
 });

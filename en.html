@@ -217,7 +217,13 @@
       <div>
         <div class="flex justify-between items-center mb-2">
           <label for="workmanship" class="text-gray-600 text-xs font-bold">Workmanship (SAR / gram)</label>
-          <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="workmanshipLabel">35</span> SAR</span>
+          <div class="flex items-center gap-2">
+            <div class="labor-tax-toggle flex items-center bg-slate-800 p-0.5 rounded-lg border border-slate-700 text-[10px] font-bold">
+              <button type="button" id="laborTaxExclBtn" class="tax-mode-btn active px-2 py-0.5 rounded bg-amber-400 text-slate-900 font-bold" data-labor-tax="exclusive">Excl. VAT</button>
+              <button type="button" id="laborTaxInclBtn" class="tax-mode-btn px-2 py-0.5 rounded text-gray-400 hover:text-white" data-labor-tax="inclusive">Incl. VAT</button>
+            </div>
+            <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="workmanshipLabel">35</span> SAR</span>
+          </div>
         </div>
         <div class="flex items-center gap-2">
           <button type="button" data-adjust-target="workmanship" data-adjust-amount="-5" class="step-btn text-xs font-black">−5</button>
@@ -248,6 +254,15 @@
       <input type="range" id="taxRange" min="0" max="25" step="1" value="15" aria-label="VAT rate">
       <input type="hidden" id="tax" value="15">
       <div class="flex justify-between text-[10px] text-gray-400 mt-1 px-0.5"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%</span></div>
+      <div class="country-vat-presets flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-gray-700/60">
+        <button type="button" class="country-vat-btn active text-[10px] font-bold px-2 py-1 rounded-lg border border-amber-400 bg-amber-400/10 text-amber-300" data-vat="15" data-country="sa">🇸🇦 Saudi 15%</button>
+        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="5" data-country="ae">🇦🇪 UAE 5%</button>
+        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="10" data-country="bh">🇧🇭 Bahrain 10%</button>
+        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="5" data-country="om">🇴🇲 Oman 5%</button>
+        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="0" data-country="kw">🇰🇼 Kuwait/Qatar 0%</button>
+        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="14" data-country="eg">🇪🇬 Egypt 14%</button>
+      </div>
+      <p id="bullionNotice" class="text-[11px] font-bold text-amber-400 mt-2 p-1.5 rounded-lg bg-amber-950/40 border border-amber-800/50 flex items-center gap-1.5" hidden><span>✨</span><span>24K investment bullion is tax-exempt (0% VAT)</span></p>
     </section>
 
     <section id="sellDeductionPanel" class="input-card sell-card" aria-labelledby="sellHeading" hidden>
