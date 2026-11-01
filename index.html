@@ -98,6 +98,24 @@
         <span class="text-gray-400 text-[11px]">آخر تحديث: <strong id="liveUpdatedAt" class="text-gray-200 font-mono">—</strong></span>
       </div>
 
+      <div id="marketEquivalentPanel" class="mb-3 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs" hidden>
+        <div class="flex items-center gap-1.5 text-gray-400 font-bold text-[11px]">
+          <span class="text-amber-400">🌐</span>
+          <span>الأونصة العالمية:</span>
+        </div>
+        <div class="font-mono text-gray-200 flex items-center gap-2 text-xs">
+          <span class="text-amber-400 font-bold"><span id="equivalentOunceUSD">—</span> $</span>
+          <span class="text-slate-600">|</span>
+          <span class="text-gray-200 font-bold"><span id="equivalentOunceSAR">—</span></span>
+        </div>
+        <span hidden>
+          <span id="equivalentGram24">—</span>
+          <span id="equivalentGram22">—</span>
+          <span id="equivalentGram21">—</span>
+          <span id="equivalentGram18">—</span>
+        </span>
+      </div>
+
       <div class="live-karat-grid grid grid-cols-4 gap-2 text-center">
         <div class="live-karat-cell p-2 rounded-xl bg-slate-900 border border-slate-800">
           <p class="text-[10px] text-gray-400 font-bold mb-0.5">24 قيراط</p>
@@ -118,17 +136,6 @@
           <p class="text-[10px] text-gray-400 font-bold mb-0.5">18 قيراط</p>
           <strong id="liveKarat18" class="text-sm font-black text-amber-400 live-val">—</strong>
           <span class="block text-[9px] text-gray-400">ر.س/جرام</span>
-        </div>
-      </div>
-
-      <div id="marketEquivalentPanel" class="mt-2.5 p-2.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5 text-[11px]" hidden>
-        <div class="flex justify-between items-center text-gray-400">
-          <span class="font-bold text-[10px] text-gray-400">المكافئ بالأونصة:</span>
-          <span class="font-mono text-gray-200"><span id="equivalentOunceUSD" class="text-amber-400 font-bold">—</span> $ · <span id="equivalentOunceSAR" class="text-amber-400 font-bold">—</span></span>
-        </div>
-        <div class="flex justify-between items-center text-gray-400 pt-1.5 border-t border-slate-800/80">
-          <span class="font-bold text-[10px] text-gray-400">أسعار الجرام المحسوبة:</span>
-          <span class="font-mono text-gray-300 text-[10.5px]">24ق: <span id="equivalentGram24" class="text-amber-400 font-bold">—</span> · 22ق: <span id="equivalentGram22" class="text-amber-400 font-bold">—</span> · 21ق: <span id="equivalentGram21" class="text-amber-400 font-bold">—</span> · 18ق: <span id="equivalentGram18" class="text-amber-400 font-bold">—</span></span>
         </div>
       </div>
     </section>
