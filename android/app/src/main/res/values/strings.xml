@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">حاسبة الذهب</string>
-    <string name="title_activity_main">حاسبة الذهب</string>
-    <string name="package_name">sa.goldcalc.assistant</string>
-    <string name="custom_url_scheme">sa.goldcalc.assistant</string>
-</resources>
