@@ -7,13 +7,33 @@
 
   const LIVE_REQUEST_TIMEOUT_MS = 8000;
 
+  function resolveApiBaseUrl({ apiBaseUrl = '', rootRef = root } = {}) {
+    if (typeof apiBaseUrl === 'string' && apiBaseUrl) {
+      return apiBaseUrl.replace(/\/+$/, '');
+    }
+    if (typeof rootRef.GOLD_CALC_API_BASE === 'string' && rootRef.GOLD_CALC_API_BASE) {
+      return rootRef.GOLD_CALC_API_BASE.replace(/\/+$/, '');
+    }
+    const isCapacitor = Boolean(
+      rootRef.Capacitor?.isNativePlatform?.() ||
+      (rootRef.location?.protocol && ['capacitor:', 'ionic:', 'file:'].includes(rootRef.location.protocol))
+    );
+    if (isCapacitor) {
+      return 'https://gold-calc.vercel.app';
+    }
+    return '';
+  }
+
   function createLivePriceClient({
     fetchImpl = typeof root.fetch === 'function' ? root.fetch.bind(root) : null,
     AbortControllerImpl = typeof root.AbortController === 'function' ? root.AbortController : null,
     setTimeoutImpl = root.setTimeout ? root.setTimeout.bind(root) : setTimeout,
     clearTimeoutImpl = root.clearTimeout ? root.clearTimeout.bind(root) : clearTimeout,
     now = () => Date.now(),
+    apiBaseUrl,
   } = {}) {
+    const baseUrl = resolveApiBaseUrl({ apiBaseUrl, rootRef: root });
+
     async function fetchQuote({ force = false } = {}) {
       if (typeof fetchImpl !== 'function') throw new Error('Live price fetch is unavailable.');
 
@@ -23,7 +43,8 @@
         : null;
 
       try {
-        const url = force ? `/api/gold-price?refresh=${now()}` : '/api/gold-price';
+        const path = force ? `/api/gold-price?refresh=${now()}` : '/api/gold-price';
+        const url = `${baseUrl}${path}`;
         const response = await fetchImpl(url, {
           headers: { accept: 'application/json' },
           cache: 'no-store',
@@ -43,8 +64,8 @@
       }
     }
 
-    return { fetchQuote };
+    return { fetchQuote, resolveApiBaseUrl: () => baseUrl };
   }
 
-  return { LIVE_REQUEST_TIMEOUT_MS, createLivePriceClient };
+  return { LIVE_REQUEST_TIMEOUT_MS, createLivePriceClient, resolveApiBaseUrl };
 });

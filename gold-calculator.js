@@ -161,6 +161,124 @@
     };
   }
 
+  function auditCounterQuote({ price24k, karat, weight, quotedTotal, taxRate = 15 } = {}) {
+    const safePrice24k = sanitizeNonNegative(price24k);
+    const safeKarat = normalizeKarat(karat);
+    const safeWeight = sanitizeNonNegative(weight);
+    const safeQuote = sanitizeNonNegative(quotedTotal);
+    const safeTaxRate = clampTaxRate(taxRate);
+
+    if (safePrice24k <= 0 || safeWeight <= 0 || safeQuote <= 0) {
+      return { available: false, reason: 'insufficient_inputs' };
+    }
+
+    const subtotal = safeQuote / (1 + safeTaxRate / 100);
+    const vat = safeQuote - subtotal;
+    const purity = safeKarat / 24;
+    const gramPrice = safePrice24k * purity;
+    const rawMetalCost = gramPrice * safeWeight;
+    const laborCost = subtotal - rawMetalCost;
+    const laborPerGram = safeWeight > 0 ? laborCost / safeWeight : 0;
+    const laborPct = subtotal > 0 ? (laborCost / subtotal) * 100 : 0;
+
+    let benchmarkCategory = 'luxury';
+    if (laborPerGram < 0) benchmarkCategory = 'below_spot';
+    else if (laborPerGram <= 25) benchmarkCategory = 'plain';
+    else if (laborPerGram <= 45) benchmarkCategory = 'gulf';
+    else if (laborPerGram <= 80) benchmarkCategory = 'italian';
+
+    return {
+      available: true,
+      price24k: safePrice24k,
+      karat: safeKarat,
+      weight: safeWeight,
+      quotedTotal: safeQuote,
+      taxRate: safeTaxRate,
+      purity,
+      gramPrice,
+      rawMetalCost,
+      subtotal,
+      vat,
+      laborCost,
+      laborPerGram,
+      laborPct,
+      benchmarkCategory,
+    };
+  }
+
+  function calculateStoneDeduction({
+    grossWeight,
+    stoneWeight,
+    hasStones = false,
+    price24k,
+    karat,
+    workmanshipPerGram = 0,
+    profitPerGram = 0,
+    taxRate = 15,
+  } = {}) {
+    const safeGross = sanitizeNonNegative(grossWeight);
+    const safeStone = hasStones ? sanitizeNonNegative(stoneWeight) : 0;
+    const netGoldWeight = Math.max(0, safeGross - safeStone);
+    const safeKarat = normalizeKarat(karat);
+    const purity = safeKarat / 24;
+    const gramPrice = sanitizeNonNegative(price24k) * purity;
+    const laborPerGram = sanitizeNonNegative(workmanshipPerGram) + sanitizeNonNegative(profitPerGram);
+    const safeTaxRate = clampTaxRate(taxRate);
+    const grossGramRate = (gramPrice + laborPerGram) * (1 + safeTaxRate / 100);
+
+    const stonePremiumPaid = safeStone * grossGramRate;
+    const pureGoldTotal = netGoldWeight * grossGramRate;
+    const goldRatio = safeGross > 0 ? (netGoldWeight / safeGross) * 100 : 100;
+
+    return {
+      hasStones: Boolean(hasStones),
+      grossWeight: safeGross,
+      stoneWeight: safeStone,
+      netGoldWeight,
+      goldRatio,
+      stonePremiumPaid,
+      pureGoldTotal,
+      hasResaleWarning: safeStone > 0,
+    };
+  }
+
+  function calculateTradeIn({
+    price24k,
+    newPiece = { weight: 0, karat: 21, workmanshipPerGram: 0, profitPerGram: 0, taxRate: 15 },
+    oldPiece = { weight: 0, karat: 21, deductionRate: 0 },
+  } = {}) {
+    const purchase = calculateGoldPurchase({ ...newPiece, price24k });
+    const sale = calculateGoldSale({ ...oldPiece, price24k });
+
+    const netPayable = purchase.total - sale.total;
+
+    return {
+      isTradeIn: true,
+      shariaCompliant: true,
+      zatcaCompliant: true,
+      purchaseContract: {
+        weight: purchase.weight,
+        karat: purchase.karat,
+        subtotal: purchase.subtotal,
+        vat: purchase.vat,
+        total: purchase.total,
+      },
+      saleContract: {
+        weight: sale.weight,
+        karat: sale.karat,
+        rawMetalValue: sale.rawMetalValue,
+        deductionValue: sale.deductionValue,
+        total: sale.total,
+      },
+      settlement: {
+        newPurchaseTotal: purchase.total,
+        oldGoldPayout: sale.total,
+        netCashDifference: netPayable,
+        action: netPayable > 0 ? 'customer_pays' : netPayable < 0 ? 'customer_receives' : 'even',
+      },
+    };
+  }
+
   return {
     normalizeMode,
     clampTaxRate,
@@ -170,5 +288,8 @@
     calculateTransaction,
     calculateInvoice,
     compareQuote,
+    auditCounterQuote,
+    calculateStoneDeduction,
+    calculateTradeIn,
   };
 });

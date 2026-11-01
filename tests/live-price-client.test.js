@@ -112,3 +112,19 @@ test('uses an 8-second abort timeout when AbortController is available', async (
   assert.equal(aborted, true);
   assert.equal(cleared, 77);
 });
+
+
+test('uses configured or injected apiBaseUrl when passed', async () => {
+  let requestedUrl = '';
+  const client = createLivePriceClient({
+    apiBaseUrl: 'https://custom-domain.com/',
+    fetchImpl: async (url) => {
+      requestedUrl = url;
+      return response({ body: { priceUsdOunce: 4300, updatedAt: '2026-10-03T00:00:00Z' } });
+    },
+    AbortControllerImpl: null,
+  });
+
+  await client.fetchQuote();
+  assert.equal(requestedUrl, 'https://custom-domain.com/api/gold-price');
+});

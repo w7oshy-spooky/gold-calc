@@ -1,7 +1,7 @@
 'use strict';
 
 // Bump the version when files are added to or removed from APP_SHELL.
-const CACHE_NAME = 'gold-calc-shell-v2';
+const CACHE_NAME = 'gold-calc-shell-v3';
 const NETWORK_TIMEOUT_MS = 3000;
 
 const APP_SHELL = [
@@ -31,6 +31,7 @@ const APP_SHELL = [
   'js/ui/share-ui.js',
   'js/ui/invoice-ui.js',
   'js/ui/price-chart-ui.js',
+  'js/ui/auditor-ui.js',
   'js/app.js',
 ];
 
@@ -50,31 +51,52 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Network first so deploys show up immediately; the cached copy is used when the
-// network fails or is too slow (weak signal inside a shop).
-async function networkFirst(request) {
-  const cache = await caches.open(CACHE_NAME);
-  const network = fetch(request).then((response) => {
-    if (response.ok) cache.put(request, response.clone());
-    return response;
-  });
-
-  const timeout = new Promise((resolve) => setTimeout(resolve, NETWORK_TIMEOUT_MS));
-  const fastest = await Promise.race([network.catch(() => null), timeout]);
-  if (fastest) return fastest;
-
-  const cached = await cache.match(request, { ignoreSearch: request.mode === 'navigate' });
-  if (cached) return cached;
-  return network;
-}
-
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  if (request.method !== 'GET') return;
+  const url = new URL(event.request.url);
 
-  const url = new URL(request.url);
-  // Only same-origin app files: live prices stay with the page's own short-lived cache.
-  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
+  // Live quotes and external APIs should always go to the network directly.
+  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) {
+    return;
+  }
 
-  event.respondWith(networkFirst(request));
+  // Network-first with a 3-second timeout for app-shell assets.
+  event.respondWith(
+    new Promise((resolve) => {
+      let resolved = false;
+
+      const timer = setTimeout(() => {
+        if (!resolved) {
+          caches.match(event.request).then((cached) => {
+            if (cached && !resolved) {
+              resolved = true;
+              resolve(cached);
+            }
+          });
+        }
+      }, NETWORK_TIMEOUT_MS);
+
+      fetch(event.request)
+        .then((response) => {
+          if (!resolved) {
+            resolved = true;
+            clearTimeout(timer);
+            if (response.ok) {
+              const clone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+            }
+            resolve(response);
+          }
+        })
+        .catch(() => {
+          if (!resolved) {
+            resolved = true;
+            clearTimeout(timer);
+            caches.match(event.request).then((cached) => {
+              if (cached) resolve(cached);
+              else if (event.request.mode === 'navigate') resolve(caches.match('index.html'));
+            });
+          }
+        });
+    }),
+  );
 });

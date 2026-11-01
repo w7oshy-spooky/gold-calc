@@ -16,6 +16,7 @@
     'GoldShareUI',
     'GoldInvoiceUI',
     'GoldPriceChartUI',
+    'GoldAuditorUI',
   ];
 
   if (requiredGlobals.some((name) => !globalThis[name])) {
@@ -98,27 +99,31 @@
 
   function showLiveQuoteValues(quote) {
     marketUi.setLiveQuoteInput(Number(quote.priceUsdOunce));
-    marketUi.renderLiveKaratPrices(Number(quote.priceUsdOunce));
+    const market = marketUi.getMarketInput();
+    const prices = priceConverter.deriveMarketPrices(market);
+    marketUi.renderMarketEquivalents(prices);
+    marketUi.renderLiveQuoteKaratPrices(prices);
+    marketUi.renderLiveStatus(quote, 'ready');
   }
 
-  function applyLiveQuote(quote, state = 'live') {
-    showLiveQuoteValues(quote);
-    marketUi.renderLiveStatus(quote, state);
+  function applyLiveQuote(quote, status = 'ready') {
+    marketUi.setLiveQuoteInput(Number(quote.priceUsdOunce));
+    marketUi.renderLiveStatus(quote, status);
     calculate();
   }
 
-  shareUiApi.createShareUI({
+  const shareUi = shareUiApi.createShareUI({
     document,
     copy,
-    navigator,
-    getSummary() {
-      if (!lastResult || lastResult.price24k <= 0) return '';
+    formatting,
+    onShare() {
+      vibrate();
       return shareUiApi.buildSummaryText({
         result: lastResult,
         comparison: lastComparison,
-        quotedTotal: transactionUi.getTransactionInput().quotedTotal,
-        price24k: lastResult.price24k,
         invoice: lastInvoice,
+        quotedTotal: transactionUi.getTransactionInput().quotedTotal,
+        price24k: getPrice24k(),
         copy,
         formatting,
       });
@@ -153,6 +158,17 @@
     document,
     locale,
     formatting,
+  });
+
+  const auditorUi = globalThis.GoldAuditorUI.createAuditorUI({
+    document,
+    core,
+    formatting,
+    copy,
+    onChange(change) {
+      if (change.type === 'karat' || change.type === 'stone-toggle') vibrate();
+      calculate();
+    },
   });
 
   function addCurrentPieceToInvoice() {
@@ -246,6 +262,12 @@
     const input = transactionUi.getTransactionInput();
     const previous = preferencesStore.read();
     const source = liveFallbackActive ? 'live' : market.source;
+
+    const toggle = document.getElementById('hasStonesToggle');
+    const stoneInput = document.getElementById('stoneWeightInput');
+    const hasStones = toggle ? toggle.checked : false;
+    const stoneWeight = stoneInput && stoneInput.value ? Number(stoneInput.value) : undefined;
+
     preferencesStore.write({
       mode: input.mode,
       karat: input.karat,
@@ -261,6 +283,8 @@
       ouncePriceSar: market.ouncePriceSar,
       gramPriceSar: market.gramPriceSar,
       gramKarat: market.gramKarat,
+      hasStones,
+      stoneWeight,
       invoice: invoiceItems,
     });
   }
@@ -300,6 +324,11 @@
         quotedTotal: input.quotedTotal,
       });
     quoteComparisonUi.render(comparison);
+
+    if (auditorUi) {
+      auditorUi.render({ price24k, karat: input.karat });
+    }
+
     lastResult = result;
     lastComparison = comparison;
     lastInvoice = invoice;
@@ -323,6 +352,14 @@
     liveFallbackNotice = '';
     transactionUi.resetInput();
     marketUi.resetManualInput();
+
+    const toggle = document.getElementById('hasStonesToggle');
+    if (toggle) toggle.checked = false;
+    const container = document.getElementById('stoneWeightContainer');
+    if (container) container.hidden = true;
+    const stoneInput = document.getElementById('stoneWeightInput');
+    if (stoneInput) stoneInput.value = '';
+
     setPriceSource('live');
   }
 
@@ -331,6 +368,20 @@
     const { ouncePriceUsd, ...manualPrices } = prefs;
     invoiceItems = prefs.invoice || [];
     transactionUi.applyInput(prefs);
+
+    if (prefs.hasStones !== undefined) {
+      const toggle = document.getElementById('hasStonesToggle');
+      if (toggle) {
+        toggle.checked = Boolean(prefs.hasStones);
+        const container = document.getElementById('stoneWeightContainer');
+        if (container) container.hidden = !toggle.checked;
+      }
+    }
+    if (prefs.stoneWeight !== undefined) {
+      const stoneInput = document.getElementById('stoneWeightInput');
+      if (stoneInput) stoneInput.value = prefs.stoneWeight;
+    }
+
     // The USD field doubles as the LIVE feed display, so only restore it for manual USD entry.
     marketUi.applyManualInput(prefs.source === 'ounce-usd' ? prefs : manualPrices);
     setTransactionMode(prefs.mode || 'buy');

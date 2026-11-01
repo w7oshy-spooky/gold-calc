@@ -1,0 +1,36 @@
+{
+  "name": "gold-calc-saudi",
+  "version": "2.0.0",
+  "description": "Smart Saudi Gold Counter Assistant & Stealth Auditor",
+  "main": "gold-calculator.js",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node --check gold-calculator.js && node --check live-gold.js && node --check api/gold-price.js && node --check js/core/price-converter.js && node --check js/market/live-price-client.js && node --check js/market/price-cache.js && node --check js/state/preferences-store.js && node --check js/i18n/translations.js && node --check js/ui/formatting.js && node --check js/ui/market-ui.js && node --check js/ui/transaction-ui.js && node --check js/ui/quote-comparison-ui.js && node --check js/ui/summary-ui.js && node --check js/ui/share-ui.js && node --check js/ui/invoice-ui.js && node --check js/ui/price-chart-ui.js && node --check js/ui/auditor-ui.js && node --check js/app.js && node --check sw.js",
+    "build": "node scripts/build-mobile.js",
+    "build:css": "tailwindcss -c tailwind.config.js -o tailwind.css --minify",
+    "cap:sync": "npm run build && cap sync",
+    "cap:android": "npm run build && cap sync android && cap open android",
+    "cap:ios": "npm run build && cap sync ios && cap open ios"
+  },
+  "keywords": [
+    "gold",
+    "calculator",
+    "saudi-arabia",
+    "jewelry",
+    "zatca",
+    "sharia",
+    "pwa",
+    "capacitor"
+  ],
+  "author": "w7oshy",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/core": "^6.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/ios": "^6.2.0",
+    "tailwindcss": "^3.4.17"
+  }
+}

@@ -17,6 +17,8 @@
     'ouncePriceUsd',
     'ouncePriceSar',
     'gramPriceSar',
+    'stoneWeight',
+    'auditorQuote',
   ]);
   const NUMERIC_LIMITS = Object.freeze({ taxRate: 25, deductionRate: 100 });
   const INVOICE_FIELDS = Object.freeze([
@@ -76,6 +78,10 @@
       if (value !== undefined) prefs[field] = value;
     }
 
+    if (typeof raw.hasStones === 'boolean') {
+      prefs.hasStones = raw.hasStones;
+    }
+
     if (Array.isArray(raw.invoice)) {
       const invoice = raw.invoice.map(sanitizeInvoiceItem).filter(Boolean).slice(0, MAX_INVOICE_ITEMS);
       if (invoice.length > 0) prefs.invoice = invoice;
@@ -98,16 +104,23 @@
 
     function write(preferences) {
       try {
-        if (!prefsStorage) return;
-        prefsStorage.setItem(PREFERENCES_KEY, JSON.stringify(sanitizePreferences(preferences)));
-      } catch {}
+        if (!prefsStorage) return false;
+        const sanitized = sanitizePreferences(preferences);
+        prefsStorage.setItem(PREFERENCES_KEY, JSON.stringify(sanitized));
+        return true;
+      } catch {
+        return false;
+      }
     }
 
     function clear() {
       try {
-        if (!prefsStorage) return;
+        if (!prefsStorage) return false;
         prefsStorage.removeItem(PREFERENCES_KEY);
-      } catch {}
+        return true;
+      } catch {
+        return false;
+      }
     }
 
     return { read, write, clear };
@@ -115,6 +128,9 @@
 
   return {
     PREFERENCES_KEY,
+    SOURCES,
+    KARATS,
+    NUMERIC_FIELDS,
     MAX_INVOICE_ITEMS,
     sanitizeInvoiceItem,
     sanitizePreferences,

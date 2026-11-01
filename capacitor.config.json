@@ -1,0 +1,13 @@
+{
+  "appId": "sa.goldcalc.assistant",
+  "appName": "حاسبة الذهب",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "https",
+    "allowNavigation": [
+      "gold-calc.vercel.app",
+      "gold-calc-sa.vercel.app"
+    ]
+  }
+}
