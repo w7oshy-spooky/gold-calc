@@ -66,12 +66,14 @@
   function createShareUI({
     document,
     copy,
-    navigator: nav,
+    navigator: nav = (typeof globalThis !== 'undefined' ? globalThis.navigator : null),
     getSummary,
+    onShare,
     onReset = () => {},
     setTimeoutImpl = setTimeout,
     clearTimeoutImpl = clearTimeout,
   }) {
+    const getSummaryFn = getSummary || onShare;
     const requireElement = (id) => {
       const element = document.getElementById(id);
       if (!element) throw new Error(`Missing required share UI element #${id}`);
@@ -93,13 +95,78 @@
       }, STATUS_CLEAR_MS);
     }
 
+    async function copyToClipboard(text) {
+      if (nav?.clipboard && typeof nav.clipboard.writeText === 'function') {
+        try {
+          await nav.clipboard.writeText(text);
+          return true;
+        } catch {
+          // Fall through to document.execCommand fallback
+        }
+      }
+
+      try {
+        if (typeof document?.createElement === 'function' && document?.body) {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.setAttribute('readonly', '');
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          textarea.style.pointerEvents = 'none';
+          textarea.style.top = '0';
+          textarea.style.left = '0';
+          document.body.appendChild(textarea);
+          textarea.focus();
+          textarea.select();
+          const copied = document.execCommand('copy');
+          document.body.removeChild(textarea);
+          if (copied) return true;
+        }
+      } catch {
+        // Fallback failed
+      }
+
+      return false;
+    }
+
     async function share() {
-      const summary = getSummary();
+      if (typeof getSummaryFn !== 'function') {
+        showStatus(copy.shareFailed, 'error');
+        return;
+      }
+
+      let summary = '';
+      try {
+        summary = getSummaryFn();
+      } catch {
+        showStatus(copy.shareFailed, 'error');
+        return;
+      }
+
       if (!summary) {
         showStatus(copy.shareNeedsPrice, 'error');
         return;
       }
 
+      // 1. Capacitor Native Share Plugin (Mobile Android/iOS APK)
+      const capShare = (typeof globalThis !== 'undefined' ? globalThis.Capacitor?.Plugins?.Share : null);
+      if (capShare && typeof capShare.share === 'function') {
+        try {
+          await capShare.share({
+            title: copy.shareLabels.title,
+            text: summary,
+            dialogTitle: copy.shareLabels.title,
+          });
+          return;
+        } catch (error) {
+          const msg = String(error?.message || '').toLowerCase();
+          if (error?.name === 'AbortError' || msg.includes('canceled') || msg.includes('cancelled')) {
+            return;
+          }
+        }
+      }
+
+      // 2. Web Share API (Safari iOS, Chrome Mobile, Android Browser)
       if (nav && typeof nav.share === 'function') {
         try {
           await nav.share({ title: copy.shareLabels.title, text: summary });
@@ -110,13 +177,11 @@
         }
       }
 
-      try {
-        if (!nav?.clipboard || typeof nav.clipboard.writeText !== 'function') {
-          throw new Error('Clipboard is unavailable.');
-        }
-        await nav.clipboard.writeText(summary);
+      // 3. Modern Clipboard and Fallback (Desktop / Web fallback)
+      const copied = await copyToClipboard(summary);
+      if (copied) {
         showStatus(copy.shareCopied);
-      } catch {
+      } else {
         showStatus(copy.shareFailed, 'error');
       }
     }

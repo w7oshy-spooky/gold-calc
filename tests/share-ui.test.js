@@ -154,3 +154,47 @@ test('a 0% sell deduction is shared without a minus sign', () => {
   const text = buildSummaryText({ result, price24k, copy: getCopy('en'), formatting: createFormatting('en') });
   assert.match(text, /Buyer deduction \(0%\): 0\.00 SAR/);
 });
+
+test('createShareUI supports onShare as an alias for getSummary', async () => {
+  const shared = [];
+  const doc = fakeDocument();
+  const ui = createShareUI({
+    document: doc,
+    copy: getCopy('en'),
+    navigator: { share: async (d) => shared.push(d) },
+    onShare: () => 'alias summary',
+    setTimeoutImpl: () => 1,
+    clearTimeoutImpl: () => {},
+  });
+  await ui.share();
+  assert.equal(shared[0]?.text, 'alias summary');
+});
+
+test('copyToClipboard falls back to document.execCommand when clipboard API fails', async () => {
+  let executed = '';
+  let appendedChild = null;
+  const doc = fakeDocument();
+  doc.createElement = (tag) => ({
+    style: {},
+    setAttribute: () => {},
+    focus: () => {},
+    select: () => {},
+    value: '',
+  });
+  doc.body = {
+    appendChild: (el) => { appendedChild = el; },
+    removeChild: () => { appendedChild = null; },
+  };
+  doc.execCommand = (cmd) => { executed = cmd; return true; };
+  const ui = createShareUI({
+    document: doc,
+    copy: getCopy('en'),
+    navigator: { clipboard: { writeText: async () => { throw new Error('denied'); } } },
+    getSummary: () => 'fallback summary',
+    setTimeoutImpl: () => 1,
+    clearTimeoutImpl: () => {},
+  });
+  await ui.share();
+  assert.equal(executed, 'copy');
+  assert.equal(doc.elements.actionStatus.textContent, getCopy('en').shareCopied);
+});

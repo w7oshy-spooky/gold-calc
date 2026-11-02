@@ -117,7 +117,8 @@
     document,
     copy,
     formatting,
-    onShare() {
+    navigator: globalThis.navigator,
+    getSummary() {
       vibrate();
       return shareUiApi.buildSummaryText({
         result: lastResult,
