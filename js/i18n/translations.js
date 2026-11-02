@@ -110,6 +110,15 @@
         even: 'الصفقة متكافئة تماماً',
         shariaNotice: 'متوافق مع الضوابط الشرعية وتعليمات هيئة الزكاة والضريبة والجمارك.',
       },
+      trendLabels: {
+        title: 'مسار الذهب اليوم',
+        up: 'صاعد',
+        down: 'هابط',
+        stable: 'مستقر',
+        upAdvice: '💡 فرصة مناسبة للبيع (السعر مرتفع اليوم)',
+        downAdvice: '💡 فرصة مناسبة للشراء (السعر منخفض اليوم)',
+        stableAdvice: '💡 حركة السعر مستقرة حالياً',
+      },
     },
     en: {
       liveMode: 'The live troy-ounce price is fetched automatically, refreshed every minute and converted to the 24K gram price in Saudi riyals.',
@@ -214,6 +223,15 @@
         netReceive: 'Net Cash to Receive',
         even: 'Even trade',
         shariaNotice: 'Complies with Sharia contract separation and ZATCA tax regulations.',
+      },
+      trendLabels: {
+        title: "Today's Gold Trend",
+        up: 'Upward',
+        down: 'Downward',
+        stable: 'Stable',
+        upAdvice: '💡 Favorable for selling (price is up today)',
+        downAdvice: '💡 Good buying opportunity (lower price today)',
+        stableAdvice: '💡 Price movement is currently stable',
       },
     },
   };

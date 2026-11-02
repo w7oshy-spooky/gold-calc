@@ -98,6 +98,18 @@
         <span class="text-gray-400 text-[11px]">Last updated: <strong id="liveUpdatedAt" class="text-gray-200 font-mono">—</strong></span>
       </div>
 
+      <div id="goldTrendRow" class="gold-trend-row flex items-center justify-between flex-wrap gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 mb-3 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-gray-400 text-[11px] font-bold">Today's Gold Trend:</span>
+          <span id="goldTrendBadge" class="trend-badge inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-xs" data-trend="down">
+            <span id="goldTrendIcon">↘</span>
+            <span id="goldTrendText">Downward</span>
+            <span id="goldTrendDiff" class="font-mono text-[11px] ltr-num">(-0.13%)</span>
+          </span>
+        </div>
+        <span id="goldTrendAdvice" class="text-[11px] text-gray-300 font-medium">💡 Good buying opportunity (lower price today)</span>
+      </div>
+
       <div id="marketEquivalentPanel" class="mb-3 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs" hidden>
         <div class="flex items-center gap-1.5 text-gray-400 font-bold text-[11px]">
           <span class="text-amber-400">🌐</span>

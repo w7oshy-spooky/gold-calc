@@ -49,6 +49,12 @@
       liveKarat22: requireElement('liveKarat22'),
       liveKarat21: requireElement('liveKarat21'),
       liveKarat18: requireElement('liveKarat18'),
+      goldTrendRow: document.getElementById('goldTrendRow'),
+      goldTrendBadge: document.getElementById('goldTrendBadge'),
+      goldTrendIcon: document.getElementById('goldTrendIcon'),
+      goldTrendText: document.getElementById('goldTrendText'),
+      goldTrendDiff: document.getElementById('goldTrendDiff'),
+      goldTrendAdvice: document.getElementById('goldTrendAdvice'),
     };
 
     const sourceButtons = Array.from(document.querySelectorAll('.source-btn'));
@@ -228,6 +234,35 @@
       elements.priceWarning.classList.remove('warning-text');
     }
 
+    function renderGoldTrend(trendData) {
+      if (!elements.goldTrendBadge) return;
+      if (!trendData || !trendData.trend) {
+        elements.goldTrendBadge.removeAttribute('data-trend');
+        if (elements.goldTrendIcon) elements.goldTrendIcon.textContent = '';
+        if (elements.goldTrendText) elements.goldTrendText.textContent = '—';
+        if (elements.goldTrendDiff) elements.goldTrendDiff.textContent = '';
+        if (elements.goldTrendAdvice) elements.goldTrendAdvice.textContent = '';
+        return;
+      }
+
+      const { trend, percent } = trendData;
+      elements.goldTrendBadge.dataset.trend = trend;
+      if (elements.goldTrendIcon) {
+        elements.goldTrendIcon.textContent = trend === 'up' ? '↗' : trend === 'down' ? '↘' : '↔';
+      }
+      if (elements.goldTrendText) {
+        elements.goldTrendText.textContent = copy.trendLabels?.[trend] || trend;
+      }
+      if (elements.goldTrendDiff) {
+        const sign = percent >= 0 ? '+' : '−';
+        elements.goldTrendDiff.textContent = `(${sign}${Math.abs(percent).toFixed(2)}%)`;
+      }
+      if (elements.goldTrendAdvice) {
+        const adviceKey = `${trend}Advice`;
+        elements.goldTrendAdvice.textContent = copy.trendLabels?.[adviceKey] || '';
+      }
+    }
+
     function sanitizeMarketField(element) {
       const value = priceConverter.sanitizeNonNegative(element.value);
       if (element.value !== '') {
@@ -297,6 +332,7 @@
       setLiveRefreshDisabled,
       showWarning,
       clearWarning,
+      renderGoldTrend,
     };
   }
 

@@ -19,7 +19,7 @@
       (rootRef.location?.protocol && ['capacitor:', 'ionic:', 'file:'].includes(rootRef.location.protocol))
     );
     if (isCapacitor) {
-      return 'https://gold-calc.vercel.app';
+      return 'https://gold-calc-live.vercel.app';
     }
     return '';
   }

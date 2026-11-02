@@ -47,6 +47,7 @@ test('Arabic and English dynamic copy expose the same contract', () => {
   assert.deepEqual(Object.keys(ar.buyLabels).sort(), Object.keys(en.buyLabels).sort());
   assert.deepEqual(Object.keys(ar.sellLabels).sort(), Object.keys(en.sellLabels).sort());
   assert.deepEqual(Object.keys(ar.shareLabels).sort(), Object.keys(en.shareLabels).sort());
+  assert.deepEqual(Object.keys(ar.trendLabels).sort(), Object.keys(en.trendLabels).sort());
 
   for (const key of [
     'liveMode',

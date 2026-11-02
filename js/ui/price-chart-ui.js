@@ -53,7 +53,13 @@
     return { change, percent: (change / series[0]) * 100 };
   }
 
-  function createPriceChartUI({ document, locale, formatting, now = () => new Date() }) {
+  function getDaySeed(date, rangeIndex = 0) {
+    const d = date instanceof Date && !isNaN(date.getTime()) ? date : new Date();
+    const dayKey = d.getFullYear() * 372 + (d.getMonth() + 1) * 31 + d.getDate();
+    return (dayKey * 17 + rangeIndex * 31) % 2147483647 || 7;
+  }
+
+  function createPriceChartUI({ document, locale, formatting, now = () => new Date(), onTrend }) {
     const requireElement = (id) => {
       const element = document.getElementById(id);
       if (!element) throw new Error(`Missing required price chart element #${id}`);
@@ -94,12 +100,14 @@
       elements.price.textContent = '—';
       elements.change.textContent = '';
       elements.change.removeAttribute('data-trend');
+      elements.change.hidden = true;
       elements.area.setAttribute('d', '');
       elements.line.setAttribute('d', '');
       elements.cursor.setAttribute('visibility', 'hidden');
       elements.dot.hidden = true;
       elements.firstLabel.textContent = '';
       elements.lastLabel.textContent = '';
+      if (typeof onTrend === 'function') onTrend(null);
     }
 
     function draw() {
@@ -108,7 +116,7 @@
         return;
       }
       const range = RANGES[rangeIndex];
-      const series = buildSeries(price, range, 7 + rangeIndex * 13);
+      const series = buildSeries(price, range, getDaySeed(now(), rangeIndex));
       const paths = buildPaths(series);
       const active = hoverIndex == null ? series.length - 1 : hoverIndex;
       const { change, percent } = summarize(series, active);
@@ -118,6 +126,7 @@
       elements.price.textContent = formatting.formatMoney(series[active]);
       elements.change.textContent = `${arrow}${formatting.formatMoney(Math.abs(change))} (${percentSign}${Math.abs(percent).toFixed(2)}%)`;
       elements.change.dataset.trend = change >= 0 ? 'up' : 'down';
+      elements.change.hidden = false;
       elements.area.setAttribute('d', paths.area);
       elements.line.setAttribute('d', paths.line);
 
@@ -135,6 +144,16 @@
         button.setAttribute('aria-pressed', String(index === rangeIndex));
         button.classList.toggle('active', index === rangeIndex);
       });
+      if (typeof onTrend === 'function') {
+        const daySeries = rangeIndex === 0 ? series : buildSeries(price, RANGES[0], getDaySeed(now(), 0));
+        const daySummary = summarize(daySeries, daySeries.length - 1);
+        const trend = daySummary.percent > 0.05 ? 'up' : daySummary.percent < -0.05 ? 'down' : 'stable';
+        onTrend({
+          trend,
+          change: daySummary.change,
+          percent: daySummary.percent,
+        });
+      }
     }
 
     function pointFromEvent(event) {
@@ -183,5 +202,5 @@
     return { render };
   }
 
-  return { createPriceChartUI, buildSeries, buildPaths, summarize, RANGES };
+  return { createPriceChartUI, buildSeries, buildPaths, summarize, getDaySeed, RANGES };
 });

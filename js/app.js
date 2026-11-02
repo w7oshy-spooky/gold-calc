@@ -159,6 +159,9 @@
     document,
     locale,
     formatting,
+    onTrend(trendData) {
+      marketUi.renderGoldTrend(trendData);
+    },
   });
 
   const auditorUi = globalThis.GoldAuditorUI.createAuditorUI({
