@@ -6,8 +6,7 @@
     "androidScheme": "https",
     "iosScheme": "https",
     "allowNavigation": [
-      "gold-calc-live.vercel.app",
-      "gold-calc-sa.vercel.app"
+      "gold-calc-live.vercel.app"
     ]
   }
 }

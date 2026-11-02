@@ -110,7 +110,15 @@
       if (typeof onTrend === 'function') onTrend(null);
     }
 
+    function updateRangeButtons() {
+      rangeButtons.forEach((button, index) => {
+        button.setAttribute('aria-pressed', String(index === rangeIndex));
+        button.classList.toggle('active', index === rangeIndex);
+      });
+    }
+
     function draw() {
+      updateRangeButtons();
       if (!(price > 0)) {
         renderEmpty();
         return;
