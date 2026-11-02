@@ -317,6 +317,11 @@
     });
 
     for (const element of [elements.weight, elements.workmanship, elements.profit, elements.quotedTotal]) {
+      element.addEventListener('focus', () => {
+        setTimeout(() => {
+          if (typeof element.select === 'function') element.select();
+        }, 20);
+      });
       element.addEventListener('input', () => {
         if (Number.parseFloat(element.value) < 0) element.value = '0';
         onChange({ type: 'input', id: element.id });
@@ -326,6 +331,12 @@
         onChange({ type: 'blur', id: element.id });
       });
     }
+
+    elements.sellDeduction.addEventListener('focus', () => {
+      setTimeout(() => {
+        if (typeof elements.sellDeduction.select === 'function') elements.sellDeduction.select();
+      }, 20);
+    });
 
     elements.sellDeduction.addEventListener('input', () => {
       const rate = core.clampPercent(elements.sellDeduction.value);

@@ -413,5 +413,13 @@
     registerOfflineSupport();
     setInterval(refreshLiveInBackground, 15 * 1000);
     document.addEventListener('visibilitychange', refreshLiveInBackground);
+
+    document.querySelectorAll('.num-input, .market-input').forEach((input) => {
+      input.addEventListener('focus', () => {
+        setTimeout(() => {
+          if (typeof input.select === 'function') input.select();
+        }, 20);
+      });
+    });
   });
 })();
