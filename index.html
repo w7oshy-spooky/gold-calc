@@ -489,19 +489,121 @@
           </select>
         </div>
         <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-700/60">
-          <div class="space-y-1">
-            <label for="vaultPiecePhoto" class="block text-[11px] text-gray-300 font-bold">📷 صورة القطعة (اختياري)</label>
-            <input type="file" id="vaultPiecePhoto" accept="image/*" class="w-full text-[10px] text-gray-400 file:mr-1 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-amber-400 file:text-[10px]">
-            <img id="vaultPhotoPreview" alt="معاينة القطعة" class="w-14 h-14 object-cover rounded-lg border border-slate-700 mt-1" hidden>
+          <div>
+            <label for="vaultPiecePhoto" class="flex flex-col items-center justify-center p-2.5 rounded-xl border border-dashed border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-center cursor-pointer transition">
+              <span class="text-lg">📷</span>
+              <span class="text-[11px] font-bold text-gray-200 mt-0.5">صورة القطعة</span>
+              <span id="vaultPhotoStatus" class="text-[9px] text-amber-400">اضغط للاختيار</span>
+            </label>
+            <input type="file" id="vaultPiecePhoto" accept="image/*" class="hidden">
+            <div class="flex justify-center mt-1">
+              <img id="vaultPhotoPreview" alt="معاينة القطعة" class="w-14 h-14 object-cover rounded-lg border border-amber-400/40" hidden>
+            </div>
           </div>
-          <div class="space-y-1">
-            <label for="vaultPieceInvoice" class="block text-[11px] text-gray-300 font-bold">🧾 صورة الفاتورة (اختياري)</label>
-            <input type="file" id="vaultPieceInvoice" accept="image/*" class="w-full text-[10px] text-gray-400 file:mr-1 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-amber-400 file:text-[10px]">
-            <img id="vaultInvoicePreview" alt="معاينة الفاتورة" class="w-14 h-14 object-cover rounded-lg border border-slate-700 mt-1" hidden>
+          <div>
+            <label for="vaultPieceInvoice" class="flex flex-col items-center justify-center p-2.5 rounded-xl border border-dashed border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-center cursor-pointer transition">
+              <span class="text-lg">🧾</span>
+              <span class="text-[11px] font-bold text-gray-200 mt-0.5">صورة الفاتورة</span>
+              <span id="vaultInvoiceStatus" class="text-[9px] text-amber-400">اضغط للاختيار</span>
+            </label>
+            <input type="file" id="vaultPieceInvoice" accept="image/*" class="hidden">
+            <div class="flex justify-center mt-1">
+              <img id="vaultInvoicePreview" alt="معاينة الفاتورة" class="w-14 h-14 object-cover rounded-lg border border-amber-400/40" hidden>
+            </div>
           </div>
         </div>
         <p id="vaultStatus" class="text-xs text-red-400 font-bold"></p>
         <button type="button" id="saveVaultPieceBtn" class="action-btn action-btn-primary w-full text-xs py-2 mt-2">حفظ في الخزانة</button>
+      </div>
+    </div>
+
+    <!-- Vault Piece Details Modal -->
+    <div id="vaultDetailModal" class="vault-modal-backdrop" hidden>
+      <div class="vault-modal-dialog space-y-4 max-w-sm">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+          <h3 id="vaultDetailTitle" class="text-base font-bold text-white truncate">تفاصيل القطعة</h3>
+          <button type="button" id="closeVaultDetailModalBtn" class="text-gray-400 hover:text-white p-1 text-base">✕</button>
+        </div>
+
+        <!-- Photos Row -->
+        <div id="vaultDetailPhotosRow" class="grid grid-cols-2 gap-2" hidden>
+          <div id="vaultDetailPiecePhotoBox" class="p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-center cursor-pointer hover:border-amber-400/50 transition" hidden>
+            <img id="vaultDetailPieceImg" src="" alt="صورة القطعة" class="w-full h-24 object-cover rounded-lg mb-1">
+            <span class="text-[10px] text-amber-300 font-bold">📷 صورة القطعة (تكبير)</span>
+          </div>
+          <div id="vaultDetailInvoicePhotoBox" class="p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-center cursor-pointer hover:border-amber-400/50 transition" hidden>
+            <img id="vaultDetailInvoiceImg" src="" alt="صورة الفاتورة" class="w-full h-24 object-cover rounded-lg mb-1">
+            <span class="text-[10px] text-amber-300 font-bold">🧾 الفاتورة (تكبير)</span>
+          </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+            <span class="block text-[10px] text-gray-400">الوزن والعيار</span>
+            <strong id="vaultDetailWeightKarat" class="text-sm font-bold text-white font-mono">—</strong>
+            <span id="vaultDetailPureWeight" class="block text-[10px] text-gray-400 mt-0.5">—</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+            <span class="block text-[10px] text-gray-400">القيمة السوقية الحالية</span>
+            <strong id="vaultDetailMarketValue" class="text-sm font-bold text-amber-400 font-mono">—</strong>
+            <span id="vaultDetailProfitLoss" class="block text-[10px] font-mono mt-0.5">—</span>
+          </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1.5 text-xs">
+          <div class="flex justify-between items-center text-gray-300">
+            <span class="text-gray-400">سعر الشراء:</span>
+            <strong id="vaultDetailPurchasePrice" class="font-mono text-white">—</strong>
+          </div>
+          <div class="flex justify-between items-center text-gray-300">
+            <span class="text-gray-400">تاريخ الشراء:</span>
+            <strong id="vaultDetailPurchaseDate" class="font-mono text-white">—</strong>
+          </div>
+          <div class="flex justify-between items-center text-gray-300">
+            <span class="text-gray-400">الغرض وحكم الزكاة:</span>
+            <span id="vaultDetailCategory" class="font-bold">—</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-2 pt-2 border-t border-slate-700/60">
+          <button type="button" id="editVaultPieceBtn" class="action-btn text-xs py-2 flex-1 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl font-bold flex items-center justify-center gap-1.5">
+            <span>✏️</span>
+            <span>تعديل القطعة</span>
+          </button>
+          <button type="button" id="deleteVaultPieceBtn" class="action-btn text-xs py-2 px-4 bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/80 rounded-xl font-bold flex items-center justify-center gap-1.5">
+            <span>🗑️</span>
+            <span>حذف</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full-Size Image Viewer Modal -->
+    <div id="imageViewerModal" class="vault-modal-backdrop" hidden>
+      <div class="vault-modal-dialog space-y-3 max-w-sm text-center">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+          <h4 id="imageViewerTitle" class="text-sm font-bold text-white">معاينة الصورة</h4>
+          <button type="button" id="closeImageViewerBtn" class="text-gray-400 hover:text-white p-1 text-base font-bold">✕</button>
+        </div>
+        <div class="flex justify-center bg-black/80 rounded-xl p-2 border border-slate-800 max-h-[65vh] overflow-auto">
+          <img id="imageViewerImg" src="" alt="معاينة" class="max-h-[60vh] w-auto object-contain rounded-lg">
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="vault-modal-backdrop" hidden>
+      <div class="vault-modal-dialog space-y-3 max-w-xs text-center">
+        <span class="text-3xl block">⚠️</span>
+        <h4 class="text-sm font-bold text-white">تأكيد حذف القطعة</h4>
+        <p id="deleteConfirmText" class="text-xs text-gray-300 leading-relaxed">هل أنت متأكد من حذف هذه القطعة من الخزانة؟ لا يمكن التراجع عن هذا الإجراء.</p>
+        <div class="flex items-center gap-2 pt-2">
+          <button type="button" id="cancelDeleteBtn" class="action-btn text-xs py-2 flex-1 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl font-bold">إلغاء</button>
+          <button type="button" id="confirmDeleteBtn" class="action-btn text-xs py-2 flex-1 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold">نعم، احذف</button>
+        </div>
       </div>
     </div>
 
