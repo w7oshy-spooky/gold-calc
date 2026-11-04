@@ -443,6 +443,20 @@
       </div>
       <p id="vaultEmptyMsg" class="text-[11px] leading-relaxed text-gray-400 text-center py-2">Your vault is empty. Add your gold items to track current market value and Zakat.</p>
       <ul id="vaultList" class="space-y-1.5" aria-label="Vault gold pieces"></ul>
+
+      <!-- Vault Backup & Restore Controls -->
+      <div class="pt-3 mt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
+        <button type="button" id="exportVaultBackupBtn" class="action-btn text-[11px] py-1.5 px-3 flex-1 bg-slate-900 hover:bg-slate-800 text-gray-300 hover:text-white border border-slate-700/80 rounded-xl flex items-center justify-center gap-1.5 transition">
+          <span>📥</span>
+          <span id="exportVaultBackupLabel">Export Backup</span>
+        </button>
+        <label for="importVaultBackupInput" class="action-btn text-[11px] py-1.5 px-3 flex-1 bg-slate-900 hover:bg-slate-800 text-gray-300 hover:text-white border border-slate-700/80 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition text-center">
+          <span>📤</span>
+          <span id="importVaultBackupLabel">Restore Backup</span>
+        </label>
+        <input type="file" id="importVaultBackupInput" accept=".json,application/json" class="hidden">
+      </div>
+      <p id="vaultBackupStatus" class="text-[10px] text-center text-amber-400 font-bold mt-1.5 min-h-[1rem]"></p>
     </section>
 
   <div class="bottom-receipt dashboard-result" data-tab="calc">

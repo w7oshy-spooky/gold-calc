@@ -65,3 +65,15 @@ test('vault store exports and imports backup cleanly', async () => {
   const newPieces = await newStore.getAllPieces();
   assert.equal(newPieces.length, 2);
 });
+
+test('both index.html and en.html expose vault backup and restore controls symmetrically', () => {
+  const fs = require('node:fs');
+  const arabic = fs.readFileSync('index.html', 'utf8');
+  const english = fs.readFileSync('en.html', 'utf8');
+
+  for (const html of [arabic, english]) {
+    assert.match(html, /id=["']exportVaultBackupBtn["']/);
+    assert.match(html, /id=["']importVaultBackupInput["']/);
+    assert.match(html, /id=["']vaultBackupStatus["']/);
+  }
+});
