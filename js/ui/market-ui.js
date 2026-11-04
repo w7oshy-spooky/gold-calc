@@ -55,7 +55,10 @@
       goldTrendText: document.getElementById('goldTrendText'),
       goldTrendDiff: document.getElementById('goldTrendDiff'),
       goldTrendAdvice: document.getElementById('goldTrendAdvice'),
+      lockPriceBtn: document.getElementById('lockPriceBtn'),
     };
+
+    let isPriceLockedState = false;
 
     const sourceButtons = Array.from(document.querySelectorAll('.source-btn'));
     const gramKaratButtons = Array.from(document.querySelectorAll('.gram-karat-btn'));
@@ -286,6 +289,25 @@
       });
     });
 
+    function setPriceLocked(locked) {
+      isPriceLockedState = Boolean(locked);
+      if (elements.lockPriceBtn) {
+        elements.lockPriceBtn.classList.toggle('active', isPriceLockedState);
+        elements.lockPriceBtn.classList.toggle('locked', isPriceLockedState);
+        elements.lockPriceBtn.setAttribute('aria-pressed', String(isPriceLockedState));
+        elements.lockPriceBtn.textContent = isPriceLockedState
+          ? (copy.lockPriceActive || 'تم تثبيت السعر 🔒')
+          : (copy.lockPriceInactive || 'تثبيت السعر 🔓');
+      }
+    }
+
+    if (elements.lockPriceBtn) {
+      elements.lockPriceBtn.addEventListener('click', () => {
+        setPriceLocked(!isPriceLockedState);
+        onChange({ type: 'price-lock', locked: isPriceLockedState });
+      });
+    }
+
     elements.liveRefresh.addEventListener('click', () => onRefresh());
 
     elements.ouncePriceUSD.addEventListener('input', () => {
@@ -333,6 +355,8 @@
       showWarning,
       clearWarning,
       renderGoldTrend,
+      isPriceLocked: () => isPriceLockedState,
+      setPriceLocked,
     };
   }
 

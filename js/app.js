@@ -17,6 +17,10 @@
     'GoldInvoiceUI',
     'GoldPriceChartUI',
     'GoldAuditorUI',
+    'GoldQuickInputParser',
+    'GoldVaultStore',
+    'GoldCardCanvasGenerator',
+    'GoldVaultUI',
   ];
 
   if (requiredGlobals.some((name) => !globalThis[name])) {
@@ -34,6 +38,9 @@
   const preferencesApi = globalThis.GoldPreferencesStore;
   const preferencesStore = preferencesApi.createPreferencesStore();
   const shareUiApi = globalThis.GoldShareUI;
+  const quickInputParser = globalThis.GoldQuickInputParser;
+  const vaultStore = globalThis.GoldVaultStore ? globalThis.GoldVaultStore.createVaultStore() : null;
+  const cardCanvasGenerator = globalThis.GoldCardCanvasGenerator;
 
   const LIVE_AUTO_REFRESH_MS = 60 * 1000;
 
@@ -170,11 +177,47 @@
     core,
     formatting,
     copy,
-    onChange(change) {
+    async onChange(change) {
       if (change.type === 'karat' || change.type === 'stone-toggle') vibrate();
-      calculate();
+      if (change.type === 'share-card') {
+        vibrate();
+        if (cardCanvasGenerator) {
+          try {
+            const blob = await cardCanvasGenerator.generateCardBlob({
+              audit: change.audit,
+              advice: change.advice,
+              copy,
+              locale,
+              documentRef: document,
+            });
+            await cardCanvasGenerator.shareOrDownloadCard({
+              blob,
+              filename: `gold-audit-${Date.now()}.png`,
+              title: copy.shareLabels?.title || 'حاسبة الذهب',
+              navigatorRef: globalThis.navigator,
+              windowRef: globalThis.window,
+            });
+          } catch (err) {
+            console.error('Failed to export card image', err);
+          }
+        }
+      } else {
+        calculate();
+      }
     },
   });
+
+  const vaultUi = globalThis.GoldVaultUI ? globalThis.GoldVaultUI.createVaultUI({
+    document,
+    vaultStore,
+    core,
+    formatting,
+    copy,
+    getPrice24k,
+    onChange() {
+      vibrate();
+    },
+  }) : null;
 
   function addCurrentPieceToInvoice() {
     const item = preferencesApi.sanitizeInvoiceItem(transactionUi.getTransactionInput());
@@ -210,6 +253,7 @@
   }
 
   async function fetchLiveGoldPrice({ force = false, background = false } = {}) {
+    if (marketUi.isPriceLocked && marketUi.isPriceLocked() && !force) return;
     if (liveFetchInFlight) return;
     liveFetchInFlight = true;
     lastLiveFetchAt = Date.now();
@@ -341,6 +385,10 @@
       auditorUi.render({ price24k, karat: input.karat, taxRate: input.taxRate });
     }
 
+    if (vaultUi) {
+      vaultUi.render();
+    }
+
     lastResult = result;
     lastComparison = comparison;
     lastInvoice = invoice;
@@ -412,9 +460,43 @@
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 
+  function initQuickInput() {
+    const bar = document.getElementById('quickInputBar');
+    if (!bar || !quickInputParser) return;
+
+    bar.addEventListener('input', () => {
+      const parsed = quickInputParser.parseQuickInput(bar.value);
+      if (!parsed.success) return;
+
+      if (parsed.karat) {
+        transactionUi.setKarat(parsed.karat);
+        auditorUi.setKarat(parsed.karat);
+      }
+      if (parsed.weight) {
+        const weightInput = document.getElementById('weight');
+        if (weightInput) weightInput.value = parsed.weight;
+      }
+      if (parsed.quotedTotal) {
+        const quotedInput = document.getElementById('quotedTotal');
+        if (quotedInput) quotedInput.value = parsed.quotedTotal;
+      }
+      if (parsed.hasStones) {
+        const toggle = document.getElementById('hasStonesToggle');
+        if (toggle && !toggle.checked) {
+          toggle.checked = true;
+          const container = document.getElementById('stoneWeightContainer');
+          if (container) container.hidden = false;
+        }
+      }
+      calculate();
+    });
+  }
+
   window.addEventListener('load', () => {
     restoreInputs();
     registerOfflineSupport();
+    initQuickInput();
+    if (vaultUi) vaultUi.render();
     setInterval(refreshLiveInBackground, 15 * 1000);
     document.addEventListener('visibilitychange', refreshLiveInBackground);
 

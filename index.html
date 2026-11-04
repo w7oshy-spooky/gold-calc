@@ -87,7 +87,10 @@
     <section id="livePricePanel" class="input-card market-summary-card" aria-labelledby="liveHeading">
       <div class="flex items-center justify-between gap-2 mb-3">
         <p id="liveHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">🟡 أسعار الذهب المرجعية</p>
-        <button type="button" id="liveRefresh" class="live-refresh-btn" aria-label="تحديث السعر الحي الآن">تحديث</button>
+        <div class="flex items-center gap-1.5">
+          <button type="button" id="lockPriceBtn" class="lock-price-btn" aria-label="تثبيت السعر لحظة الفحص" aria-pressed="false">تثبيت السعر 🔓</button>
+          <button type="button" id="liveRefresh" class="live-refresh-btn" aria-label="تحديث السعر الحي الآن">تحديث</button>
+        </div>
       </div>
 
       <div class="live-status-row flex items-center justify-between gap-2 mb-3 text-xs">
@@ -194,6 +197,15 @@
 
     <section class="input-card item-card space-y-5" aria-labelledby="itemHeading">
       <p id="itemHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">⚖️ مواصفات القطعة</p>
+
+      <!-- Quick Natural Language Input -->
+      <div class="col-span-full pb-3 border-b border-gray-700/60">
+        <label for="quickInputBar" class="flex items-center justify-between text-xs font-bold text-amber-400 mb-1.5">
+          <span class="flex items-center gap-1.5"><span>⚡</span><span>فحص سريع بالكلام المباشر</span></span>
+          <span class="text-[10px] text-gray-400 font-normal">مثال: خاتم 21 وزن 6.5 بـ 2800</span>
+        </label>
+        <input type="text" id="quickInputBar" placeholder="اكتبي أو الصقي: خاتم عيار 21 وزنه 6.5 جرام بـ 2800 ريال" class="quick-input-box text-xs" autocomplete="off">
+      </div>
 
       <div>
         <label for="weight" class="block text-gray-600 text-xs font-bold mb-2">الوزن (جرام)</label>
@@ -343,6 +355,20 @@
           <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">المصنعية للجرام</span><strong id="auditorLaborPerGramOutput" class="text-amber-400 font-mono font-bold">—</strong></div>
         </div>
         <div id="auditorBenchmarkBadge" class="benchmark-badge benchmark-neutral">أدخل عرض المحل لكشف المصنعية</div>
+
+        <!-- Bargaining Advice Container -->
+        <div id="bargainingAdviceContainer" class="bargain-advice-card mt-3" hidden>
+          <div class="flex items-center justify-between mb-1.5 text-xs">
+            <span class="text-amber-400 font-bold">💡 نطاق السعر العادل:</span>
+            <strong id="fairPriceRangeOutput" class="font-mono text-white">—</strong>
+          </div>
+          <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-gray-200 mt-2">
+            <p class="text-[10px] text-gray-400 mb-1">جملتك المقترحة للبائع في المحل:</p>
+            <p id="bargainAdviceText" class="font-bold text-amber-300 leading-relaxed text-xs">—</p>
+            <button type="button" id="copyBargainAdviceBtn" class="mt-2 text-[10px] font-bold px-2 py-1 rounded bg-amber-400 text-slate-900">📋 نسخ الجملة</button>
+          </div>
+          <button type="button" id="shareCardBtn" class="action-btn action-btn-primary w-full mt-2.5 text-xs">📸 مشاركة الفحص كصورة (واتساب وسناب)</button>
+        </div>
       </div>
       <p class="mt-2 text-[10px] leading-relaxed text-gray-400">المقارنة مرجعية فقط؛ قد تختلف عروض المحلات بسبب المصنعية والأحجار والعروض والسياسة التجارية والمعاملة الضريبية.</p>
     </section>
@@ -360,6 +386,81 @@
       <p id="actionStatus" class="status-note mt-2 text-[11px] font-bold text-center text-emerald-700" aria-live="polite"></p>
       <p class="text-[10px] leading-relaxed text-gray-400 text-center">تُحفظ إدخالاتك على هذا الجهاز فقط لتجدها عند العودة.</p>
     </section>
+
+    <!-- Vault & Zakat Card -->
+    <section id="vaultSection" class="input-card vault-card" aria-labelledby="vaultHeading">
+      <div class="flex items-center justify-between gap-2 mb-3">
+        <p id="vaultHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">💎 خزانتي والزكاة</p>
+        <button type="button" id="openVaultModalBtn" class="action-btn action-btn-primary text-xs py-1 px-3">➕ إضافة قطعة</button>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-3 text-center">
+        <div class="p-2 rounded-xl bg-slate-900 border border-slate-800">
+          <span class="block text-[10px] text-gray-400">إجمالي الذهب</span>
+          <strong id="vaultTotalWeight" class="text-xs font-bold text-white">0.00 جرام</strong>
+        </div>
+        <div class="p-2 rounded-xl bg-slate-900 border border-slate-800">
+          <span class="block text-[10px] text-gray-400">القيمة السوقية</span>
+          <strong id="vaultMarketValue" class="text-xs font-bold text-amber-400">0.00 ر.س</strong>
+        </div>
+      </div>
+      <div id="vaultZakatNotice" class="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-800/80 mb-3 text-xs" hidden>
+        <div class="flex items-center justify-between">
+          <span class="text-emerald-300 font-bold">✨ بلغ النصاب الشرعي (85 جم)</span>
+          <span class="text-[10px] text-emerald-400 font-bold">الزكاة: <strong id="vaultZakatAmount" class="font-mono text-sm text-emerald-200">0.00 ر.س</strong></span>
+        </div>
+      </div>
+      <p id="vaultEmptyMsg" class="text-[11px] leading-relaxed text-gray-400 text-center py-2">خزانتك خالية. أضيفي قطعك الذهبية لتتابعي قيمتها اللحظية وزكاتها.</p>
+      <ul id="vaultList" class="space-y-1.5" aria-label="قطع الذهب في الخزانة"></ul>
+    </section>
+
+    <!-- Vault Modal Dialog -->
+    <div id="vaultItemModal" class="vault-modal-backdrop" hidden>
+      <div class="vault-modal-dialog space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+          <h3 class="text-sm font-bold text-white">إضافة قطعة ذهب للخزانة</h3>
+          <button type="button" id="closeVaultModalBtn" class="text-gray-400 hover:text-white p-1">✕</button>
+        </div>
+        <div>
+          <label for="vaultPieceName" class="block text-[11px] text-gray-300 mb-1 font-bold">اسم أو وصف القطعة</label>
+          <input type="text" id="vaultPieceName" placeholder="مثال: سوارة لازوردي عيار 21" class="quick-input-box text-xs">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="vaultPieceWeight" class="block text-[11px] text-gray-300 mb-1 font-bold">الوزن (جرام)</label>
+            <input type="number" id="vaultPieceWeight" step="0.01" min="0" placeholder="0.00" class="quick-input-box text-xs">
+          </div>
+          <div>
+            <label for="vaultPieceKarat" class="block text-[11px] text-gray-300 mb-1 font-bold">العيار</label>
+            <select id="vaultPieceKarat" class="quick-input-box text-xs">
+              <option value="18">18 قيراط</option>
+              <option value="21" selected>21 قيراط</option>
+              <option value="22">22 قيراط</option>
+              <option value="24">24 قيراط</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="vaultPiecePrice" class="block text-[11px] text-gray-300 mb-1 font-bold">سعر الشراء التقريبي</label>
+            <input type="number" id="vaultPiecePrice" step="0.01" min="0" placeholder="0.00" class="quick-input-box text-xs">
+          </div>
+          <div>
+            <label for="vaultPieceCategory" class="block text-[11px] text-gray-300 mb-1 font-bold">الغرض</label>
+            <select id="vaultPieceCategory" class="quick-input-box text-xs">
+              <option value="personal_jewelry">زينة شخصية (معفاة)</option>
+              <option value="investment_gold">ادخار/استثمار (تجب الزكاة)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="vaultPiecePhoto" class="block text-[11px] text-gray-300 mb-1 font-bold">صورة القطعة (اختياري)</label>
+          <input type="file" id="vaultPiecePhoto" accept="image/*" class="text-xs text-gray-400 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-slate-800 file:text-amber-400 file:text-xs">
+          <img id="vaultPhotoPreview" alt="معاينة الصورة" class="w-16 h-16 object-cover rounded-lg border border-slate-700 mt-2" hidden>
+        </div>
+        <p id="vaultStatus" class="text-xs text-red-400 font-bold"></p>
+        <button type="button" id="saveVaultPieceBtn" class="action-btn action-btn-primary w-full text-xs py-2 mt-2">حفظ في الخزانة</button>
+      </div>
+    </div>
 
   <div class="bottom-receipt dashboard-result">
     <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="ملخص السعر">
@@ -385,6 +486,7 @@
   </main>
 
   <script src="js/core/price-converter.js"></script>
+  <script src="js/core/quick-input-parser.js"></script>
   <script src="gold-calculator.js"></script>
   <script src="js/i18n/translations.js"></script>
   <script src="js/ui/formatting.js"></script>
@@ -395,10 +497,13 @@
   <script src="js/ui/quote-comparison-ui.js"></script>
   <script src="js/ui/summary-ui.js"></script>
   <script src="js/state/preferences-store.js"></script>
+  <script src="js/state/vault-store.js"></script>
   <script src="js/ui/share-ui.js"></script>
+  <script src="js/ui/card-canvas-generator.js"></script>
   <script src="js/ui/invoice-ui.js"></script>
   <script src="js/ui/price-chart-ui.js"></script>
   <script src="js/ui/auditor-ui.js"></script>
+  <script src="js/ui/vault-ui.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

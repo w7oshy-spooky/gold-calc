@@ -28,7 +28,34 @@
       stoneWeightContainer: el('stoneWeightContainer'),
       stoneLossCallout: el('stoneLossCallout'),
       stoneLossAmount: el('stoneLossAmount'),
+      bargainingAdviceContainer: el('bargainingAdviceContainer'),
+      fairPriceRangeOutput: el('fairPriceRangeOutput'),
+      bargainAdviceText: el('bargainAdviceText'),
+      copyBargainAdviceBtn: el('copyBargainAdviceBtn'),
+      shareCardBtn: el('shareCardBtn'),
     };
+
+    let latestAudit = null;
+    let latestAdvice = null;
+
+    if (elements.copyBargainAdviceBtn && elements.bargainAdviceText) {
+      elements.copyBargainAdviceBtn.addEventListener('click', () => {
+        const text = elements.bargainAdviceText.textContent;
+        if (text && navigator.clipboard) {
+          navigator.clipboard.writeText(text).then(() => {
+            const original = elements.copyBargainAdviceBtn.textContent;
+            elements.copyBargainAdviceBtn.textContent = '✓ تم النسخ';
+            setTimeout(() => { elements.copyBargainAdviceBtn.textContent = original; }, 2000);
+          }).catch(() => {});
+        }
+      });
+    }
+
+    if (elements.shareCardBtn) {
+      elements.shareCardBtn.addEventListener('click', () => {
+        onChange({ type: 'share-card', audit: latestAudit, advice: latestAdvice });
+      });
+    }
 
     let currentKarat = 21;
     const karatButtons = elements.panel
@@ -83,6 +110,8 @@
       });
 
       if (!audit.available) {
+        latestAudit = null;
+        latestAdvice = null;
         if (elements.rawGold) elements.rawGold.textContent = '—';
         if (elements.vat) elements.vat.textContent = '—';
         if (elements.labor) elements.labor.textContent = '—';
@@ -91,7 +120,9 @@
           elements.benchmarkBadge.textContent = copy.comparePrompt || 'أدخل العرض والوزن';
           elements.benchmarkBadge.className = 'benchmark-badge benchmark-neutral';
         }
+        if (elements.bargainingAdviceContainer) elements.bargainingAdviceContainer.hidden = true;
       } else {
+        latestAudit = audit;
         if (elements.rawGold) elements.rawGold.textContent = formatting.formatMoney(audit.rawMetalCost);
         if (elements.vat) elements.vat.textContent = formatting.formatMoney(audit.vat);
         if (elements.labor) elements.labor.textContent = formatting.formatMoney(audit.laborCost);
@@ -102,6 +133,23 @@
           const label = copy.benchmarks?.[badgeKey] || badgeKey;
           elements.benchmarkBadge.textContent = label;
           elements.benchmarkBadge.className = `benchmark-badge benchmark-${badgeKey}`;
+        }
+
+        if (core.generateBargainingAdvice) {
+          latestAdvice = core.generateBargainingAdvice({ audit });
+          if (latestAdvice && latestAdvice.available && elements.bargainingAdviceContainer) {
+            elements.bargainingAdviceContainer.hidden = false;
+            if (elements.fairPriceRangeOutput) {
+              elements.fairPriceRangeOutput.textContent = `${formatting.formatSar(latestAdvice.minFairPrice)} — ${formatting.formatSar(latestAdvice.maxFairPrice)}`;
+            }
+            if (elements.bargainAdviceText) {
+              const offerStr = formatting.formatMoney(Math.round(latestAdvice.suggestedOffer));
+              const template = copy.adviceLabels?.[latestAdvice.adviceTemplateKey]
+                || copy.adviceLabels?.advice_negotiate_high
+                || 'احسبها لي بـ {offer} وأتمم معك الآن.';
+              elements.bargainAdviceText.textContent = template.replace('{offer}', offerStr);
+            }
+          }
         }
       }
 
@@ -129,7 +177,12 @@
       return audit;
     }
 
-    return { render, setKarat };
+    return {
+      render,
+      setKarat,
+      getLatestAudit: () => latestAudit,
+      getLatestAdvice: () => latestAdvice,
+    };
   }
 
   return { createAuditorUI };

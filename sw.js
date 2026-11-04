@@ -1,7 +1,7 @@
 'use strict';
 
 // Bump the version when files are added to or removed from APP_SHELL.
-const CACHE_NAME = 'gold-calc-shell-v6';
+const CACHE_NAME = 'gold-calc-shell-v7';
 const NETWORK_TIMEOUT_MS = 3000;
 
 const APP_SHELL = [
@@ -18,6 +18,7 @@ const APP_SHELL = [
   'fonts/ibm-plex-sans-arabic-500.woff2',
   'fonts/ibm-plex-sans-arabic-700.woff2',
   'js/core/price-converter.js',
+  'js/core/quick-input-parser.js',
   'gold-calculator.js',
   'js/i18n/translations.js',
   'js/ui/formatting.js',
@@ -28,10 +29,13 @@ const APP_SHELL = [
   'js/ui/quote-comparison-ui.js',
   'js/ui/summary-ui.js',
   'js/state/preferences-store.js',
+  'js/state/vault-store.js',
   'js/ui/share-ui.js',
+  'js/ui/card-canvas-generator.js',
   'js/ui/invoice-ui.js',
   'js/ui/price-chart-ui.js',
   'js/ui/auditor-ui.js',
+  'js/ui/vault-ui.js',
   'js/app.js',
 ];
 

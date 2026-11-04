@@ -307,6 +307,115 @@
     };
   }
 
+  const BENCHMARK_RANGES = Object.freeze({
+    plain: { min: 15, max: 25 },
+    gulf: { min: 25, max: 45 },
+    italian: { min: 45, max: 80 },
+    luxury: { min: 80, max: 150 },
+  });
+
+  const NISAB_GOLD_24K_GRAMS = 85;
+
+  function generateBargainingAdvice({ audit, targetCategory = null } = {}) {
+    if (!audit || !audit.available) {
+      return { available: false };
+    }
+
+    const category = targetCategory && BENCHMARK_RANGES[targetCategory]
+      ? targetCategory
+      : (audit.benchmarkCategory === 'below_spot' ? 'plain' : audit.benchmarkCategory);
+
+    const range = BENCHMARK_RANGES[category] || BENCHMARK_RANGES.gulf;
+    const rawMetalCost = audit.rawMetalCost;
+    const weight = audit.weight;
+    const taxRate = audit.taxRate;
+    const vatMultiplier = 1 + (taxRate / 100);
+
+    const minFairLabor = range.min * weight;
+    const maxFairLabor = range.max * weight;
+    const minFairPrice = (rawMetalCost + minFairLabor) * vatMultiplier;
+    const maxFairPrice = (rawMetalCost + maxFairLabor) * vatMultiplier;
+    const suggestedOffer = (minFairPrice + maxFairPrice) / 2;
+
+    const laborPerGram = audit.laborPerGram;
+    let verdictKey = 'fair';
+    let adviceTemplateKey = 'advice_fair';
+
+    if (laborPerGram <= 25) {
+      verdictKey = 'great_deal';
+      adviceTemplateKey = 'advice_great_deal';
+    } else if (laborPerGram <= 45) {
+      verdictKey = 'fair';
+      adviceTemplateKey = 'advice_fair';
+    } else if (laborPerGram <= 80) {
+      verdictKey = 'moderate_high';
+      adviceTemplateKey = 'advice_negotiate_moderate';
+    } else {
+      verdictKey = 'overpriced';
+      adviceTemplateKey = 'advice_negotiate_high';
+    }
+
+    const potentialSavings = Math.max(0, audit.quotedTotal - maxFairPrice);
+
+    return {
+      available: true,
+      quotedTotal: audit.quotedTotal,
+      rawMetalCost,
+      weight,
+      laborPerGram,
+      targetBenchmark: category,
+      minFairPrice,
+      maxFairPrice,
+      suggestedOffer,
+      potentialSavings,
+      verdictKey,
+      adviceTemplateKey,
+    };
+  }
+
+  function calculateZakat({ items = [], price24k = 0, exemptPersonalUse = true, hawlMet = true } = {}) {
+    const safePrice24k = sanitizeNonNegative(price24k);
+    const itemList = Array.isArray(items) ? items : [];
+
+    let totalWeight = 0;
+    let zakatEligibleWeight24 = 0;
+    let totalMarketValueSar = 0;
+
+    for (const item of itemList) {
+      const weight = sanitizeNonNegative(item.weight);
+      const karat = normalizeKarat(item.karat);
+      const category = item.category || 'personal_jewelry';
+      const purity = karat / 24;
+      const eq24 = weight * purity;
+      const marketVal = eq24 * safePrice24k;
+
+      totalWeight += weight;
+      totalMarketValueSar += marketVal;
+
+      const isExempt = exemptPersonalUse && category === 'personal_jewelry';
+      if (!isExempt) {
+        zakatEligibleWeight24 += eq24;
+      }
+    }
+
+    const nisabReached = zakatEligibleWeight24 >= NISAB_GOLD_24K_GRAMS;
+    const isObligatory = nisabReached && Boolean(hawlMet) && safePrice24k > 0;
+    const zakatDueGrams24 = isObligatory ? (zakatEligibleWeight24 * 0.025) : 0;
+    const zakatDueSar = isObligatory ? (zakatDueGrams24 * safePrice24k) : 0;
+
+    return {
+      totalWeight,
+      zakatEligibleWeight24,
+      nisabGrams24: NISAB_GOLD_24K_GRAMS,
+      nisabReached,
+      hawlMet: Boolean(hawlMet),
+      exemptPersonalUse: Boolean(exemptPersonalUse),
+      totalMarketValueSar,
+      zakatDueGrams24,
+      zakatDueSar,
+    };
+  }
+
   return {
     normalizeMode,
     clampTaxRate,
@@ -319,6 +428,10 @@
     auditCounterQuote,
     calculateStoneDeduction,
     calculateTradeIn,
+    generateBargainingAdvice,
+    calculateZakat,
+    BENCHMARK_RANGES,
+    NISAB_GOLD_24K_GRAMS,
     COUNTRY_VAT_RATES,
     defaultTaxRateForKarat,
   };
