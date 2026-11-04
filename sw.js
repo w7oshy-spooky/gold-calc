@@ -1,7 +1,7 @@
 'use strict';
 
 // Bump the version when files are added to or removed from APP_SHELL.
-const CACHE_NAME = 'gold-calc-shell-v12';
+const CACHE_NAME = 'gold-calc-shell-v13';
 const NETWORK_TIMEOUT_MS = 3000;
 
 const APP_SHELL = [

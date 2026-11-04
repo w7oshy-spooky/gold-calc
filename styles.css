@@ -378,8 +378,9 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
 .lock-price-btn.active,.lock-price-btn.locked{background:#d97706;border-color:#f59e0b;color:#0f172a}
 .bargain-advice-card{background:#131a24;border:1px solid #d4af3740;border-radius:0.85rem;padding:0.85rem}
 .vault-card{background:var(--bg-card);border:1px solid var(--border-color)}
-.vault-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem}
-.vault-modal-dialog{background:#131822;border:1px solid #2d3748;border-radius:1.25rem;max-width:28rem;width:100%;max-height:90vh;overflow-y:auto;padding:1.25rem}
+.vault-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:9999;display:flex!important;align-items:center;justify-content:center;padding:1rem}
+.vault-modal-backdrop[hidden]{display:none!important}
+.vault-modal-dialog{background:#131822;border:1px solid #2d3748;border-radius:1.25rem;max-width:28rem;width:100%;max-height:90vh;overflow-y:auto;padding:1.25rem;box-shadow:0 25px 50px -12px rgba(0,0,0,0.7)}
 
 /* Mobile Bottom Navigation Bar */
 .mobile-bottom-nav{
@@ -427,10 +428,10 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
 
 /* Tab Content Visibility Rules on Mobile (< 1100px) */
 @media(max-width:1099px){
-  main[data-active-tab="auditor"] > *:not([data-tab~="auditor"]):not([id^="shareModal"]):not([id^="vaultItemModal"]),
-  main[data-active-tab="calc"] > *:not([data-tab~="calc"]):not(.dashboard-result):not([id^="shareModal"]):not([id^="vaultItemModal"]),
-  main[data-active-tab="market"] > *:not([data-tab~="market"]):not([id^="shareModal"]):not([id^="vaultItemModal"]),
-  main[data-active-tab="vault"] > *:not([data-tab~="vault"]):not([id^="shareModal"]):not([id^="vaultItemModal"]) {
+  main[data-active-tab="auditor"] > *:not([data-tab~="auditor"]):not(.vault-modal-backdrop),
+  main[data-active-tab="calc"] > *:not([data-tab~="calc"]):not(.dashboard-result):not(.vault-modal-backdrop),
+  main[data-active-tab="market"] > *:not([data-tab~="market"]):not(.vault-modal-backdrop),
+  main[data-active-tab="vault"] > *:not([data-tab~="vault"]):not(.vault-modal-backdrop) {
     display:none!important;
   }
 

@@ -445,8 +445,32 @@
       <ul id="vaultList" class="space-y-1.5" aria-label="Vault gold pieces"></ul>
     </section>
 
-    <!-- Vault Modal Dialog -->
-    <div id="vaultItemModal" class="vault-modal-backdrop" hidden>
+  <div class="bottom-receipt dashboard-result" data-tab="calc">
+    <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="Price summary">
+      <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3">
+        <div class="flex justify-between text-[11px]"><span id="summaryPrimaryLabel" class="text-slate-400">Gold cost</span><span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span></div>
+        <div class="flex justify-between text-[11px]"><span id="summarySecondaryLabel" class="text-slate-400">Workmanship + margin</span><span class="text-slate-200 font-mono" id="laborCostOutput">0.00</span></div>
+        <div id="summarySubtotalRow" class="flex justify-between text-[11px]"><span id="summarySubtotalLabel" class="text-slate-400">Before VAT</span><span class="text-slate-200 font-mono" id="subtotalOutput">0.00</span></div>
+        <div id="summaryTaxRow" class="flex justify-between text-[11px]"><span class="text-red-400">VAT (<span id="taxValueLabel">15</span>%)</span><span class="text-red-300 font-mono">+<span id="vatOutput">0.00</span></span></div>
+      </div>
+      <div id="summaryInvoiceRow" class="flex justify-between items-center text-[11px] mb-3 px-2 py-1.5 rounded-lg bg-slate-800" hidden><span id="summaryInvoiceLabel" class="text-amber-300 font-bold">—</span><span class="text-white font-mono font-bold" id="summaryInvoiceNet">0.00</span></div>
+      <div class="border-t border-slate-700 pt-3 flex justify-between items-center">
+        <div>
+          <p id="finalAmountLabel" class="text-amber-500 text-[10px] uppercase font-bold tracking-widest mb-0.5">Final amount</p>
+          <div class="flex items-baseline gap-1"><span class="text-3xl font-black font-mono live-val" id="finalTotalOutput">0.00</span><span class="text-sm text-slate-400">SAR</span></div>
+        </div>
+        <div class="bg-slate-800 px-3 py-2 rounded-xl text-center">
+          <p class="text-[10px] text-slate-500 mb-0.5">Weight / Karat</p>
+          <p class="text-sm font-bold text-amber-400"><span id="summaryWeight">15</span>g · <span id="summaryKarat">21</span>K</p>
+        </div>
+      </div>
+    </section>
+  </div>
+  </main>
+
+  <!-- Modals and Overlays (Outside main content to prevent tab overflow/clipping) -->
+  <!-- Vault Modal Dialog -->
+  <div id="vaultItemModal" class="vault-modal-backdrop" hidden>
       <div class="vault-modal-dialog space-y-3">
         <div class="flex items-center justify-between border-b border-slate-700 pb-2">
           <h3 class="text-sm font-bold text-white">Add Gold Piece to Vault</h3>
@@ -636,29 +660,6 @@
         </div>
       </div>
     </div>
-
-  <div class="bottom-receipt dashboard-result" data-tab="calc">
-    <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="Price summary">
-      <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3">
-        <div class="flex justify-between text-[11px]"><span id="summaryPrimaryLabel" class="text-slate-400">Gold cost</span><span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span></div>
-        <div class="flex justify-between text-[11px]"><span id="summarySecondaryLabel" class="text-slate-400">Workmanship + margin</span><span class="text-slate-200 font-mono" id="laborCostOutput">0.00</span></div>
-        <div id="summarySubtotalRow" class="flex justify-between text-[11px]"><span id="summarySubtotalLabel" class="text-slate-400">Before VAT</span><span class="text-slate-200 font-mono" id="subtotalOutput">0.00</span></div>
-        <div id="summaryTaxRow" class="flex justify-between text-[11px]"><span class="text-red-400">VAT (<span id="taxValueLabel">15</span>%)</span><span class="text-red-300 font-mono">+<span id="vatOutput">0.00</span></span></div>
-      </div>
-      <div id="summaryInvoiceRow" class="flex justify-between items-center text-[11px] mb-3 px-2 py-1.5 rounded-lg bg-slate-800" hidden><span id="summaryInvoiceLabel" class="text-amber-300 font-bold">—</span><span class="text-white font-mono font-bold" id="summaryInvoiceNet">0.00</span></div>
-      <div class="border-t border-slate-700 pt-3 flex justify-between items-center">
-        <div>
-          <p id="finalAmountLabel" class="text-amber-500 text-[10px] uppercase font-bold tracking-widest mb-0.5">Final amount</p>
-          <div class="flex items-baseline gap-1"><span class="text-3xl font-black font-mono live-val" id="finalTotalOutput">0.00</span><span class="text-sm text-slate-400">SAR</span></div>
-        </div>
-        <div class="bg-slate-800 px-3 py-2 rounded-xl text-center">
-          <p class="text-[10px] text-slate-500 mb-0.5">Weight / Karat</p>
-          <p class="text-sm font-bold text-amber-400"><span id="summaryWeight">15</span>g · <span id="summaryKarat">21</span>K</p>
-        </div>
-      </div>
-    </section>
-  </div>
-  </main>
 
   <!-- Mobile Bottom Navigation Bar (< 1100px) -->
   <nav id="bottomNavBar" class="mobile-bottom-nav" aria-label="Main Navigation">
