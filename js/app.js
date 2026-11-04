@@ -120,6 +120,108 @@
     calculate();
   }
 
+  let activeShareBlob = null;
+  let activeShareText = '';
+  let activeShareFilename = 'gold-card.png';
+  let activeShareTitle = 'حاسبة الذهب';
+
+  const shareModal = document.getElementById('shareModal');
+  const closeShareModalBtn = document.getElementById('closeShareModalBtn');
+  const shareModalPreview = document.getElementById('shareModalPreview');
+  const shareModalNativeBtn = document.getElementById('shareModalNativeBtn');
+  const shareModalDownloadBtn = document.getElementById('shareModalDownloadBtn');
+  const shareModalCopyBtn = document.getElementById('shareModalCopyBtn');
+  const shareModalStatus = document.getElementById('shareModalStatus');
+
+  function showShareModalStatus(msg) {
+    if (shareModalStatus) {
+      shareModalStatus.textContent = msg;
+      setTimeout(() => {
+        if (shareModalStatus) shareModalStatus.textContent = '';
+      }, 3000);
+    }
+  }
+
+  function openShareModal({ blob, summaryText, filename, title }) {
+    activeShareBlob = blob;
+    activeShareText = summaryText || '';
+    activeShareFilename = filename || `gold-calc-${Date.now()}.png`;
+    activeShareTitle = title || copy.shareLabels?.title || 'حاسبة الذهب';
+
+    if (shareModal && shareModalPreview && blob) {
+      if (shareModalPreview.src && shareModalPreview.src.startsWith('blob:')) {
+        URL.revokeObjectURL(shareModalPreview.src);
+      }
+      shareModalPreview.src = URL.createObjectURL(blob);
+      shareModal.hidden = false;
+      shareModal.classList.remove('hidden');
+    }
+  }
+
+  function closeShareModal() {
+    if (shareModal) {
+      shareModal.hidden = true;
+      shareModal.classList.add('hidden');
+    }
+    if (shareModalPreview && shareModalPreview.src && shareModalPreview.src.startsWith('blob:')) {
+      URL.revokeObjectURL(shareModalPreview.src);
+      shareModalPreview.src = '';
+    }
+  }
+
+  if (closeShareModalBtn) {
+    closeShareModalBtn.addEventListener('click', closeShareModal);
+  }
+
+  if (shareModalNativeBtn) {
+    shareModalNativeBtn.addEventListener('click', async () => {
+      vibrate();
+      if (!activeShareBlob || !cardCanvasGenerator) return;
+      try {
+        const res = await cardCanvasGenerator.shareOrDownloadCard({
+          blob: activeShareBlob,
+          filename: activeShareFilename,
+          title: activeShareTitle,
+          navigatorRef: globalThis.navigator,
+          windowRef: globalThis.window,
+        });
+        if (res.method === 'download') {
+          showShareModalStatus(copy.shareModalDownloadBtn ? `${copy.shareModalDownloadBtn} ✓` : 'تم التحميل ✓');
+        }
+      } catch (e) {
+        console.error('Share native error', e);
+      }
+    });
+  }
+
+  if (shareModalDownloadBtn) {
+    shareModalDownloadBtn.addEventListener('click', () => {
+      vibrate();
+      if (!activeShareBlob) return;
+      const url = URL.createObjectURL(activeShareBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = activeShareFilename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showShareModalStatus(copy.shareModalDownloadBtn ? `${copy.shareModalDownloadBtn} ✓` : 'تم التحميل ✓');
+    });
+  }
+
+  if (shareModalCopyBtn) {
+    shareModalCopyBtn.addEventListener('click', async () => {
+      vibrate();
+      if (activeShareText && shareUi && typeof shareUi.copyToClipboard === 'function') {
+        const ok = await shareUi.copyToClipboard(activeShareText);
+        if (ok) {
+          showShareModalStatus(copy.shareModalCopied || 'تم نسخ النص بنجاح ✓');
+        }
+      }
+    });
+  }
+
   const shareUi = shareUiApi.createShareUI({
     document,
     copy,
@@ -136,6 +238,53 @@
         copy,
         formatting,
       });
+    },
+    async onShareCard() {
+      vibrate();
+      const currentPrice24k = getPrice24k();
+      if (!lastResult && !lastInvoice?.count) {
+        shareUi.showStatus(copy.shareNeedsPrice, 'error');
+        return;
+      }
+      const summaryText = shareUiApi.buildSummaryText({
+        result: lastResult,
+        comparison: lastComparison,
+        invoice: lastInvoice,
+        quotedTotal: transactionUi.getTransactionInput().quotedTotal,
+        price24k: currentPrice24k,
+        copy,
+        formatting,
+      });
+
+      if (cardCanvasGenerator) {
+        try {
+          const blob = await cardCanvasGenerator.generateCardBlob({
+            result: lastResult,
+            invoice: lastInvoice,
+            copy,
+            locale,
+            documentRef: document,
+          });
+
+          const filename = `gold-calc-${Date.now()}.png`;
+          const title = copy.shareLabels?.title || 'حاسبة الذهب';
+
+          openShareModal({ blob, summaryText, filename, title });
+
+          await cardCanvasGenerator.shareOrDownloadCard({
+            blob,
+            filename,
+            title,
+            navigatorRef: globalThis.navigator,
+            windowRef: globalThis.window,
+          });
+        } catch (err) {
+          console.error('Failed to generate calculation card', err);
+          shareUi.share();
+        }
+      } else {
+        shareUi.share();
+      }
     },
     onReset() {
       vibrate();
@@ -190,10 +339,13 @@
               locale,
               documentRef: document,
             });
+            const filename = `gold-audit-${Date.now()}.png`;
+            const title = copy.shareLabels?.title || 'حاسبة الذهب';
+            openShareModal({ blob, summaryText: '', filename, title });
             await cardCanvasGenerator.shareOrDownloadCard({
               blob,
-              filename: `gold-audit-${Date.now()}.png`,
-              title: copy.shareLabels?.title || 'حاسبة الذهب',
+              filename,
+              title,
               navigatorRef: globalThis.navigator,
               windowRef: globalThis.window,
             });

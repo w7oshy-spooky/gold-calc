@@ -69,6 +69,7 @@
     navigator: nav = (typeof globalThis !== 'undefined' ? globalThis.navigator : null),
     getSummary,
     onShare,
+    onShareCard,
     onReset = () => {},
     setTimeoutImpl = setTimeout,
     clearTimeoutImpl = clearTimeout,
@@ -187,7 +188,11 @@
     }
 
     shareButton.addEventListener('click', () => {
-      share();
+      if (typeof onShareCard === 'function') {
+        onShareCard();
+      } else {
+        share();
+      }
     });
 
     resetButton.addEventListener('click', () => {

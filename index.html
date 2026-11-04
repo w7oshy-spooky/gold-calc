@@ -462,6 +462,36 @@
       </div>
     </div>
 
+    <!-- Share Card Preview Modal -->
+    <div id="shareModal" class="vault-modal-backdrop" hidden>
+      <div class="vault-modal-dialog space-y-3 max-w-sm">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+          <h3 id="shareModalHeading" class="text-sm font-bold text-amber-400">بطاقة المشاركة الفاخرة</h3>
+          <button type="button" id="closeShareModalBtn" class="text-gray-400 hover:text-white p-1 text-base font-bold">✕</button>
+        </div>
+        <div class="flex justify-center bg-black/60 rounded-xl p-2 border border-slate-800">
+          <img id="shareModalPreview" src="" alt="معاينة بطاقة الذهب" class="max-h-[46vh] rounded-lg shadow-xl object-contain w-auto">
+        </div>
+        <div class="space-y-2 pt-1">
+          <button type="button" id="shareModalNativeBtn" class="action-btn action-btn-primary w-full py-2.5 text-xs font-bold flex items-center justify-center gap-2">
+            <span>📸</span>
+            <span id="shareModalNativeBtnLabel">مشاركة الصورة</span>
+          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="shareModalDownloadBtn" class="action-btn text-xs py-2 flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl">
+              <span>⬇️</span>
+              <span id="shareModalDownloadBtnLabel">تحميل PNG</span>
+            </button>
+            <button type="button" id="shareModalCopyBtn" class="action-btn text-xs py-2 flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl">
+              <span>📋</span>
+              <span id="shareModalCopyBtnLabel">نسخ النص</span>
+            </button>
+          </div>
+          <p id="shareModalStatus" class="text-center text-[11px] text-amber-400 min-h-[1.25rem]"></p>
+        </div>
+      </div>
+    </div>
+
   <div class="bottom-receipt dashboard-result">
     <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="ملخص السعر">
       <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3">
