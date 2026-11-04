@@ -260,7 +260,10 @@
       </div>
 
       <div class="bg-gradient-to-l from-amber-50 to-yellow-50 rounded-xl p-3 border border-amber-100 flex justify-between items-center">
-        <span class="text-gray-500 text-xs font-bold">Gram price / <span id="selectedKaratLabel" class="text-amber-600 font-black">21</span>K</span>
+        <div class="flex items-center gap-1.5">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span class="text-gray-500 text-xs font-bold">Gram price / <span id="selectedKaratLabel" class="text-amber-600 font-black">21</span>K</span>
+        </div>
         <div><span class="text-amber-700 font-black text-base live-val" id="karatPriceOutput">0.00</span> <span class="text-amber-400 text-xs">SAR</span></div>
       </div>
 
@@ -364,7 +367,7 @@
       <p class="mt-2 text-[10px] leading-relaxed text-gray-400">Every piece is priced at the current market price and keeps its own karat, weight, workmanship and VAT.</p>
     </section>
 
-    <section id="comparisonPanel" class="input-card comparison-card" data-tab="auditor" aria-labelledby="compareHeading">
+    <section id="comparisonPanel" class="input-card comparison-card" data-tab="auditor calc" aria-labelledby="compareHeading">
       <p id="compareHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔎 Shop Quote Comparison</p>
       <label id="quotedTotalLabel" for="quotedTotal" class="block text-gray-600 text-xs font-bold mb-2">Shop quoted total (SAR)</label>
       <input type="number" id="quotedTotal" min="0" step="0.01" placeholder="Enter the quote to compare" inputmode="decimal" autocomplete="off" class="num-input">
@@ -382,7 +385,7 @@
         <p class="text-amber-400 text-[11px] font-bold uppercase tracking-widest mb-2">⚡ Quote Deconstruction (Stealth Auditor)</p>
         <div class="grid grid-cols-2 gap-2 text-xs mb-2.5">
           <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">Pure Gold Value</span><strong id="auditorRawGoldOutput" class="text-slate-200 font-mono">—</strong></div>
-          <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">VAT (15%)</span><strong id="auditorVatOutput" class="text-slate-200 font-mono">—</strong></div>
+          <div class="auditor-metric"><span id="auditorVatLabel" class="text-gray-400 block text-[10px]">VAT (15%)</span><strong id="auditorVatOutput" class="text-slate-200 font-mono">—</strong></div>
           <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">Total Labor & Margin</span><strong id="auditorLaborOutput" class="text-slate-200 font-mono">—</strong></div>
           <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">Labor / gram</span><strong id="auditorLaborPerGramOutput" class="text-amber-400 font-mono font-bold">—</strong></div>
         </div>
@@ -409,7 +412,7 @@
       <strong class="text-gray-700">Note:</strong> LIVE uses an indicative XAU/USD raw-gold spot quote converted to Saudi riyals. Results are estimates; actual shop execution can differ because of bid/ask spreads, workmanship, stones, promotions and tax treatment.
     </aside>
 
-    <section class="input-card actions-card" data-tab="calc" aria-labelledby="actionsHeading">
+    <section class="input-card actions-card" data-tab="auditor calc" aria-labelledby="actionsHeading">
       <p id="actionsHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">⚡ Quick Actions</p>
       <div class="grid grid-cols-2 gap-2">
         <button type="button" id="shareSummary" class="action-btn action-btn-primary">📋 Share summary</button>
@@ -468,7 +471,7 @@
       </div>
     </section>
 
-  <div class="bottom-receipt dashboard-result" data-tab="calc">
+  <div class="bottom-receipt dashboard-result" data-tab="auditor calc">
     <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="Price summary">
       <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3">
         <div class="flex justify-between text-[11px]"><span id="summaryPrimaryLabel" class="text-slate-400">Gold cost</span><span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span></div>

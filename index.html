@@ -260,7 +260,10 @@
       </div>
 
       <div class="bg-gradient-to-l from-amber-50 to-yellow-50 rounded-xl p-3 border border-amber-100 flex justify-between items-center">
-        <span class="text-gray-500 text-xs font-bold">سعر الجرام / عيار <span id="selectedKaratLabel" class="text-amber-600 font-black">21</span>ق</span>
+        <div class="flex items-center gap-1.5">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span class="text-gray-500 text-xs font-bold">سعر الجرام / عيار <span id="selectedKaratLabel" class="text-amber-600 font-black">21</span>ق</span>
+        </div>
         <div><span class="text-amber-700 font-black text-base live-val" id="karatPriceOutput">0.00</span> <span class="text-amber-400 text-xs">ر.س</span></div>
       </div>
 
@@ -364,7 +367,7 @@
       <p class="mt-2 text-[10px] leading-relaxed text-gray-400">تُحسب كل القطع بسعر السوق الحالي، ويبقى للقطعة عيارها ووزنها ومصنعيتها وضريبتها.</p>
     </section>
 
-    <section id="comparisonPanel" class="input-card comparison-card" data-tab="auditor" aria-labelledby="compareHeading">
+    <section id="comparisonPanel" class="input-card comparison-card" data-tab="auditor calc" aria-labelledby="compareHeading">
       <p id="compareHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔎 مقارنة عرض المحل</p>
       <label id="quotedTotalLabel" for="quotedTotal" class="block text-gray-600 text-xs font-bold mb-2">السعر الإجمالي المعروض من المحل (ر.س)</label>
       <input type="number" id="quotedTotal" min="0" step="0.01" placeholder="أدخل العرض للمقارنة" inputmode="decimal" autocomplete="off" class="num-input">
@@ -382,7 +385,7 @@
         <p class="text-amber-400 text-[11px] font-bold uppercase tracking-widest mb-2">⚡ تفكيك عرض المحل (كاشف المصنعية)</p>
         <div class="grid grid-cols-2 gap-2 text-xs mb-2.5">
           <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">الذهب الصافي</span><strong id="auditorRawGoldOutput" class="text-slate-200 font-mono">—</strong></div>
-          <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">ض.ق.م (15%)</span><strong id="auditorVatOutput" class="text-slate-200 font-mono">—</strong></div>
+          <div class="auditor-metric"><span id="auditorVatLabel" class="text-gray-400 block text-[10px]">ض.ق.م (15%)</span><strong id="auditorVatOutput" class="text-slate-200 font-mono">—</strong></div>
           <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">إجمالي المصنعية والربح</span><strong id="auditorLaborOutput" class="text-slate-200 font-mono">—</strong></div>
           <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">المصنعية للجرام</span><strong id="auditorLaborPerGramOutput" class="text-amber-400 font-mono font-bold">—</strong></div>
         </div>
@@ -409,7 +412,7 @@
       <strong class="text-gray-700">ملاحظة:</strong> سعر LIVE سعر فوري إرشادي للذهب الخام XAU/USD ويُحوّل إلى الريال السعودي. النتائج تقديرية، وقد يختلف سعر التنفيذ الفعلي لدى المحلات بسبب فرق الشراء والبيع والمصنعية والأحجار والعروض والمعاملة الضريبية.
     </aside>
 
-    <section class="input-card actions-card" data-tab="calc" aria-labelledby="actionsHeading">
+    <section class="input-card actions-card" data-tab="auditor calc" aria-labelledby="actionsHeading">
       <p id="actionsHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">⚡ إجراءات سريعة</p>
       <div class="grid grid-cols-2 gap-2">
         <button type="button" id="shareSummary" class="action-btn action-btn-primary">📋 مشاركة الملخص</button>
@@ -468,7 +471,7 @@
       </div>
     </section>
 
-  <div class="bottom-receipt dashboard-result" data-tab="calc">
+  <div class="bottom-receipt dashboard-result" data-tab="auditor calc">
     <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="ملخص السعر">
       <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3">
         <div class="flex justify-between text-[11px]"><span id="summaryPrimaryLabel" class="text-slate-400">تكلفة الذهب</span><span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span></div>

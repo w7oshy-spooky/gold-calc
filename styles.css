@@ -434,8 +434,8 @@ main[data-active-tab="vault"] > *:not([data-tab~="vault"]):not(.vault-modal-back
   display:none!important;
 }
 
-/* Hide bottom receipt when not in calc or all tabs */
-main:not([data-active-tab="calc"]):not([data-active-tab="all"]) .dashboard-result{
+/* Hide bottom receipt when not in calc, auditor or all tabs */
+main:not([data-active-tab="calc"]):not([data-active-tab="auditor"]):not([data-active-tab="all"]) .dashboard-result{
   display:none!important;
 }
 
@@ -454,15 +454,16 @@ main:not([data-active-tab="calc"]):not([data-active-tab="all"]) .dashboard-resul
 
 /* Mobile-only layout rules (< 1100px) */
 @media(max-width:1099px){
-  /* Dock bottom receipt above mobile nav bar when in calc tab */
+  /* Dock bottom receipt above mobile nav bar when in calc or auditor tab */
   .bottom-receipt{
     bottom:calc(58px + env(safe-area-inset-bottom))!important;
   }
   .page-content{
     padding-bottom:calc(80px + env(safe-area-inset-bottom))!important;
   }
-  main[data-active-tab="calc"].page-content{
-    padding-bottom:calc(280px + env(safe-area-inset-bottom))!important;
+  main[data-active-tab="calc"].page-content,
+  main[data-active-tab="auditor"].page-content{
+    padding-bottom:calc(200px + env(safe-area-inset-bottom))!important;
   }
 }
 

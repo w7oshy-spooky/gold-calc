@@ -20,6 +20,7 @@
       quotedTotal: el('auditorQuotedTotal') || el('quotedTotal'),
       rawGold: el('auditorRawGoldOutput'),
       vat: el('auditorVatOutput'),
+      vatLabel: el('auditorVatLabel'),
       labor: el('auditorLaborOutput'),
       laborPerGram: el('auditorLaborPerGramOutput'),
       benchmarkBadge: el('auditorBenchmarkBadge'),
@@ -100,14 +101,19 @@
       const quotedTotal = Number(elements.quotedTotal?.value) || 0;
       const hasStones = Boolean(elements.hasStonesToggle?.checked);
       const stoneWeight = hasStones ? (Number(elements.stoneWeightInput?.value) || 0) : 0;
+      const netGoldWeight = (hasStones && stoneWeight > 0) ? Math.max(0.01, weight - stoneWeight) : weight;
 
       const audit = core.auditCounterQuote({
         price24k,
         karat: effectiveKarat,
-        weight,
+        weight: netGoldWeight,
         quotedTotal,
         taxRate: effectiveTaxRate,
       });
+
+      if (elements.vatLabel) {
+        elements.vatLabel.textContent = `ض.ق.م (${effectiveTaxRate}%)`;
+      }
 
       if (!audit.available) {
         latestAudit = null;

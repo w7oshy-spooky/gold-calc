@@ -92,3 +92,26 @@ test('auditCounterQuote correctly assigns all benchmark categories', () => {
   });
   assert.equal(luxury.benchmarkCategory, 'luxury');
 });
+
+test('auditCounterQuote with stone deduction computes labor on net gold weight', () => {
+  // Gross weight = 10g, stone weight = 2g -> net gold weight = 8g
+  // 21k, price24k = 400 -> gramPrice = 350 SAR/g
+  // Raw gold on 8g = 2,800 SAR
+  // Quoted = 3,795 SAR with 15% VAT -> subtotal = 3,300 SAR, VAT = 495 SAR
+  // Labor = 3,300 - 2,800 = 500 SAR
+  // Labor per gram on 8g = 500 / 8 = 62.5 SAR/g -> Italian (45.01 - 80)
+  const result = auditCounterQuote({
+    price24k: 400,
+    karat: 21,
+    weight: 8, // net gold weight after subtracting 2g stones
+    quotedTotal: 3795,
+    taxRate: 15,
+  });
+
+  assert.equal(result.available, true);
+  assert.equal(result.weight, 8);
+  assert.equal(result.rawMetalCost, 2800);
+  assert.equal(Math.round(result.laborCost), 500);
+  assert.ok(Math.abs(result.laborPerGram - 62.5) < 1e-4);
+  assert.equal(result.benchmarkCategory, 'italian');
+});
