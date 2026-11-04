@@ -437,8 +437,8 @@
       </div>
       <div id="vaultZakatNotice" class="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-800/80 mb-3 text-xs" hidden>
         <div class="flex items-center justify-between">
-          <span class="text-emerald-300 font-bold">✨ بلغ النصاب الشرعي (85 جم)</span>
-          <span class="text-[10px] text-emerald-400 font-bold">الزكاة: <strong id="vaultZakatAmount" class="font-mono text-sm text-emerald-200">0.00 ر.س</strong></span>
+          <span class="text-emerald-300 font-bold">✨ بلغ النصاب الشرعي (85 جم عيار 24)</span>
+          <span class="text-[10px] text-emerald-400 font-bold">الزكاة (2.5% بالسعر الحالي): <strong id="vaultZakatAmount" class="font-mono text-sm text-emerald-200">0.00 ر.س</strong></span>
         </div>
       </div>
       <p id="vaultEmptyMsg" class="text-[11px] leading-relaxed text-gray-400 text-center py-2">خزانتك خالية. أضيفي قطعك الذهبية لتتابعي قيمتها اللحظية وزكاتها.</p>
@@ -459,7 +459,7 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label for="vaultPieceWeight" class="block text-[11px] text-gray-300 mb-1 font-bold">الوزن (جرام)</label>
-            <input type="number" id="vaultPieceWeight" step="0.01" min="0" placeholder="0.00" class="quick-input-box text-xs">
+            <input type="number" id="vaultPieceWeight" step="0.01" min="0" placeholder="0.00" inputmode="decimal" dir="ltr" class="quick-input-box text-xs font-mono" onfocus="this.select()">
           </div>
           <div>
             <label for="vaultPieceKarat" class="block text-[11px] text-gray-300 mb-1 font-bold">العيار</label>
@@ -473,21 +473,32 @@
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label for="vaultPiecePrice" class="block text-[11px] text-gray-300 mb-1 font-bold">سعر الشراء التقريبي</label>
-            <input type="number" id="vaultPiecePrice" step="0.01" min="0" placeholder="0.00" class="quick-input-box text-xs">
+            <label for="vaultPiecePrice" class="block text-[11px] text-gray-300 mb-1 font-bold">سعر الشراء (اختياري)</label>
+            <input type="number" id="vaultPiecePrice" step="0.01" min="0" placeholder="0.00" inputmode="decimal" dir="ltr" class="quick-input-box text-xs font-mono" onfocus="this.select()">
           </div>
           <div>
-            <label for="vaultPieceCategory" class="block text-[11px] text-gray-300 mb-1 font-bold">الغرض</label>
-            <select id="vaultPieceCategory" class="quick-input-box text-xs">
-              <option value="personal_jewelry">زينة شخصية (معفاة)</option>
-              <option value="investment_gold">ادخار/استثمار (تجب الزكاة)</option>
-            </select>
+            <label for="vaultPieceDate" class="block text-[11px] text-gray-300 mb-1 font-bold">تاريخ الشراء (اختياري)</label>
+            <input type="date" id="vaultPieceDate" class="quick-input-box text-xs dir-ltr">
           </div>
         </div>
         <div>
-          <label for="vaultPiecePhoto" class="block text-[11px] text-gray-300 mb-1 font-bold">صورة القطعة (اختياري)</label>
-          <input type="file" id="vaultPiecePhoto" accept="image/*" class="text-xs text-gray-400 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-slate-800 file:text-amber-400 file:text-xs">
-          <img id="vaultPhotoPreview" alt="معاينة الصورة" class="w-16 h-16 object-cover rounded-lg border border-slate-700 mt-2" hidden>
+          <label for="vaultPieceCategory" class="block text-[11px] text-gray-300 mb-1 font-bold">الغرض من الذهب</label>
+          <select id="vaultPieceCategory" class="quick-input-box text-xs">
+            <option value="personal_jewelry">💎 زينة شخصية (معفاة من الزكاة عند الجمهور)</option>
+            <option value="investment_gold">💰 ادخار أو سبائك (تجب الزكاة إذا بلغ النصاب وحال الحول)</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-700/60">
+          <div class="space-y-1">
+            <label for="vaultPiecePhoto" class="block text-[11px] text-gray-300 font-bold">📷 صورة القطعة (اختياري)</label>
+            <input type="file" id="vaultPiecePhoto" accept="image/*" class="w-full text-[10px] text-gray-400 file:mr-1 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-amber-400 file:text-[10px]">
+            <img id="vaultPhotoPreview" alt="معاينة القطعة" class="w-14 h-14 object-cover rounded-lg border border-slate-700 mt-1" hidden>
+          </div>
+          <div class="space-y-1">
+            <label for="vaultPieceInvoice" class="block text-[11px] text-gray-300 font-bold">🧾 صورة الفاتورة (اختياري)</label>
+            <input type="file" id="vaultPieceInvoice" accept="image/*" class="w-full text-[10px] text-gray-400 file:mr-1 file:py-1 file:px-2 file:rounded file:border-0 file:bg-slate-800 file:text-amber-400 file:text-[10px]">
+            <img id="vaultInvoicePreview" alt="معاينة الفاتورة" class="w-14 h-14 object-cover rounded-lg border border-slate-700 mt-1" hidden>
+          </div>
         </div>
         <p id="vaultStatus" class="text-xs text-red-400 font-bold"></p>
         <button type="button" id="saveVaultPieceBtn" class="action-btn action-btn-primary w-full text-xs py-2 mt-2">حفظ في الخزانة</button>

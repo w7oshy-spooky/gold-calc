@@ -135,6 +135,7 @@
         hasStones: Boolean(piece.hasStones !== undefined ? piece.hasStones : existing.hasStones),
         stoneWeight: Math.max(0, Number(piece.stoneWeight) || (existing.stoneWeight || 0)),
         imageDataUrl: piece.imageDataUrl !== undefined ? piece.imageDataUrl : (existing.imageDataUrl || null),
+        invoiceDataUrl: piece.invoiceDataUrl !== undefined ? piece.invoiceDataUrl : (existing.invoiceDataUrl || null),
         updatedAt: Date.now(),
       };
     }

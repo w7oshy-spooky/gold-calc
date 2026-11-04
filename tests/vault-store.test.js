@@ -14,6 +14,8 @@ test('vault store initializes with in-memory adapter and performs CRUD', async (
     hasStones: true,
     stoneWeight: 0.5,
     imageDataUrl: 'data:image/png;base64,mock',
+    invoiceDataUrl: 'data:image/png;base64,mockinvoice',
+    purchaseDate: '2024-05-15',
   });
 
   assert.ok(piece1.id);
@@ -22,6 +24,8 @@ test('vault store initializes with in-memory adapter and performs CRUD', async (
   assert.equal(piece1.karat, 21);
   assert.equal(piece1.hasStones, true);
   assert.equal(piece1.imageDataUrl, 'data:image/png;base64,mock');
+  assert.equal(piece1.invoiceDataUrl, 'data:image/png;base64,mockinvoice');
+  assert.equal(piece1.purchaseDate, '2024-05-15');
 
   // Get
   const fetched = await store.getPiece(piece1.id);
