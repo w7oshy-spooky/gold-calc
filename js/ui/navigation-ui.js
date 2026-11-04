@@ -36,6 +36,10 @@
       } catch {
         // Fall back to default
       }
+      // Desktop default to comprehensive view 'all' if no prior preference, mobile defaults to 'market'
+      if (window && typeof window.innerWidth === 'number' && window.innerWidth >= 1100) {
+        return 'all';
+      }
       return DEFAULT_TAB;
     }
 
@@ -69,12 +73,9 @@
       if (typeof vibrate === 'function') vibrate();
       if (typeof onChange === 'function') onChange(target);
 
-      // Scroll smoothly to top of main when switching tabs on mobile
+      // Scroll smoothly to top of main when switching tabs
       if (window && typeof window.scrollTo === 'function') {
-        const isMobile = window.innerWidth < 1100;
-        if (isMobile) {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
       return target;

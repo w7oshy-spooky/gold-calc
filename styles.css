@@ -426,20 +426,34 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
   }
 }
 
-/* Tab Content Visibility Rules on Mobile (< 1100px) */
+/* Tab Content Visibility Rules (Mobile & Desktop Focused Views) */
+main[data-active-tab="auditor"] > *:not([data-tab~="auditor"]):not(.vault-modal-backdrop),
+main[data-active-tab="calc"] > *:not([data-tab~="calc"]):not(.dashboard-result):not(.vault-modal-backdrop),
+main[data-active-tab="market"] > *:not([data-tab~="market"]):not(.vault-modal-backdrop),
+main[data-active-tab="vault"] > *:not([data-tab~="vault"]):not(.vault-modal-backdrop) {
+  display:none!important;
+}
+
+/* Hide bottom receipt when not in calc or all tabs */
+main:not([data-active-tab="calc"]):not([data-active-tab="all"]) .dashboard-result{
+  display:none!important;
+}
+
+@media(min-width:1100px){
+  /* Center focused cards when a single tab is selected on desktop */
+  main[data-active-tab="vault"] .vault-card{
+    grid-column:1/-1;
+    max-width:880px;
+    margin-inline:auto;
+    width:100%;
+  }
+  main[data-active-tab="market"] .chart-card{
+    grid-row:auto;
+  }
+}
+
+/* Mobile-only layout rules (< 1100px) */
 @media(max-width:1099px){
-  main[data-active-tab="auditor"] > *:not([data-tab~="auditor"]):not(.vault-modal-backdrop),
-  main[data-active-tab="calc"] > *:not([data-tab~="calc"]):not(.dashboard-result):not(.vault-modal-backdrop),
-  main[data-active-tab="market"] > *:not([data-tab~="market"]):not(.vault-modal-backdrop),
-  main[data-active-tab="vault"] > *:not([data-tab~="vault"]):not(.vault-modal-backdrop) {
-    display:none!important;
-  }
-
-  /* Hide bottom receipt when not in calc or all tabs */
-  main:not([data-active-tab="calc"]):not([data-active-tab="all"]) .dashboard-result{
-    display:none!important;
-  }
-
   /* Dock bottom receipt above mobile nav bar when in calc tab */
   .bottom-receipt{
     bottom:calc(58px + env(safe-area-inset-bottom))!important;
