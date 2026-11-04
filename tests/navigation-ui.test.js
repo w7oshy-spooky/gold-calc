@@ -61,10 +61,10 @@ test('navigation-ui initializes with default or stored tab and switches tabs', (
     onChange: (t) => { changedTab = t; },
   });
 
-  // Default is auditor
-  assert.equal(nav.getActiveTab(), 'auditor');
-  assert.equal(main.getAttribute('data-active-tab'), 'auditor');
-  assert.ok(btnAuditor.classList.has('active'));
+  // Default is market
+  assert.equal(nav.getActiveTab(), 'market');
+  assert.equal(main.getAttribute('data-active-tab'), 'market');
+  assert.ok(btnMarket.classList.has('active'));
   assert.ok(!btnCalc.classList.has('active'));
 
   // Switch to calc via click
@@ -93,6 +93,6 @@ test('navigation-ui falls back gracefully for invalid tab', () => {
 
   const nav = navApi.createNavigationUI({ document: doc });
   nav.setActiveTab('invalid_nonexistent_tab');
-  assert.equal(nav.getActiveTab(), 'auditor');
-  assert.equal(main.getAttribute('data-active-tab'), 'auditor');
+  assert.equal(nav.getActiveTab(), 'market');
+  assert.equal(main.getAttribute('data-active-tab'), 'market');
 });

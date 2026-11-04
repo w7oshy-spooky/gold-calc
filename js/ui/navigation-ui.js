@@ -5,8 +5,8 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  const VALID_TABS = ['auditor', 'calc', 'market', 'vault', 'all'];
-  const DEFAULT_TAB = 'auditor';
+  const VALID_TABS = ['market', 'auditor', 'calc', 'vault', 'all'];
+  const DEFAULT_TAB = 'market';
   const STORAGE_KEY = 'gold_active_tab';
 
   function createNavigationUI({

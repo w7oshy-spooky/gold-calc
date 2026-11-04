@@ -24,17 +24,17 @@
     <p class="text-yellow-100 text-sm opacity-90">Calculate buy or sell value and compare a shop quote with the reference</p>
     <nav class="desktop-tab-bar" aria-label="Navigation Tabs">
       <div class="desktop-tab-pills">
-        <button type="button" class="desktop-tab-btn active" data-tab-target="auditor">
+        <button type="button" class="desktop-tab-btn active" data-tab-target="market">
+          <span>📊</span>
+          <span data-i18n="tabMarket">Gold Prices</span>
+        </button>
+        <button type="button" class="desktop-tab-btn" data-tab-target="auditor">
           <span>🔍</span>
           <span data-i18n="tabAuditor">Inspector</span>
         </button>
         <button type="button" class="desktop-tab-btn" data-tab-target="calc">
           <span>⚖️</span>
           <span data-i18n="tabCalc">Calculator</span>
-        </button>
-        <button type="button" class="desktop-tab-btn" data-tab-target="market">
-          <span>📊</span>
-          <span data-i18n="tabMarket">Market</span>
         </button>
         <button type="button" class="desktop-tab-btn" data-tab-target="vault">
           <span>💎</span>
@@ -48,15 +48,23 @@
     </nav>
   </header>
 
-  <main class="page-content desktop-dashboard px-4 -mt-8 space-y-4 max-w-md mx-auto" data-active-tab="auditor">
+  <main class="page-content desktop-dashboard px-4 -mt-8 space-y-4 max-w-md mx-auto" data-active-tab="market">
     <section class="input-card market-card" data-tab="market" aria-labelledby="marketHeading">
-      <p id="marketHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">📈 Market Data</p>
+      <div class="mb-3">
+        <p id="marketHeading" class="text-amber-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+          <span>⚙️</span>
+          <span>Gold Price Method</span>
+        </p>
+        <p class="text-[12px] text-gray-300 mt-1 leading-relaxed">
+          Choose how the base gold price is set: real-time <strong class="text-amber-300">LIVE spot feed</strong> from global markets, or <strong class="text-amber-300">manual entry</strong> by gram or ounce.
+        </p>
+      </div>
 
-      <div class="market-source-grid grid grid-cols-2 gap-2 mb-4" role="group" aria-label="Gold price source">
-        <button type="button" class="source-btn active" data-source="live" aria-pressed="true">LIVE</button>
-        <button type="button" class="source-btn" data-source="ounce-usd" aria-pressed="false">Ounce USD</button>
-        <button type="button" class="source-btn" data-source="ounce-sar" aria-pressed="false">Ounce SAR</button>
-        <button type="button" class="source-btn" data-source="gram-sar" aria-pressed="false">Gram SAR</button>
+      <div class="market-source-grid grid grid-cols-2 gap-2 mb-4" role="group" aria-label="Gold price method">
+        <button type="button" class="source-btn active" data-source="live" aria-pressed="true">⚡ LIVE Feed</button>
+        <button type="button" class="source-btn" data-source="gram-sar" aria-pressed="false">✍️ Manual Gram (SAR)</button>
+        <button type="button" class="source-btn" data-source="ounce-usd" aria-pressed="false">💵 Ounce (USD $)</button>
+        <button type="button" class="source-btn" data-source="ounce-sar" aria-pressed="false">🇸🇦 Ounce (SAR)</button>
       </div>
       <input type="hidden" id="priceSource" value="live">
 
@@ -541,17 +549,17 @@
 
   <!-- Mobile Bottom Navigation Bar (< 1100px) -->
   <nav id="bottomNavBar" class="mobile-bottom-nav" aria-label="Main Navigation">
-    <button type="button" class="bottom-nav-btn active" data-tab-target="auditor">
+    <button type="button" class="bottom-nav-btn active" data-tab-target="market">
+      <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+      <span class="bottom-nav-label" data-i18n="tabMarket">Gold Prices</span>
+    </button>
+    <button type="button" class="bottom-nav-btn" data-tab-target="auditor">
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
       <span class="bottom-nav-label" data-i18n="tabAuditor">Inspector</span>
     </button>
     <button type="button" class="bottom-nav-btn" data-tab-target="calc">
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 7h8"/><path d="M12 7v10"/><path d="M8 17h8"/></svg>
       <span class="bottom-nav-label" data-i18n="tabCalc">Calculator</span>
-    </button>
-    <button type="button" class="bottom-nav-btn" data-tab-target="market">
-      <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-      <span class="bottom-nav-label" data-i18n="tabMarket">Market</span>
     </button>
     <button type="button" class="bottom-nav-btn" data-tab-target="vault">
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20"/><path d="m10 3 2 6-4 12"/></svg>
