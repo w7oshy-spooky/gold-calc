@@ -21,6 +21,7 @@
     'GoldVaultStore',
     'GoldCardCanvasGenerator',
     'GoldVaultUI',
+    'GoldNavigationUI',
   ];
 
   if (requiredGlobals.some((name) => !globalThis[name])) {
@@ -368,6 +369,16 @@
     getPrice24k,
     onChange() {
       vibrate();
+    },
+  }) : null;
+
+  const navigationUi = globalThis.GoldNavigationUI ? globalThis.GoldNavigationUI.createNavigationUI({
+    document,
+    window: globalThis.window,
+    preferencesStore,
+    vibrate,
+    onChange(tab) {
+      if (tab === 'calc') calculate();
     },
   }) : null;
 
