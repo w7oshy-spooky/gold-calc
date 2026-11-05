@@ -22,6 +22,7 @@
     'GoldCardCanvasGenerator',
     'GoldVaultUI',
     'GoldNavigationUI',
+    'GoldThemeUI',
   ];
 
   if (requiredGlobals.some((name) => !globalThis[name])) {
@@ -42,6 +43,14 @@
   const quickInputParser = globalThis.GoldQuickInputParser;
   const vaultStore = globalThis.GoldVaultStore ? globalThis.GoldVaultStore.createVaultStore() : null;
   const cardCanvasGenerator = globalThis.GoldCardCanvasGenerator;
+  const themeUi = globalThis.GoldThemeUI
+    ? globalThis.GoldThemeUI.createThemeUI({
+        document,
+        window: globalThis,
+        preferencesStore,
+        vibrate,
+      })
+    : null;
 
   const LIVE_AUTO_REFRESH_MS = 60 * 1000;
 

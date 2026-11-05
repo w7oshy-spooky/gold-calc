@@ -74,6 +74,7 @@
 
     if (raw.mode === 'buy' || raw.mode === 'sell') prefs.mode = raw.mode;
     if (SOURCES.includes(raw.source)) prefs.source = raw.source;
+    if (raw.theme === 'light' || raw.theme === 'dark') prefs.theme = raw.theme;
 
     for (const field of ['karat', 'gramKarat']) {
       const karat = Number(raw[field]);
