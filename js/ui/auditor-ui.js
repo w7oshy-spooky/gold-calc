@@ -29,6 +29,14 @@
       stoneWeightContainer: el('stoneWeightContainer'),
       stoneLossCallout: el('stoneLossCallout'),
       stoneLossAmount: el('stoneLossAmount'),
+      stoneGrossPriceOutput: el('stoneGrossPriceOutput'),
+      stoneNetPriceOutput: el('stoneNetPriceOutput'),
+      stoneGrossWeightLabel: el('stoneGrossWeightLabel'),
+      stoneNetWeightLabel: el('stoneNetWeightLabel'),
+      stoneGoldRatioValue: el('stoneGoldRatioValue'),
+      stoneNetPriceHint: el('stoneNetPriceHint'),
+      stoneZirconRegulationWarning: el('stoneZirconRegulationWarning'),
+      stoneZirconRatio: el('stoneZirconRatio'),
       bargainingAdviceContainer: el('bargainingAdviceContainer'),
       fairPriceRangeOutput: el('fairPriceRangeOutput'),
       bargainAdviceText: el('bargainAdviceText'),
@@ -160,7 +168,7 @@
       }
 
       if (elements.hasStonesToggle && elements.stoneLossCallout) {
-        if (hasStones && stoneWeight > 0 && price24k > 0) {
+        if (hasStones && stoneWeight > 0 && (price24k > 0 || quotedTotal > 0)) {
           const stoneData = core.calculateStoneDeduction({
             grossWeight: weight,
             stoneWeight,
@@ -169,11 +177,36 @@
             karat: effectiveKarat,
             workmanshipPerGram: audit.available ? audit.laborPerGram : 30,
             taxRate: effectiveTaxRate,
+            quotedTotal: audit.available ? quotedTotal : 0,
           });
 
           elements.stoneLossCallout.hidden = false;
           if (elements.stoneLossAmount) {
             elements.stoneLossAmount.textContent = formatting.formatMoney(stoneData.stonePremiumPaid);
+          }
+          if (elements.stoneGrossPriceOutput) {
+            elements.stoneGrossPriceOutput.textContent = formatting.formatMoney(stoneData.grossTotal);
+          }
+          if (elements.stoneNetPriceOutput) {
+            elements.stoneNetPriceOutput.textContent = formatting.formatMoney(stoneData.pureGoldTotal);
+          }
+          if (elements.stoneGrossWeightLabel) {
+            elements.stoneGrossWeightLabel.textContent = formatting.formatMoney(stoneData.grossWeight);
+          }
+          if (elements.stoneNetWeightLabel) {
+            elements.stoneNetWeightLabel.textContent = formatting.formatMoney(stoneData.netGoldWeight);
+          }
+          if (elements.stoneGoldRatioValue) {
+            elements.stoneGoldRatioValue.textContent = Number(stoneData.goldRatio).toFixed(1);
+          }
+          if (elements.stoneNetPriceHint) {
+            elements.stoneNetPriceHint.textContent = formatting.formatMoney(stoneData.pureGoldTotal);
+          }
+          if (elements.stoneZirconRegulationWarning) {
+            elements.stoneZirconRegulationWarning.hidden = !stoneData.exceedsZirconLimit;
+            if (elements.stoneZirconRatio) {
+              elements.stoneZirconRatio.textContent = Number(stoneData.stoneRatio).toFixed(1);
+            }
           }
         } else {
           elements.stoneLossCallout.hidden = true;

@@ -243,6 +243,7 @@
     workmanshipPerGram = 0,
     profitPerGram = 0,
     taxRate = 15,
+    quotedTotal = 0,
   } = {}) {
     const safeGross = sanitizeNonNegative(grossWeight);
     const safeStone = hasStones ? sanitizeNonNegative(stoneWeight) : 0;
@@ -252,20 +253,42 @@
     const gramPrice = sanitizeNonNegative(price24k) * purity;
     const laborPerGram = sanitizeNonNegative(workmanshipPerGram) + sanitizeNonNegative(profitPerGram);
     const safeTaxRate = clampTaxRate(taxRate);
-    const grossGramRate = (gramPrice + laborPerGram) * (1 + safeTaxRate / 100);
+    const safeQuote = sanitizeNonNegative(quotedTotal);
 
-    const stonePremiumPaid = safeStone * grossGramRate;
-    const pureGoldTotal = netGoldWeight * grossGramRate;
+    let grossTotal = 0;
+    let pureGoldTotal = 0;
+    let stonePremiumPaid = 0;
+    let ratePerGram = 0;
+
+    if (safeQuote > 0 && safeGross > 0) {
+      ratePerGram = safeQuote / safeGross;
+      grossTotal = safeQuote;
+      pureGoldTotal = netGoldWeight * ratePerGram;
+      stonePremiumPaid = safeStone * ratePerGram;
+    } else {
+      const grossGramRate = (gramPrice + laborPerGram) * (1 + safeTaxRate / 100);
+      ratePerGram = grossGramRate;
+      grossTotal = safeGross * grossGramRate;
+      pureGoldTotal = netGoldWeight * grossGramRate;
+      stonePremiumPaid = safeStone * grossGramRate;
+    }
+
     const goldRatio = safeGross > 0 ? (netGoldWeight / safeGross) * 100 : 100;
+    const stoneRatio = safeGross > 0 ? (safeStone / safeGross) * 100 : 0;
+    const exceedsZirconLimit = stoneRatio > 5;
 
     return {
       hasStones: Boolean(hasStones),
       grossWeight: safeGross,
       stoneWeight: safeStone,
       netGoldWeight,
+      ratePerGram,
       goldRatio,
+      stoneRatio,
       stonePremiumPaid,
       pureGoldTotal,
+      grossTotal,
+      exceedsZirconLimit,
       hasResaleWarning: safeStone > 0,
     };
   }

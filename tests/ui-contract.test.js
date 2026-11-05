@@ -327,3 +327,26 @@ test('service worker precaches every script and stylesheet the pages load', () =
   assert.match(sw, /url\.pathname\.startsWith\('\/api\/'\)/);
   assert.match(app, /navigator\.serviceWorker\.register\('sw\.js'\)/);
 });
+
+test('both index.html and en.html expose stone price separation controls symmetrically', () => {
+  const stoneIds = [
+    'hasStonesToggle',
+    'stoneWeightContainer',
+    'stoneWeightInput',
+    'stoneLossCallout',
+    'stoneLossAmount',
+    'stoneGrossPriceOutput',
+    'stoneNetPriceOutput',
+    'stoneGrossWeightLabel',
+    'stoneNetWeightLabel',
+    'stoneGoldRatioValue',
+    'stoneNetPriceHint',
+    'stoneZirconRegulationWarning',
+    'stoneZirconRatio',
+  ];
+
+  for (const id of stoneIds) {
+    assert.match(arabic, new RegExp(`id=["']${id}["']`), `index.html must expose #${id}`);
+    assert.match(english, new RegExp(`id=["']${id}["']`), `en.html must expose #${id}`);
+  }
+});

@@ -61,3 +61,53 @@ test('calculateStoneDeduction clamps stone weight to not exceed gross weight', (
   assert.equal(result.netGoldWeight, 0);
   assert.equal(result.goldRatio, 0);
 });
+
+test('calculateStoneDeduction separates price with stones vs price for pure gold only from quoted total', () => {
+  // Quote is 4000 SAR for a 10g piece containing 2g stones (net gold 8g, 20% stones)
+  // Rate = 4000 / 10 = 400 SAR/g
+  // Gross total (if stones counted as gold) = 4000 SAR
+  // Pure gold only (without stones) = 8 * 400 = 3200 SAR
+  // Premium paid for stones at gold rate = 2 * 400 = 800 SAR
+  const result = calculateStoneDeduction({
+    grossWeight: 10,
+    stoneWeight: 2,
+    hasStones: true,
+    quotedTotal: 4000,
+    price24k: 400,
+    karat: 21,
+  });
+
+  assert.equal(result.grossWeight, 10);
+  assert.equal(result.stoneWeight, 2);
+  assert.equal(result.netGoldWeight, 8);
+  assert.equal(result.grossTotal, 4000);
+  assert.equal(result.pureGoldTotal, 3200);
+  assert.equal(result.stonePremiumPaid, 800);
+  assert.equal(result.pureGoldTotal + result.stonePremiumPaid, result.grossTotal);
+  assert.equal(result.goldRatio, 80);
+  assert.equal(result.stoneRatio, 20);
+  assert.equal(result.exceedsZirconLimit, true);
+});
+
+test('calculateStoneDeduction flags Saudi 5% zircon limit correctly', () => {
+  // 10g total with 0.3g stones = 3% <= 5% limit
+  const withinLimit = calculateStoneDeduction({
+    grossWeight: 10,
+    stoneWeight: 0.3,
+    hasStones: true,
+    price24k: 400,
+    karat: 21,
+  });
+  assert.equal(withinLimit.exceedsZirconLimit, false);
+
+  // 10g total with 0.8g stones = 8% > 5% limit
+  const overLimit = calculateStoneDeduction({
+    grossWeight: 10,
+    stoneWeight: 0.8,
+    hasStones: true,
+    price24k: 400,
+    karat: 21,
+  });
+  assert.equal(overLimit.exceedsZirconLimit, true);
+});
+
