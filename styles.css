@@ -167,6 +167,8 @@ html[dir=rtl] .chart-change{text-align:right}
 .chart-range-btn:focus-visible,.chart-range-pill:focus-visible{outline:3px solid #e8bf5580;outline-offset:2px}
 .chart-plot{position:relative;margin-top:.9rem;direction:ltr}
 .chart-plot svg{display:block;width:100%;height:180px;touch-action:pan-y;cursor:crosshair}
+.chart-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;margin:0;padding:0 1rem;text-align:center;direction:inherit;font-size:.8rem;color:var(--muted,#8b94a3);pointer-events:none}
+.chart-empty[hidden]{display:none}
 .chart-dot{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--gold);border:3px solid var(--card);transform:translate(-50%,-50%);pointer-events:none}
 .chart-axis{display:flex;justify-content:space-between;margin-top:.4rem;font-size:.7rem;color:var(--muted);direction:ltr}
 
