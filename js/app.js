@@ -34,6 +34,7 @@
   const core = globalThis.GoldCalculator;
   const locale = document.documentElement.lang === 'ar' ? 'ar' : 'en';
   const copy = globalThis.GoldTranslations.getCopy(locale);
+  if (globalThis.GoldStaticText) globalThis.GoldStaticText.applyStaticText(document, locale);
   const formatting = globalThis.GoldFormatting.createFormatting(locale);
   const priceCache = globalThis.GoldPriceCache.createPriceCache();
   const livePriceClient = globalThis.GoldLivePriceClient.createLivePriceClient();

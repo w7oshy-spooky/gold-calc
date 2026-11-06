@@ -4,8 +4,8 @@ Bilingual Arabic and English calculator for gold jewellery pricing and used-gold
 
 ## Features
 
-- Arabic: `index.html`
-- English: `en.html`
+- One page, `index.html`, in Arabic and English: switch with the EN / العربية button (or `?lang=en` / `?lang=ar`); the choice is remembered. `en.html` only redirects to `index.html?lang=en` for old links
+- Static English text lives in `js/i18n/static-text.js` (keys referenced from `data-t` / `data-t-attr` in `index.html`); dynamic text lives in `js/i18n/translations.js`
 - Live XAU/USD spot mode is the default price source
 - Primary live provider: Gold API; automatic fallback: XAUS
 - Live quote status, upstream timestamp, refresh button and 24K / 22K / 21K / 18K SAR-per-gram reference prices
