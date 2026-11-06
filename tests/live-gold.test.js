@@ -22,6 +22,7 @@ function createMockRes() {
     setHeader(name, value) { this.headers[name.toLowerCase()] = value; },
     status(code) { this.statusCode = code; return this; },
     json(payload) { this.body = payload; return this; },
+    end() { this.ended = true; return this; },
   };
 }
 
@@ -113,6 +114,20 @@ test('API returns 502 when both live sources fail', async () => {
   await handler({}, res);
   assert.equal(res.statusCode, 502);
   assert.deepEqual(res.body, { error: 'live_price_unavailable' });
+  assert.equal(res.headers['cache-control'], 'no-store');
+});
+
+test('API sends CORS headers and answers preflight requests', async () => {
+  let fetched = false;
+  const handler = api.createGoldPriceHandler({
+    fetchImpl: async () => { fetched = true; return jsonResponse({}); },
+  });
+  const res = createMockRes();
+  await handler({ method: 'OPTIONS' }, res);
+  assert.equal(res.statusCode, 204);
+  assert.equal(res.headers['access-control-allow-origin'], '*');
+  assert.equal(res.ended, true);
+  assert.equal(fetched, false);
 });
 
 test('both upstream attempts fit inside the browser live-price timeout', () => {

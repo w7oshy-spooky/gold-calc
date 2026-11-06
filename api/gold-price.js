@@ -31,7 +31,17 @@ async function fetchJson(fetchImpl, url) {
 function createGoldPriceHandler({ fetchImpl = globalThis.fetch } = {}) {
   if (typeof fetchImpl !== 'function') throw new Error('fetch implementation is required');
 
-  return async function goldPriceHandler(_req, res) {
+  return async function goldPriceHandler(req, res) {
+    // The Capacitor app calls this endpoint from a different origin.
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'accept, content-type');
+
+    if (req?.method === 'OPTIONS') {
+      res.status(204);
+      return res.end();
+    }
+
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=120');
 
@@ -43,6 +53,8 @@ function createGoldPriceHandler({ fetchImpl = globalThis.fetch } = {}) {
         const fallbackPayload = await fetchJson(fetchImpl, XAUS_URL);
         return res.status(200).json(normalizeXausPayload(fallbackPayload));
       } catch (fallbackError) {
+        // Do not let the CDN cache a temporary upstream failure.
+        res.setHeader('Cache-Control', 'no-store');
         return res.status(502).json({ error: 'live_price_unavailable' });
       }
     }
