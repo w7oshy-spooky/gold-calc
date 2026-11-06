@@ -5,6 +5,17 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    })[ch]);
+  }
+
+  // Only allow image data URLs inside src attributes.
+  function safeImageSrc(value) {
+    return /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(value || '') ? value : '';
+  }
+
   function createVaultUI({
     document,
     vaultStore,
@@ -561,17 +572,17 @@
               : `<span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">${copy.vaultLabels?.personal || 'زينة'}</span>`;
 
             let photoHtml = '';
-            if (piece.imageDataUrl) {
-              photoHtml += `<img src="${piece.imageDataUrl}" alt="${piece.name}" class="piece-thumbnail w-10 h-10 object-cover rounded-lg border border-amber-400/40 me-1.5 flex-shrink-0" title="اضغط لعرض صورة القطعة">`;
+            if (safeImageSrc(piece.imageDataUrl)) {
+              photoHtml += `<img src="${safeImageSrc(piece.imageDataUrl)}" alt="${escapeHtml(piece.name)}" class="piece-thumbnail w-10 h-10 object-cover rounded-lg border border-amber-400/40 me-1.5 flex-shrink-0" title="اضغط لعرض صورة القطعة">`;
             } else {
-              photoHtml += `<span class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-900 border border-slate-700 text-amber-400 font-bold text-xs me-1.5 flex-shrink-0">${piece.karat}K</span>`;
+              photoHtml += `<span class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-900 border border-slate-700 text-amber-400 font-bold text-xs me-1.5 flex-shrink-0">${escapeHtml(piece.karat)}K</span>`;
             }
 
             if (piece.invoiceDataUrl) {
               photoHtml += `<button type="button" class="invoice-thumbnail-btn w-7 h-10 flex flex-col items-center justify-center rounded-md bg-slate-900 border border-amber-500/40 text-[9px] text-amber-300 font-bold me-2 hover:bg-slate-700 flex-shrink-0" title="اضغط لعرض الفاتورة"><span>🧾</span><span class="text-[7px]">فاتورة</span></button>`;
             }
 
-            const dateStr = piece.purchaseDate ? `<span class="text-gray-400 text-[10px]"> · 📅 ${piece.purchaseDate}</span>` : '';
+            const dateStr = piece.purchaseDate ? `<span class="text-gray-400 text-[10px]"> · 📅 ${escapeHtml(piece.purchaseDate)}</span>` : '';
             const purchaseStr = purchasePrice > 0 ? `<span class="text-gray-400 text-[10px]"> · شراء: ${formatting.formatMoney(purchasePrice)}</span>` : '';
 
             li.innerHTML = `
@@ -579,10 +590,10 @@
                 ${photoHtml}
                 <div class="truncate ms-1">
                   <div class="flex items-center gap-1.5">
-                    <p class="font-bold text-xs text-white truncate">${piece.name}</p>
+                    <p class="font-bold text-xs text-white truncate">${escapeHtml(piece.name)}</p>
                     <span class="text-[10px] text-amber-400/80">👁️</span>
                   </div>
-                  <p class="text-[10px] text-gray-400 truncate">${piece.weight} ${copy.invoiceGramUnit || 'جرام'} · عيار ${piece.karat} ${categoryBadge}${dateStr}${purchaseStr}</p>
+                  <p class="text-[10px] text-gray-400 truncate">${escapeHtml(piece.weight)} ${copy.invoiceGramUnit || 'جرام'} · عيار ${escapeHtml(piece.karat)} ${categoryBadge}${dateStr}${purchaseStr}</p>
                 </div>
               </div>
               <div class="text-end flex items-center gap-2 flex-shrink-0 ms-2">
@@ -590,7 +601,7 @@
                   <strong class="block text-xs font-mono text-amber-400 font-bold">${formatting.formatSar(currentVal)}</strong>
                   ${profitLossHtml}
                 </div>
-                <button type="button" class="delete-vault-piece-btn text-gray-400 hover:text-red-400 p-1.5 text-xs rounded-lg hover:bg-rose-950/40" data-id="${piece.id}" aria-label="حذف القطعة">✕</button>
+                <button type="button" class="delete-vault-piece-btn text-gray-400 hover:text-red-400 p-1.5 text-xs rounded-lg hover:bg-rose-950/40" data-id="${escapeHtml(piece.id)}" aria-label="حذف القطعة">✕</button>
               </div>
             `;
 
