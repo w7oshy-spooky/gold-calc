@@ -19,6 +19,7 @@
     const el = (id) => document.getElementById(id);
 
     // Looks up vault text in the active language; the Arabic fallback keeps tests with partial copy working.
+    const insights = globalThis.GoldVaultInsights;
     const label = (key, fallback, vars = {}) => String(copy.vaultLabels?.[key] ?? fallback)
       .replace(/\{(\w+)\}/g, (match, name) => (name in vars ? vars[name] : match));
 
@@ -94,6 +95,10 @@
       importBackupInput: el('importVaultBackupInput'),
       backupStatus: el('vaultBackupStatus'),
       backupReminder: el('vaultBackupReminder'),
+      pnl: el('vaultPnl'),
+      hawlLabel: el('vaultHawlLabel'),
+      hawlDate: el('vaultHawlDate'),
+      hawlStatus: el('vaultHawlStatus'),
     };
 
     let currentPhotoDataUrl = null;
@@ -450,6 +455,50 @@
       elements.detailModal.hidden = false;
     }
 
+    function hawlStorage() {
+      try { return globalThis.localStorage; } catch (_error) { return null; }
+    }
+
+    function renderPnl(pieces, price24k) {
+      if (!elements.pnl || !insights) return;
+      const result = insights.summarizePnl(pieces, price24k);
+      if (!result.count || Math.abs(result.diff) < 0.005) {
+        elements.pnl.hidden = true;
+        return;
+      }
+      const pct = Math.abs(result.pct).toFixed(1);
+      const amount = formatting.formatMoney(Math.abs(result.diff));
+      const gain = result.diff > 0;
+      elements.pnl.textContent = gain
+        ? label('pnlProfit', 'إجمالي الربح على القطع المسعّرة: +{amount} ر.س (+{pct}%)', { amount, pct })
+        : label('pnlLoss', 'إجمالي الفرق على القطع المسعّرة: -{amount} ر.س ({pct}%)', { amount, pct: `-${pct}` });
+      elements.pnl.className = `text-[11px] font-mono font-bold text-center mb-3 ${gain ? 'text-emerald-400' : 'text-rose-400'}`;
+      elements.pnl.hidden = false;
+    }
+
+    function renderHawl() {
+      if (!elements.hawlStatus || !insights) return;
+      if (elements.hawlLabel) elements.hawlLabel.textContent = label('hawlLabel', 'بداية الحول (اختياري)');
+      const start = insights.loadHawlStart(hawlStorage());
+      if (elements.hawlDate && elements.hawlDate.value !== start) elements.hawlDate.value = start;
+      const hawl = insights.getHawlState(start);
+      if (hawl.state === 'none') {
+        elements.hawlStatus.hidden = true;
+        return;
+      }
+      elements.hawlStatus.textContent = hawl.state === 'due'
+        ? label('hawlDue', '✨ تم الحول، وحان موعد إخراج الزكاة')
+        : label('hawlCounting', 'يتبقى {days} يومًا على تمام الحول (354 يومًا هجريًا)', { days: hawl.daysLeft });
+      elements.hawlStatus.hidden = false;
+    }
+
+    if (elements.hawlDate && insights) {
+      elements.hawlDate.addEventListener('change', () => {
+        insights.saveHawlStart(hawlStorage(), elements.hawlDate.value);
+        renderHawl();
+      });
+    }
+
     async function render() {
       if (!vaultStore) return;
       const pieces = await vaultStore.getAllPieces();
@@ -478,6 +527,9 @@
           elements.zakatNotice.hidden = true;
         }
       }
+
+      renderPnl(pieces, price24k);
+      renderHawl();
 
       if (elements.list && elements.emptyMsg) {
         if (pieces.length === 0) {

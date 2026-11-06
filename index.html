@@ -507,11 +507,17 @@
           <strong id="vaultMarketValue" class="text-xs font-bold text-amber-400" data-t="s162">0.00 ر.س</strong>
         </div>
       </div>
+      <p id="vaultPnl" class="text-[11px] font-mono font-bold text-center mb-3" hidden></p>
       <div id="vaultZakatNotice" class="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-800/80 mb-3 text-xs" hidden>
         <div class="flex items-center justify-between">
           <span class="text-emerald-300 font-bold" data-t="s163">✨ بلغ النصاب الشرعي (85 جم عيار 24)</span>
           <span class="text-[10px] text-emerald-400 font-bold"><span data-t="s164">الزكاة (2.5% بالسعر الحالي):</span> <strong id="vaultZakatAmount" class="font-mono text-sm text-emerald-200" data-t="s165">0.00 ر.س</strong></span>
         </div>
+        <div class="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-emerald-800/60">
+          <label for="vaultHawlDate" id="vaultHawlLabel" class="text-[10px] text-emerald-300 font-bold"></label>
+          <input type="date" id="vaultHawlDate" class="quick-input-box text-[11px] dir-ltr w-auto py-1">
+        </div>
+        <p id="vaultHawlStatus" class="text-[10px] text-emerald-200 font-bold mt-1" hidden></p>
       </div>
       <p id="vaultEmptyMsg" class="text-[11px] leading-relaxed text-gray-400 text-center py-2" data-t="s166">خزانتك خالية. أضيفي قطعك الذهبية لتتابعي قيمتها اللحظية وزكاتها.</p>
       <ul id="vaultList" class="space-y-1.5" aria-label="قطع الذهب في الخزانة" data-t-attr="aria-label:s167"></ul>
@@ -800,6 +806,7 @@
   <script src="js/ui/auditor-ui.js"></script>
   <script src="js/ui/vault-row.js"></script>
   <script src="js/ui/backup-reminder.js"></script>
+  <script src="js/ui/vault-insights.js"></script>
   <script src="js/ui/vault-backup-ui.js"></script>
   <script src="js/ui/vault-ui.js"></script>
   <script src="js/ui/navigation-ui.js"></script>
