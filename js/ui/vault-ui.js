@@ -93,6 +93,7 @@
       exportBackupBtn: el('exportVaultBackupBtn'),
       importBackupInput: el('importVaultBackupInput'),
       backupStatus: el('vaultBackupStatus'),
+      backupReminder: el('vaultBackupReminder'),
     };
 
     let currentPhotoDataUrl = null;
@@ -363,7 +364,7 @@
       });
     });
 
-    globalThis.GoldVaultBackupUI.createVaultBackupUI({
+    const backupUi = globalThis.GoldVaultBackupUI.createVaultBackupUI({
       document,
       elements,
       vaultStore,
@@ -452,6 +453,7 @@
     async function render() {
       if (!vaultStore) return;
       const pieces = await vaultStore.getAllPieces();
+      if (backupUi) backupUi.refreshReminder(pieces.length);
       const price24k = typeof getPrice24k === 'function' ? getPrice24k() : 0;
 
       const zakatData = core.calculateZakat

@@ -15,7 +15,18 @@
     render,
     onChange,
     saveFile = (options) => globalThis.GoldNativeFile.saveFile(options),
+    reminder = globalThis.GoldBackupReminder,
+    storage = (() => { try { return globalThis.localStorage; } catch (_error) { return null; } })(),
   }) {
+    function refreshReminder(pieceCount) {
+      const el = elements.backupReminder;
+      if (!el || !reminder) return;
+      const state = reminder.getReminderState({ pieceCount, lastBackupAt: reminder.getLastBackup(storage) });
+      el.hidden = !state;
+      if (state === 'never') el.textContent = label('backupReminderNever', 'بياناتك محفوظة على هذا الجهاز فقط. صدّر نسخة احتياطية حتى لا تضيع.');
+      if (state === 'stale') el.textContent = label('backupReminderStale', 'مرّ أكثر من 30 يومًا على آخر نسخة احتياطية. صدّر نسخة جديدة.');
+    }
+
     // Backup Export
     if (elements.exportBackupBtn && vaultStore) {
       elements.exportBackupBtn.addEventListener('click', async () => {
@@ -39,6 +50,8 @@
             document,
           });
           if (result.cancelled) return;
+          if (reminder) reminder.markBackedUp(storage);
+          refreshReminder(pieces.length);
 
           if (elements.backupStatus) {
             elements.backupStatus.textContent = copy.vaultLabels?.backupExported || 'تم تصدير النسخة الاحتياطية بنجاح ✓';
@@ -90,6 +103,8 @@
         reader.readAsText(file);
       });
     }
+
+    return { refreshReminder };
   }
 
   return { createVaultBackupUI };
