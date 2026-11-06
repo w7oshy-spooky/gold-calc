@@ -629,8 +629,7 @@
   }
 
   function registerOfflineSupport() {
-    if (!('serviceWorker' in navigator)) return;
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    if (globalThis.GoldOfflineSupport) globalThis.GoldOfflineSupport.registerOfflineSupport();
   }
 
   function initQuickInput() {

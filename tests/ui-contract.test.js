@@ -325,7 +325,9 @@ test('service worker precaches every script and stylesheet the pages load', () =
     }
   }
   assert.match(sw, /url\.pathname\.startsWith\('\/api\/'\)/);
-  assert.match(app, /navigator\.serviceWorker\.register\('sw\.js'\)/);
+  const offlineSupport = fs.readFileSync('js/ui/offline-support.js', 'utf8');
+  assert.match(offlineSupport, /serviceWorker\.register\('sw\.js'\)/);
+  assert.match(app, /GoldOfflineSupport\.registerOfflineSupport\(\)/);
 });
 
 test('index.html expose stone price separation controls symmetrically', () => {
