@@ -22,6 +22,7 @@ const filesToCopy = [
 
 const dirsToCopy = [
   'fonts',
+  'icons',
   'js',
 ];
 
