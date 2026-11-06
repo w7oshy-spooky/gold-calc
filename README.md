@@ -47,4 +47,14 @@ npx cap sync
 npx cap open android
 ```
 
+### App icon and splash screen
+
+Source art lives in `assets/` (`icon-only.png`, `icon-foreground.png`, `icon-background.png`, `splash.png`, `splash-dark.png`; the `.svg` files are the editable originals). After `npx cap add android` / `npx cap add ios`, generate every native icon, adaptive icon and splash size with:
+
+```bash
+npm run assets:generate
+```
+
+The PNGs in `icons/` are used by the PWA manifest and the iOS home-screen icon.
+
 Backups and share cards cannot be downloaded from a WebView, so inside the app they are written to the app cache with `@capacitor/filesystem` and opened in the system share sheet (`@capacitor/share`). After pulling changes that add a plugin, run `npm install` and `npx cap sync` again so the native projects include it. In a browser they download as normal files.

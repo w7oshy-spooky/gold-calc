@@ -10,6 +10,7 @@
     "build:mobile": "node scripts/build-mobile.js",
     "build:apk": "node scripts/build-apk.js",
     "build:css": "tailwindcss -c tailwind.config.js -o tailwind.css --minify",
+    "assets:generate": "capacitor-assets generate --assetPath assets",
     "cap:sync": "npm run build:mobile && cap sync",
     "cap:android": "npm run build:mobile && cap sync android && cap open android",
     "cap:ios": "npm run build:mobile && cap sync ios && cap open ios"
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@capacitor/android": "^6.2.0",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^6.2.0",
     "@capacitor/ios": "^6.2.0",
     "tailwindcss": "^3.4.17"
