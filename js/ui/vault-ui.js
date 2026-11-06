@@ -27,6 +27,22 @@
   } = {}) {
     const el = (id) => document.getElementById(id);
 
+    // Looks up vault text in the active language; the Arabic fallback keeps tests with partial copy working.
+    const label = (key, fallback, vars = {}) => String(copy.vaultLabels?.[key] ?? fallback)
+      .replace(/\{(\w+)\}/g, (match, name) => (name in vars ? vars[name] : match));
+
+    function readImage(file, maxSize) {
+      if (globalThis.GoldImageResize) {
+        return globalThis.GoldImageResize.resizeImageFile(file, { maxSize, document });
+      }
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+    }
+
     const elements = {
       section: el('vaultSection'),
       totalWeight: el('vaultTotalWeight'),
@@ -108,24 +124,22 @@
       elements.photoInput.addEventListener('change', () => {
         const file = elements.photoInput.files?.[0];
         if (file) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            currentPhotoDataUrl = e.target.result;
+          readImage(file, 1280).then((dataUrl) => {
+            currentPhotoDataUrl = dataUrl;
             if (elements.photoPreview) {
               elements.photoPreview.src = currentPhotoDataUrl;
               elements.photoPreview.hidden = false;
             }
             if (elements.photoStatus) {
-              elements.photoStatus.textContent = 'تم اختيار صورة ✓';
+              elements.photoStatus.textContent = label('photoChosen', 'تم اختيار صورة ✓');
               elements.photoStatus.className = 'text-[9px] text-emerald-400 font-bold';
             }
-          };
-          reader.readAsDataURL(file);
+          }).catch(() => {});
         } else {
           currentPhotoDataUrl = null;
           if (elements.photoPreview) elements.photoPreview.hidden = true;
           if (elements.photoStatus) {
-            elements.photoStatus.textContent = 'اضغط للاختيار';
+            elements.photoStatus.textContent = label('tapToChoose', 'اضغط للاختيار');
             elements.photoStatus.className = 'text-[9px] text-amber-400';
           }
         }
@@ -136,24 +150,22 @@
       elements.invoiceInput.addEventListener('change', () => {
         const file = elements.invoiceInput.files?.[0];
         if (file) {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            currentInvoiceDataUrl = e.target.result;
+          readImage(file, 1600).then((dataUrl) => {
+            currentInvoiceDataUrl = dataUrl;
             if (elements.invoicePreview) {
               elements.invoicePreview.src = currentInvoiceDataUrl;
               elements.invoicePreview.hidden = false;
             }
             if (elements.invoiceStatus) {
-              elements.invoiceStatus.textContent = 'تم اختيار فاتورة ✓';
+              elements.invoiceStatus.textContent = label('invoiceChosen', 'تم اختيار فاتورة ✓');
               elements.invoiceStatus.className = 'text-[9px] text-emerald-400 font-bold';
             }
-          };
-          reader.readAsDataURL(file);
+          }).catch(() => {});
         } else {
           currentInvoiceDataUrl = null;
           if (elements.invoicePreview) elements.invoicePreview.hidden = true;
           if (elements.invoiceStatus) {
-            elements.invoiceStatus.textContent = 'اضغط للاختيار';
+            elements.invoiceStatus.textContent = label('tapToChoose', 'اضغط للاختيار');
             elements.invoiceStatus.className = 'text-[9px] text-amber-400';
           }
         }
@@ -184,7 +196,7 @@
           return;
         }
 
-        const name = elements.nameInput?.value?.trim() || 'قطعة ذهب';
+        const name = elements.nameInput?.value?.trim() || label('defaultName', 'قطعة ذهب');
         const karat = Number(elements.karatSelect?.value) || 21;
         const purchasePrice = Number(elements.priceInput?.value) || 0;
         const purchaseDate = elements.dateInput?.value || '';
@@ -225,8 +237,8 @@
       editingPieceId = piece ? piece.id : null;
       if (elements.modalHeading) {
         elements.modalHeading.textContent = piece
-          ? (copy.vaultLabels?.editPiece || 'تعديل قطعة الذهب')
-          : (copy.vaultLabels?.addPiece || 'إضافة قطعة ذهب للخزانة');
+          ? label('editPiece', 'تعديل قطعة الذهب')
+          : label('addPiece', 'إضافة قطعة ذهب للخزانة');
       }
       if (elements.nameInput) elements.nameInput.value = piece?.name || '';
       if (elements.weightInput) elements.weightInput.value = piece ? (piece.weight || '') : '';
@@ -241,7 +253,7 @@
         elements.photoPreview.hidden = !currentPhotoDataUrl;
       }
       if (elements.photoStatus) {
-        elements.photoStatus.textContent = currentPhotoDataUrl ? 'صورة محفوظة ✓' : 'اضغط للاختيار';
+        elements.photoStatus.textContent = currentPhotoDataUrl ? label('photoSaved', 'صورة محفوظة ✓') : label('tapToChoose', 'اضغط للاختيار');
         elements.photoStatus.className = currentPhotoDataUrl ? 'text-[9px] text-emerald-400 font-bold' : 'text-[9px] text-amber-400';
       }
 
@@ -251,14 +263,14 @@
         elements.invoicePreview.hidden = !currentInvoiceDataUrl;
       }
       if (elements.invoiceStatus) {
-        elements.invoiceStatus.textContent = currentInvoiceDataUrl ? 'فاتورة محفوظة ✓' : 'اضغط للاختيار';
+        elements.invoiceStatus.textContent = currentInvoiceDataUrl ? label('invoiceSaved', 'فاتورة محفوظة ✓') : label('tapToChoose', 'اضغط للاختيار');
         elements.invoiceStatus.className = currentInvoiceDataUrl ? 'text-[9px] text-emerald-400 font-bold' : 'text-[9px] text-amber-400';
       }
 
       if (elements.status) elements.status.textContent = '';
     }
 
-    function openImageViewer(src, title = 'معاينة الصورة') {
+    function openImageViewer(src, title = label('imageViewerTitle', 'معاينة الصورة')) {
       if (!elements.imageViewerModal || !elements.imageViewerImg) return;
       elements.imageViewerImg.src = src;
       if (elements.imageViewerTitle) elements.imageViewerTitle.textContent = title;
@@ -282,7 +294,7 @@
     if (elements.detailPiecePhotoBox) {
       elements.detailPiecePhotoBox.addEventListener('click', () => {
         if (activePiece?.imageDataUrl) {
-          openImageViewer(activePiece.imageDataUrl, `صورة القطعة: ${activePiece.name}`);
+          openImageViewer(activePiece.imageDataUrl, label('pieceImageTitle', 'صورة القطعة: {name}', { name: activePiece.name }));
         }
       });
     }
@@ -290,7 +302,7 @@
     if (elements.detailInvoicePhotoBox) {
       elements.detailInvoicePhotoBox.addEventListener('click', () => {
         if (activePiece?.invoiceDataUrl) {
-          openImageViewer(activePiece.invoiceDataUrl, `فاتورة: ${activePiece.name}`);
+          openImageViewer(activePiece.invoiceDataUrl, label('invoiceTitle', 'فاتورة: {name}', { name: activePiece.name }));
         }
       });
     }
@@ -314,13 +326,13 @@
     function askDeletePiece(piece) {
       pendingDeletePiece = piece;
       if (!elements.deleteConfirmModal) {
-        if (typeof window !== 'undefined' && window.confirm && window.confirm(`هل أنت متأكد من حذف قطعة «${piece.name}»؟`)) {
+        if (typeof window !== 'undefined' && window.confirm && window.confirm(label('deleteConfirm', 'هل أنت متأكد من حذف قطعة «{name}»؟', { name: piece.name }))) {
           executeDelete(piece.id);
         }
         return;
       }
       if (elements.deleteConfirmText) {
-        elements.deleteConfirmText.textContent = `هل أنت متأكد من حذف قطعة «${piece.name}» من الخزانة؟ لا يمكن التراجع عن هذا الإجراء.`;
+        elements.deleteConfirmText.textContent = label('deleteConfirmLong', 'هل أنت متأكد من حذف قطعة «{name}» من الخزانة؟ لا يمكن التراجع عن هذا الإجراء.', { name: piece.name });
       }
       elements.deleteConfirmModal.hidden = false;
     }
@@ -394,7 +406,7 @@
           }
         } catch (err) {
           if (elements.backupStatus) {
-            elements.backupStatus.textContent = 'حدث خطأ أثناء تصدير النسخة ⚠️';
+            elements.backupStatus.textContent = label('backupFailed', 'حدث خطأ أثناء تصدير النسخة ⚠️');
             elements.backupStatus.className = 'text-[10px] text-center text-rose-400 font-bold mt-1.5 min-h-[1rem]';
           }
         }
@@ -440,13 +452,13 @@
       activePiece = piece;
       if (!elements.detailModal) return;
 
-      if (elements.detailTitle) elements.detailTitle.textContent = piece.name || 'تفاصيل القطعة';
+      if (elements.detailTitle) elements.detailTitle.textContent = piece.name || label('detailTitle', 'تفاصيل القطعة');
       if (elements.detailWeightKarat) {
-        elements.detailWeightKarat.textContent = `${piece.weight} جم · عيار ${piece.karat}`;
+        elements.detailWeightKarat.textContent = label('detailWeightKarat', '{weight} جم · عيار {karat}', { weight: piece.weight, karat: piece.karat });
       }
       if (elements.detailPureWeight) {
         const pure24 = (piece.weight * purity).toFixed(2);
-        elements.detailPureWeight.textContent = `(يعادل ${pure24} جم ذهب خالص 24K)`;
+        elements.detailPureWeight.textContent = label('detailPureWeight', '(يعادل {pure} جم ذهب خالص 24K)', { pure: pure24 });
       }
       if (elements.detailMarketValue) {
         elements.detailMarketValue.textContent = formatting.formatSar(currentVal);
@@ -458,10 +470,10 @@
           const diff = currentVal - purchasePrice;
           const diffPct = ((diff / purchasePrice) * 100).toFixed(1);
           if (diff >= 0) {
-            elements.detailProfitLoss.textContent = `▲ ربح: +${formatting.formatMoney(diff)} ر.س (+${diffPct}%)`;
+            elements.detailProfitLoss.textContent = label('profit', '▲ ربح: +{amount} ر.س (+{pct}%)', { amount: formatting.formatMoney(diff), pct: diffPct });
             elements.detailProfitLoss.className = 'block text-[11px] font-mono text-emerald-400 font-bold mt-0.5';
           } else {
-            elements.detailProfitLoss.textContent = `▼ انخفاض: -${formatting.formatMoney(Math.abs(diff))} ر.س (${diffPct}%)`;
+            elements.detailProfitLoss.textContent = label('loss', '▼ انخفاض: -{amount} ر.س ({pct}%)', { amount: formatting.formatMoney(Math.abs(diff)), pct: diffPct });
             elements.detailProfitLoss.className = 'block text-[11px] font-mono text-rose-400 font-bold mt-0.5';
           }
           elements.detailProfitLoss.hidden = false;
@@ -472,16 +484,16 @@
       }
 
       if (elements.detailPurchasePrice) {
-        elements.detailPurchasePrice.textContent = purchasePrice > 0 ? formatting.formatSar(purchasePrice) : 'غير محدد';
+        elements.detailPurchasePrice.textContent = purchasePrice > 0 ? formatting.formatSar(purchasePrice) : label('notSpecified', 'غير محدد');
       }
       if (elements.detailPurchaseDate) {
-        elements.detailPurchaseDate.textContent = piece.purchaseDate || 'غير محدد';
+        elements.detailPurchaseDate.textContent = piece.purchaseDate || label('notSpecified', 'غير محدد');
       }
       if (elements.detailCategory) {
         if (piece.category === 'investment_gold') {
-          elements.detailCategory.innerHTML = `<span class="text-emerald-400 font-bold">💰 ادخار واستثمار (تجب الزكاة 2.5% إذا بلغ النصاب وحال الحول)</span>`;
+          elements.detailCategory.innerHTML = `<span class="text-emerald-400 font-bold">${escapeHtml(label('investmentDetail', '💰 ادخار واستثمار (تجب الزكاة 2.5% إذا بلغ النصاب وحال الحول)'))}</span>`;
         } else {
-          elements.detailCategory.innerHTML = `<span class="text-gray-300 font-bold">💎 زينة شخصية (معفاة من الزكاة عند الجمهور)</span>`;
+          elements.detailCategory.innerHTML = `<span class="text-gray-300 font-bold">${escapeHtml(label('personalDetail', '💎 زينة شخصية (معفاة من الزكاة عند الجمهور)'))}</span>`;
         }
       }
 
@@ -573,17 +585,17 @@
 
             let photoHtml = '';
             if (safeImageSrc(piece.imageDataUrl)) {
-              photoHtml += `<img src="${safeImageSrc(piece.imageDataUrl)}" alt="${escapeHtml(piece.name)}" class="piece-thumbnail w-10 h-10 object-cover rounded-lg border border-amber-400/40 me-1.5 flex-shrink-0" title="اضغط لعرض صورة القطعة">`;
+              photoHtml += `<img src="${safeImageSrc(piece.imageDataUrl)}" alt="${escapeHtml(piece.name)}" class="piece-thumbnail w-10 h-10 object-cover rounded-lg border border-amber-400/40 me-1.5 flex-shrink-0" title="${escapeHtml(label('viewPhotoHint', 'اضغط لعرض صورة القطعة'))}">`;
             } else {
               photoHtml += `<span class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-900 border border-slate-700 text-amber-400 font-bold text-xs me-1.5 flex-shrink-0">${escapeHtml(piece.karat)}K</span>`;
             }
 
             if (piece.invoiceDataUrl) {
-              photoHtml += `<button type="button" class="invoice-thumbnail-btn w-7 h-10 flex flex-col items-center justify-center rounded-md bg-slate-900 border border-amber-500/40 text-[9px] text-amber-300 font-bold me-2 hover:bg-slate-700 flex-shrink-0" title="اضغط لعرض الفاتورة"><span>🧾</span><span class="text-[7px]">فاتورة</span></button>`;
+              photoHtml += `<button type="button" class="invoice-thumbnail-btn w-7 h-10 flex flex-col items-center justify-center rounded-md bg-slate-900 border border-amber-500/40 text-[9px] text-amber-300 font-bold me-2 hover:bg-slate-700 flex-shrink-0" title="${escapeHtml(label('viewInvoiceHint', 'اضغط لعرض الفاتورة'))}"><span>🧾</span><span class="text-[7px]">${escapeHtml(label('invoiceBadge', 'فاتورة'))}</span></button>`;
             }
 
             const dateStr = piece.purchaseDate ? `<span class="text-gray-400 text-[10px]"> · 📅 ${escapeHtml(piece.purchaseDate)}</span>` : '';
-            const purchaseStr = purchasePrice > 0 ? `<span class="text-gray-400 text-[10px]"> · شراء: ${formatting.formatMoney(purchasePrice)}</span>` : '';
+            const purchaseStr = purchasePrice > 0 ? `<span class="text-gray-400 text-[10px]"> · ${escapeHtml(label('rowPurchase', 'شراء: {amount}', { amount: formatting.formatMoney(purchasePrice) }))}</span>` : '';
 
             li.innerHTML = `
               <div class="flex items-center min-w-0 flex-1">
@@ -593,7 +605,7 @@
                     <p class="font-bold text-xs text-white truncate">${escapeHtml(piece.name)}</p>
                     <span class="text-[10px] text-amber-400/80">👁️</span>
                   </div>
-                  <p class="text-[10px] text-gray-400 truncate">${escapeHtml(piece.weight)} ${copy.invoiceGramUnit || 'جرام'} · عيار ${escapeHtml(piece.karat)} ${categoryBadge}${dateStr}${purchaseStr}</p>
+                  <p class="text-[10px] text-gray-400 truncate">${escapeHtml(label('rowWeightKarat', '{weight} {unit} · عيار {karat}', { weight: piece.weight, unit: copy.invoiceGramUnit || 'جرام', karat: piece.karat }))} ${categoryBadge}${dateStr}${purchaseStr}</p>
                 </div>
               </div>
               <div class="text-end flex items-center gap-2 flex-shrink-0 ms-2">
@@ -601,7 +613,7 @@
                   <strong class="block text-xs font-mono text-amber-400 font-bold">${formatting.formatSar(currentVal)}</strong>
                   ${profitLossHtml}
                 </div>
-                <button type="button" class="delete-vault-piece-btn text-gray-400 hover:text-red-400 p-1.5 text-xs rounded-lg hover:bg-rose-950/40" data-id="${escapeHtml(piece.id)}" aria-label="حذف القطعة">✕</button>
+                <button type="button" class="delete-vault-piece-btn text-gray-400 hover:text-red-400 p-1.5 text-xs rounded-lg hover:bg-rose-950/40" data-id="${escapeHtml(piece.id)}" aria-label="${escapeHtml(label('deletePiece', 'حذف القطعة'))}">✕</button>
               </div>
             `;
 
@@ -610,12 +622,12 @@
               if (e.target.closest('.delete-vault-piece-btn')) return;
               if (e.target.closest('.invoice-thumbnail-btn')) {
                 e.stopPropagation();
-                if (piece.invoiceDataUrl) openImageViewer(piece.invoiceDataUrl, `فاتورة: ${piece.name}`);
+                if (piece.invoiceDataUrl) openImageViewer(piece.invoiceDataUrl, label('invoiceTitle', 'فاتورة: {name}', { name: piece.name }));
                 return;
               }
               if (e.target.closest('.piece-thumbnail')) {
                 e.stopPropagation();
-                if (piece.imageDataUrl) openImageViewer(piece.imageDataUrl, `صورة القطعة: ${piece.name}`);
+                if (piece.imageDataUrl) openImageViewer(piece.imageDataUrl, label('pieceImageTitle', 'صورة القطعة: {name}', { name: piece.name }));
                 return;
               }
               openPieceDetails(piece, currentVal, purity);

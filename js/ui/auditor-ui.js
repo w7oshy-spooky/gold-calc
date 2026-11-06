@@ -53,7 +53,7 @@
         if (text && navigator.clipboard) {
           navigator.clipboard.writeText(text).then(() => {
             const original = elements.copyBargainAdviceBtn.textContent;
-            elements.copyBargainAdviceBtn.textContent = '✓ تم النسخ';
+            elements.copyBargainAdviceBtn.textContent = (copy.copiedLabel || '✓ تم النسخ');
             setTimeout(() => { elements.copyBargainAdviceBtn.textContent = original; }, 2000);
           }).catch(() => {});
         }
@@ -120,7 +120,7 @@
       });
 
       if (elements.vatLabel) {
-        elements.vatLabel.textContent = `ض.ق.م (${effectiveTaxRate}%)`;
+        elements.vatLabel.textContent = (copy.vatLabel || 'ض.ق.م ({rate}%)').replace('{rate}', effectiveTaxRate);
       }
 
       if (!audit.available) {
