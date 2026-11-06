@@ -392,6 +392,8 @@
     },
   }) : null;
 
+  if (globalThis.GoldNativeBackButton) globalThis.GoldNativeBackButton.setupBackButton({ document, navigation: navigationUi });
+
   function addCurrentPieceToInvoice() {
     const item = preferencesApi.sanitizeInvoiceItem(transactionUi.getTransactionInput());
     if (!item) {
