@@ -141,3 +141,8 @@ test('index.html contain theme toggle button with accessible labels and icons', 
     assert.match(html, /class=["'][^"']*theme-icon-moon/);
   }
 });
+
+test('theme toggle stays clear of the wider Arabic language button in English', () => {
+  const css = fs.readFileSync('styles.css', 'utf8');
+  assert.match(css, /html\[lang=en\] \.theme-toggle\{inset-inline-end:calc\(1rem \+ 96px\)\}/);
+});
