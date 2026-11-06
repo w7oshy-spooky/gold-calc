@@ -241,7 +241,8 @@
       s231: "Gold Prices",
       s232: "Inspector",
       s233: "Calculator",
-      s234: "Vault"
+      s234: "Vault",
+      s235: "Waiting for the live price to show the chart"
   };
 
   const DICTIONARIES = { en: EN };

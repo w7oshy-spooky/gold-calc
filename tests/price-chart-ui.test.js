@@ -47,3 +47,37 @@ test('both pages render the chart card and load its script', () => {
     assert.ok(html.indexOf('js/ui/price-chart-ui.js') < html.indexOf('js/app.js'));
   }
 });
+
+test('chart shows a waiting message until a live price arrives', () => {
+  const { createPriceChartUI } = require('../js/ui/price-chart-ui.js');
+  const makeElement = () => ({
+    textContent: '',
+    hidden: false,
+    style: {},
+    dataset: {},
+    attrs: {},
+    classList: { toggle() {} },
+    setAttribute(name, value) { this.attrs[name] = value; },
+    removeAttribute(name) { delete this.attrs[name]; },
+    addEventListener() {},
+  });
+  const ids = ['chartPrice', 'chartChange', 'chartSvg', 'chartArea', 'chartLine', 'chartCursor', 'chartDot', 'chartFirstLabel', 'chartLastLabel', 'chartEmpty'];
+  const byId = Object.fromEntries(ids.map((id) => [id, makeElement()]));
+  const document = { getElementById: (id) => byId[id] || null, querySelectorAll: () => [] };
+  const formatting = { formatMoney: (value) => value.toFixed(2) };
+
+  const chart = createPriceChartUI({ document, locale: 'en', formatting });
+  chart.render(0);
+  assert.equal(byId.chartEmpty.hidden, false);
+
+  chart.render(450);
+  assert.equal(byId.chartEmpty.hidden, true);
+
+  chart.render(0);
+  assert.equal(byId.chartEmpty.hidden, false);
+});
+
+test('index.html has the chart waiting message with a translation', () => {
+  const html = fs.readFileSync('index.html', 'utf8');
+  assert.match(html, /id="chartEmpty"[^>]*hidden/);
+});

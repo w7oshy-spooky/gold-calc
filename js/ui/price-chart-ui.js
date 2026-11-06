@@ -77,6 +77,9 @@
       firstLabel: requireElement('chartFirstLabel'),
       lastLabel: requireElement('chartLastLabel'),
     };
+    // Optional: older markup and test documents may not have it.
+    const emptyMessage = document.getElementById('chartEmpty');
+    const setEmptyMessage = (visible) => { if (emptyMessage) emptyMessage.hidden = !visible; };
     const rangeButtons = Array.from(document.querySelectorAll('[data-chart-range]'));
 
     let rangeIndex = 0;
@@ -107,6 +110,7 @@
       elements.dot.hidden = true;
       elements.firstLabel.textContent = '';
       elements.lastLabel.textContent = '';
+      setEmptyMessage(true);
       if (typeof onTrend === 'function') onTrend(null);
     }
 
@@ -143,6 +147,7 @@
       elements.cursor.setAttribute('x2', cursorX);
       elements.cursor.setAttribute('visibility', 'visible');
       elements.dot.hidden = false;
+      setEmptyMessage(false);
       elements.dot.style.left = `${(cursorX / VIEW_WIDTH) * 100}%`;
       elements.dot.style.top = `${(paths.y(series[active]) / VIEW_HEIGHT) * 100}%`;
 
