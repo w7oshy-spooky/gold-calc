@@ -57,4 +57,6 @@ npm run assets:generate
 
 The PNGs in `icons/` are used by the PWA manifest and the iOS home-screen icon.
 
+On Android the back button closes the open dialog, then returns to the main tab, and only then exits (`@capacitor/app`).
+
 Backups and share cards cannot be downloaded from a WebView, so inside the app they are written to the app cache with `@capacitor/filesystem` and opened in the system share sheet (`@capacitor/share`). After pulling changes that add a plugin, run `npm install` and `npx cap sync` again so the native projects include it. In a browser they download as normal files.
