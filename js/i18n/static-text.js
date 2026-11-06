@@ -79,7 +79,7 @@
       s069: "⚖️ Item Details",
       s070: "Quick Natural Input",
       s071: "e.g. 21K ring 6.5g for 2800",
-      s072: "Type or paste: 21K ring 6.5g for 2800 SAR",
+      s072: "21K ring 6.5g for 2800",
       s073: "Weight (grams)",
       s074: "Decrease weight",
       s075: "Increase weight",

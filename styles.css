@@ -55,6 +55,8 @@ body .header-wrap>p{color:var(--muted);opacity:1;font-size:.8rem;text-align:star
   background:var(--card);color:var(--text);border:1px solid var(--line-strong);font-size:.8rem;font-weight:700;text-decoration:none;
 }
 .lang-switch:hover{color:var(--gold-soft);border-color:var(--gold)}
+/* The Arabic label in English mode is wider than "EN"; keep the theme toggle clear of it. */
+html[lang=en] .theme-toggle{inset-inline-end:calc(1rem + 96px)}
 .theme-toggle{
   position:absolute;top:max(1.1rem,env(safe-area-inset-top));inset-inline-end:calc(1rem + 54px);min-width:38px;min-height:38px;
   display:flex;align-items:center;justify-content:center;padding:.25rem;border-radius:10px;
@@ -379,6 +381,9 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
   .theme-toggle{
     inset-inline-end:calc(1.5rem + 54px);
     top:1.5rem;
+  }
+  html[lang=en] .theme-toggle{
+    inset-inline-end:calc(1.5rem + 96px);
   }
 }
 
