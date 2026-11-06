@@ -242,7 +242,15 @@
       s232: "Inspector",
       s233: "Calculator",
       s234: "Vault",
-      s235: "Waiting for the live price to show the chart"
+      s235: "Waiting for the live price to show the chart",
+      s300: "🔔 Price alerts",
+      s301: "Get an alert when the price per gram reaches your number. Works while the app is open.",
+      s302: "Karat",
+      s303: "Direction",
+      s304: "At or above",
+      s305: "At or below",
+      s306: "Target price per gram",
+      s307: "➕ Add alert"
   };
 
   const DICTIONARIES = { en: EN };

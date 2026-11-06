@@ -662,3 +662,6 @@ main:not([data-active-tab="calc"]):not([data-active-tab="auditor"]):not([data-ac
 .app-lock-card h2{font-size:1.1rem;font-weight:700}
 [data-theme="light"] .app-lock-screen{background:#f7f6f2}
 [data-theme="light"] .app-lock-card{color:#181613}
+
+.price-alert-toast{position:fixed;top:max(.75rem,env(safe-area-inset-top));inset-inline:1rem;z-index:9000;max-width:26rem;margin-inline:auto;padding:.75rem 1rem;border-radius:1rem;background:#92400e;color:#fffbeb;font-size:.8rem;font-weight:700;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.price-alert-toast[hidden]{display:none!important}

@@ -210,6 +210,27 @@
       </div>
     </section>
 
+    <section id="priceAlertCard" class="input-card" data-tab="market" aria-labelledby="priceAlertHeading">
+      <p id="priceAlertHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-1" data-t="s300">🔔 تنبيهات السعر</p>
+      <p class="text-[10px] text-gray-400 mb-3 leading-relaxed" data-t="s301">يصلك تنبيه عند وصول سعر الجرام إلى رقمك، ويعمل والتطبيق مفتوح.</p>
+      <form id="priceAlertForm" class="grid grid-cols-3 gap-2 mb-2">
+        <select id="priceAlertKarat" class="quick-input-box text-xs" aria-label="العيار" data-t-attr="aria-label:s302">
+          <option value="24">24</option>
+          <option value="22">22</option>
+          <option value="21" selected>21</option>
+          <option value="18">18</option>
+        </select>
+        <select id="priceAlertDirection" class="quick-input-box text-xs" aria-label="الاتجاه" data-t-attr="aria-label:s303">
+          <option value="above" data-t="s304">أعلى من</option>
+          <option value="below" data-t="s305">أقل من</option>
+        </select>
+        <input type="number" id="priceAlertTarget" step="0.01" min="0" inputmode="decimal" dir="ltr" placeholder="0.00" class="quick-input-box text-xs font-mono" aria-label="السعر المستهدف لكل جرام" data-t-attr="aria-label:s306">
+        <button type="submit" class="action-btn action-btn-primary text-xs py-1.5 col-span-3" data-t="s307">➕ إضافة تنبيه</button>
+      </form>
+      <p id="priceAlertStatus" class="text-[10px] text-rose-400 font-bold min-h-[1rem]"></p>
+      <ul id="priceAlertList" class="space-y-1.5"></ul>
+    </section>
+
     <section id="priceChartCard" class="input-card chart-card" data-tab="market" aria-labelledby="chartHeading">
       <div class="chart-header">
         <div>
@@ -577,6 +598,8 @@
 
   <!-- Modals and Overlays (Outside main content to prevent tab overflow/clipping) -->
   <!-- Vault Modal Dialog -->
+  <div id="priceAlertToast" class="price-alert-toast" role="status" aria-live="polite" hidden></div>
+
   <div id="appLockScreen" class="app-lock-screen" hidden>
     <div class="app-lock-card">
       <img src="icon.svg" alt="" width="72" height="72">
@@ -827,6 +850,7 @@
   <script src="js/ui/offline-support.js"></script>
   <script src="js/ui/native-back-button.js"></script>
   <script src="js/ui/app-lock.js"></script>
+  <script src="js/ui/price-alerts.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

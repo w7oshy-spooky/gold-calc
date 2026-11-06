@@ -124,11 +124,17 @@
     marketUi.renderLiveStatus(quote, 'ready');
   }
 
+  const priceAlerts = globalThis.GoldPriceAlerts
+    ? globalThis.GoldPriceAlerts.createPriceAlerts({ document, labels: copy.vaultLabels })
+    : null;
+  if (priceAlerts) priceAlerts.init();
+
   function applyLiveQuote(quote, status = 'ready') {
     marketUi.setLiveQuoteInput(Number(quote.priceUsdOunce));
     marketUi.renderLiveStatus(quote, status);
     marketUi.renderLiveKaratPrices(Number(quote.priceUsdOunce));
     calculate();
+    if (priceAlerts) priceAlerts.check(getPrice24k());
   }
 
   let activeShareBlob = null;

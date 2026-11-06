@@ -63,4 +63,8 @@ On Android the back button closes the open dialog, then returns to the main tab,
 
 Inside the native app, the vault tab shows a switch to lock the app with the phone's biometrics or passcode (`@aparajita/capacitor-biometric-auth`). The app locks on launch and after 30 seconds in the background. iOS needs `NSFaceIDUsageDescription` in `ios/App/App/Info.plist` after `npx cap add ios`. The switch is hidden on the website and on phones without any screen lock.
 
+### Price alerts
+
+The market tab lets you add up to 5 alerts ("21K at or above X SAR/g"). They are checked each time a live quote arrives, so they fire **while the app is open**; in the native app they also raise a system notification (`@capacitor/local-notifications`). A phone suspends a web app in the background, so alerts while the app is closed would need a server and push notifications (FCM / APNs). Android 13+ asks for notification permission the first time you add an alert.
+
 Backups and share cards cannot be downloaded from a WebView, so inside the app they are written to the app cache with `@capacitor/filesystem` and opened in the system share sheet (`@capacitor/share`). After pulling changes that add a plugin, run `npm install` and `npx cap sync` again so the native projects include it. In a browser they download as normal files.
