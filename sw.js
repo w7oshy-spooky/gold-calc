@@ -1,7 +1,7 @@
 'use strict';
 
-// Bump the version when files are added to or removed from APP_SHELL.
-const CACHE_NAME = 'gold-calc-shell-v18';
+// CACHE_NAME is generated from the APP_SHELL contents: run `npm run stamp:sw` after changing any of them.
+const CACHE_NAME = 'gold-calc-shell-7ad3a3ec53';
 const NETWORK_TIMEOUT_MS = 3000;
 
 const APP_SHELL = [
