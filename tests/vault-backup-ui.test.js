@@ -70,3 +70,48 @@ test('an invalid backup file shows the invalid message', async () => {
     delete global.FileReader;
   }
 });
+
+test('export saves the backup through saveFile and reports success', async () => {
+  const saved = [];
+  const handlers = {};
+  const elements = {
+    exportBackupBtn: { addEventListener: (type, fn) => { handlers[type] = fn; } },
+    backupStatus: { textContent: '', className: '' },
+  };
+  const vaultStore = { getAllPieces: async () => [{}], exportBackup: async () => '{"pieces":1}' };
+  createVaultBackupUI({
+    document: {},
+    elements,
+    vaultStore,
+    copy: { vaultLabels: { backupExported: 'EXPORTED' } },
+    label: (key, fallback) => fallback,
+    render: async () => {},
+    onChange: () => {},
+    saveFile: async (options) => { saved.push(options); return { method: 'native_share', cancelled: false }; },
+  });
+  await handlers.click();
+  assert.equal(saved.length, 1);
+  assert.match(saved[0].filename, /^gold-vault-backup-\d{4}-\d{2}-\d{2}\.json$/);
+  assert.equal(saved[0].text, '{"pieces":1}');
+  assert.equal(elements.backupStatus.textContent, 'EXPORTED');
+});
+
+test('closing the share sheet does not show a success message', async () => {
+  const handlers = {};
+  const elements = {
+    exportBackupBtn: { addEventListener: (type, fn) => { handlers[type] = fn; } },
+    backupStatus: { textContent: '', className: '' },
+  };
+  createVaultBackupUI({
+    document: {},
+    elements,
+    vaultStore: { getAllPieces: async () => [{}], exportBackup: async () => '{}' },
+    copy: { vaultLabels: { backupExported: 'EXPORTED' } },
+    label: (key, fallback) => fallback,
+    render: async () => {},
+    onChange: () => {},
+    saveFile: async () => ({ method: 'native_share', cancelled: true }),
+  });
+  await handlers.click();
+  assert.equal(elements.backupStatus.textContent, '');
+});

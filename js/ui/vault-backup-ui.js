@@ -6,7 +6,16 @@
   'use strict';
 
   // Wires the vault backup export / restore buttons.
-  function createVaultBackupUI({ document, elements, vaultStore, copy, label, render, onChange }) {
+  function createVaultBackupUI({
+    document,
+    elements,
+    vaultStore,
+    copy,
+    label,
+    render,
+    onChange,
+    saveFile = (options) => globalThis.GoldNativeFile.saveFile(options),
+  }) {
     // Backup Export
     if (elements.exportBackupBtn && vaultStore) {
       elements.exportBackupBtn.addEventListener('click', async () => {
@@ -21,16 +30,15 @@
           }
 
           const backupJson = await vaultStore.exportBackup();
-          const blob = new Blob([backupJson], { type: 'application/json;charset=utf-8' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
           const dateStr = new Date().toISOString().slice(0, 10);
-          a.href = url;
-          a.download = `gold-vault-backup-${dateStr}.json`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
+          const result = await saveFile({
+            filename: `gold-vault-backup-${dateStr}.json`,
+            text: backupJson,
+            mimeType: 'application/json;charset=utf-8',
+            title: label('backupShareTitle', 'نسخة الخزانة الاحتياطية'),
+            document,
+          });
+          if (result.cancelled) return;
 
           if (elements.backupStatus) {
             elements.backupStatus.textContent = copy.vaultLabels?.backupExported || 'تم تصدير النسخة الاحتياطية بنجاح ✓';

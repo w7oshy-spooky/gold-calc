@@ -437,8 +437,20 @@
     title = 'حاسبة الذهب',
     navigatorRef = (typeof navigator !== 'undefined' ? navigator : null),
     windowRef = (typeof window !== 'undefined' ? window : null),
+    nativeFile = (typeof globalThis !== 'undefined' ? globalThis.GoldNativeFile : null),
+    capacitor = (typeof globalThis !== 'undefined' ? globalThis.Capacitor : null),
   } = {}) {
     if (!blob) throw new Error('Blob is required for sharing');
+
+    // 0. Inside the Capacitor app: write the image and open the system share sheet.
+    if (nativeFile && nativeFile.getNativePlugins(capacitor)) {
+      try {
+        const result = await nativeFile.saveFile({ filename, blob, mimeType: 'image/png', title, capacitor });
+        return result.cancelled ? { shared: false, method: 'cancelled' } : { shared: true, method: 'native_share' };
+      } catch (_error) {
+        // Fall through to the web options below.
+      }
+    }
 
     const file = new File([blob], filename, { type: 'image/png' });
 

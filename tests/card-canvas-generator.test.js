@@ -177,3 +177,32 @@ test('shareOrDownloadCard falls back to download when canShare is false', async 
   assert.equal(res.shared, true);
   assert.equal(res.method, 'download');
 });
+
+test('shareOrDownloadCard uses the native share sheet inside the app', async () => {
+  const nativeFile = require('../js/ui/native-file.js');
+  const written = [];
+  const capacitor = {
+    isNativePlatform: () => true,
+    Plugins: {
+      Filesystem: { writeFile: async (options) => { written.push(options.path); return { uri: 'file:///x' }; } },
+      Share: { share: async () => {} },
+    },
+  };
+  class FakeReader { readAsDataURL() { this.result = 'data:image/png;base64,QUJD'; this.onload(); } }
+  const previous = global.FileReader;
+  global.FileReader = FakeReader;
+  try {
+    const res = await generator.shareOrDownloadCard({
+      blob: {},
+      filename: 'card.png',
+      nativeFile,
+      capacitor,
+      navigatorRef: null,
+      windowRef: null,
+    });
+    assert.deepEqual(res, { shared: true, method: 'native_share' });
+    assert.deepEqual(written, ['card.png']);
+  } finally {
+    if (previous) global.FileReader = previous; else delete global.FileReader;
+  }
+});
