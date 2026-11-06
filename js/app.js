@@ -370,7 +370,7 @@
     },
   });
 
-  const vaultUi = globalThis.GoldVaultUI ? globalThis.GoldVaultUI.createVaultUI({
+  const vaultUi = (globalThis.GoldVaultUI && globalThis.GoldVaultRow && globalThis.GoldVaultBackupUI) ? globalThis.GoldVaultUI.createVaultUI({
     document,
     vaultStore,
     core,

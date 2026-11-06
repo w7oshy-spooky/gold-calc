@@ -5,17 +5,6 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-    })[ch]);
-  }
-
-  // Only allow image data URLs inside src attributes.
-  function safeImageSrc(value) {
-    return /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(value || '') ? value : '';
-  }
-
   function createVaultUI({
     document,
     vaultStore,
@@ -25,6 +14,8 @@
     getPrice24k = () => 0,
     onChange = () => {},
   } = {}) {
+    const rowApi = globalThis.GoldVaultRow;
+    const { escapeHtml } = rowApi;
     const el = (id) => document.getElementById(id);
 
     // Looks up vault text in the active language; the Arabic fallback keeps tests with partial copy working.
@@ -372,81 +363,15 @@
       });
     });
 
-    // Backup Export
-    if (elements.exportBackupBtn && vaultStore) {
-      elements.exportBackupBtn.addEventListener('click', async () => {
-        try {
-          const pieces = await vaultStore.getAllPieces();
-          if (!pieces || pieces.length === 0) {
-            if (elements.backupStatus) {
-              elements.backupStatus.textContent = copy.vaultLabels?.backupEmpty || 'الخزانة فارغة لا توجد قطع لتصديرها';
-              elements.backupStatus.className = 'text-[10px] text-center text-amber-400 font-bold mt-1.5 min-h-[1rem]';
-            }
-            return;
-          }
-
-          const backupJson = await vaultStore.exportBackup();
-          const blob = new Blob([backupJson], { type: 'application/json;charset=utf-8' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          const dateStr = new Date().toISOString().slice(0, 10);
-          a.href = url;
-          a.download = `gold-vault-backup-${dateStr}.json`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-
-          if (elements.backupStatus) {
-            elements.backupStatus.textContent = copy.vaultLabels?.backupExported || 'تم تصدير النسخة الاحتياطية بنجاح ✓';
-            elements.backupStatus.className = 'text-[10px] text-center text-emerald-400 font-bold mt-1.5 min-h-[1rem]';
-            setTimeout(() => {
-              if (elements.backupStatus) elements.backupStatus.textContent = '';
-            }, 4000);
-          }
-        } catch (err) {
-          if (elements.backupStatus) {
-            elements.backupStatus.textContent = label('backupFailed', 'حدث خطأ أثناء تصدير النسخة ⚠️');
-            elements.backupStatus.className = 'text-[10px] text-center text-rose-400 font-bold mt-1.5 min-h-[1rem]';
-          }
-        }
-      });
-    }
-
-    // Backup Import
-    if (elements.importBackupInput && vaultStore) {
-      elements.importBackupInput.addEventListener('change', async () => {
-        const file = elements.importBackupInput.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          try {
-            const content = e.target.result;
-            const imported = await vaultStore.importBackup(content, { merge: true });
-            await render();
-            onChange({ type: 'vault-imported', count: imported.length });
-
-            if (elements.backupStatus) {
-              const template = copy.vaultLabels?.backupRestored || 'تمت استعادة {count} قطعة بنجاح ✓';
-              elements.backupStatus.textContent = template.replace('{count}', imported.length);
-              elements.backupStatus.className = 'text-[10px] text-center text-emerald-400 font-bold mt-1.5 min-h-[1rem]';
-              setTimeout(() => {
-                if (elements.backupStatus) elements.backupStatus.textContent = '';
-              }, 4000);
-            }
-          } catch (err) {
-            if (elements.backupStatus) {
-              elements.backupStatus.textContent = copy.vaultLabels?.backupInvalid || 'ملف النسخة الاحتياطية غير صالح أو تالف ⚠️';
-              elements.backupStatus.className = 'text-[10px] text-center text-rose-400 font-bold mt-1.5 min-h-[1rem]';
-            }
-          } finally {
-            elements.importBackupInput.value = '';
-          }
-        };
-        reader.readAsText(file);
-      });
-    }
+    globalThis.GoldVaultBackupUI.createVaultBackupUI({
+      document,
+      elements,
+      vaultStore,
+      copy,
+      label,
+      render: () => render(),
+      onChange,
+    });
 
     function openPieceDetails(piece, currentVal, purity) {
       activePiece = piece;
@@ -566,56 +491,7 @@
 
             const purity = (piece.karat || 21) / 24;
             const currentVal = price24k > 0 ? (piece.weight * purity * price24k) : 0;
-            const purchasePrice = Number(piece.purchasePrice) || 0;
-
-            let profitLossHtml = '';
-            if (purchasePrice > 0 && currentVal > 0) {
-              const diff = currentVal - purchasePrice;
-              const diffPct = ((diff / purchasePrice) * 100).toFixed(1);
-              if (diff >= 0) {
-                profitLossHtml = `<span class="block text-[10px] text-emerald-400 font-bold font-mono">▲ +${formatting.formatMoney(diff)} (+${diffPct}%)</span>`;
-              } else {
-                profitLossHtml = `<span class="block text-[10px] text-rose-400 font-bold font-mono">▼ -${formatting.formatMoney(Math.abs(diff))} (${diffPct}%)</span>`;
-              }
-            }
-
-            const categoryBadge = piece.category === 'investment_gold'
-              ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">${copy.vaultLabels?.investment || 'ادخار'}</span>`
-              : `<span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">${copy.vaultLabels?.personal || 'زينة'}</span>`;
-
-            let photoHtml = '';
-            if (safeImageSrc(piece.imageDataUrl)) {
-              photoHtml += `<img src="${safeImageSrc(piece.imageDataUrl)}" alt="${escapeHtml(piece.name)}" class="piece-thumbnail w-10 h-10 object-cover rounded-lg border border-amber-400/40 me-1.5 flex-shrink-0" title="${escapeHtml(label('viewPhotoHint', 'اضغط لعرض صورة القطعة'))}">`;
-            } else {
-              photoHtml += `<span class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-900 border border-slate-700 text-amber-400 font-bold text-xs me-1.5 flex-shrink-0">${escapeHtml(piece.karat)}K</span>`;
-            }
-
-            if (piece.invoiceDataUrl) {
-              photoHtml += `<button type="button" class="invoice-thumbnail-btn w-7 h-10 flex flex-col items-center justify-center rounded-md bg-slate-900 border border-amber-500/40 text-[9px] text-amber-300 font-bold me-2 hover:bg-slate-700 flex-shrink-0" title="${escapeHtml(label('viewInvoiceHint', 'اضغط لعرض الفاتورة'))}"><span>🧾</span><span class="text-[7px]">${escapeHtml(label('invoiceBadge', 'فاتورة'))}</span></button>`;
-            }
-
-            const dateStr = piece.purchaseDate ? `<span class="text-gray-400 text-[10px]"> · 📅 ${escapeHtml(piece.purchaseDate)}</span>` : '';
-            const purchaseStr = purchasePrice > 0 ? `<span class="text-gray-400 text-[10px]"> · ${escapeHtml(label('rowPurchase', 'شراء: {amount}', { amount: formatting.formatMoney(purchasePrice) }))}</span>` : '';
-
-            li.innerHTML = `
-              <div class="flex items-center min-w-0 flex-1">
-                ${photoHtml}
-                <div class="truncate ms-1">
-                  <div class="flex items-center gap-1.5">
-                    <p class="font-bold text-xs text-white truncate">${escapeHtml(piece.name)}</p>
-                    <span class="text-[10px] text-amber-400/80">👁️</span>
-                  </div>
-                  <p class="text-[10px] text-gray-400 truncate">${escapeHtml(label('rowWeightKarat', '{weight} {unit} · عيار {karat}', { weight: piece.weight, unit: copy.invoiceGramUnit || 'جرام', karat: piece.karat }))} ${categoryBadge}${dateStr}${purchaseStr}</p>
-                </div>
-              </div>
-              <div class="text-end flex items-center gap-2 flex-shrink-0 ms-2">
-                <div>
-                  <strong class="block text-xs font-mono text-amber-400 font-bold">${formatting.formatSar(currentVal)}</strong>
-                  ${profitLossHtml}
-                </div>
-                <button type="button" class="delete-vault-piece-btn text-gray-400 hover:text-red-400 p-1.5 text-xs rounded-lg hover:bg-rose-950/40" data-id="${escapeHtml(piece.id)}" aria-label="${escapeHtml(label('deletePiece', 'حذف القطعة'))}">✕</button>
-              </div>
-            `;
+            li.innerHTML = rowApi.buildPieceRowHtml({ piece, currentVal, copy, formatting, label });
 
             // Row click opens details
             li.addEventListener('click', (e) => {

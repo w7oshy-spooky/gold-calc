@@ -15,8 +15,10 @@ test('Arabic and English copy define the same keys', () => {
   }
 });
 
-test('every vault label used in vault-ui.js exists in both languages', () => {
-  const source = fs.readFileSync('js/ui/vault-ui.js', 'utf8');
+test('every vault label used by the vault UI exists in both languages', () => {
+  const source = ['vault-ui.js', 'vault-row.js', 'vault-backup-ui.js']
+    .map((file) => fs.readFileSync(`js/ui/${file}`, 'utf8'))
+    .join('\n');
   const keys = new Set([...source.matchAll(/label\('(\w+)'/g)].map((m) => m[1]));
   assert.ok(keys.size > 20);
   for (const key of keys) {
