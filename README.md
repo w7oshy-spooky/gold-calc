@@ -59,4 +59,8 @@ The PNGs in `icons/` are used by the PWA manifest and the iOS home-screen icon.
 
 On Android the back button closes the open dialog, then returns to the main tab, and only then exits (`@capacitor/app`).
 
+### App lock
+
+Inside the native app, the vault tab shows a switch to lock the app with the phone's biometrics or passcode (`@aparajita/capacitor-biometric-auth`). The app locks on launch and after 30 seconds in the background. iOS needs `NSFaceIDUsageDescription` in `ios/App/App/Info.plist` after `npx cap add ios`. The switch is hidden on the website and on phones without any screen lock.
+
 Backups and share cards cannot be downloaded from a WebView, so inside the app they are written to the app cache with `@capacitor/filesystem` and opened in the system share sheet (`@capacitor/share`). After pulling changes that add a plugin, run `npm install` and `npx cap sync` again so the native projects include it. In a browser they download as normal files.

@@ -394,6 +394,10 @@
 
   if (globalThis.GoldNativeBackButton) globalThis.GoldNativeBackButton.setupBackButton({ document, navigation: navigationUi });
 
+  if (globalThis.GoldAppLock) {
+    globalThis.GoldAppLock.createAppLock({ document, labels: copy.vaultLabels }).init();
+  }
+
   function addCurrentPieceToInvoice() {
     const item = preferencesApi.sanitizeInvoiceItem(transactionUi.getTransactionInput());
     if (!item) {
