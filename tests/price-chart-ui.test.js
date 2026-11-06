@@ -38,7 +38,7 @@ test('summarize reports the change from the first point', () => {
 });
 
 test('both pages render the chart card and load its script', () => {
-  for (const file of ['index.html', 'en.html']) {
+  for (const file of ['index.html']) {
     const html = fs.readFileSync(file, 'utf8');
     for (const id of ['chartPrice', 'chartChange', 'chartSvg', 'chartArea', 'chartLine', 'chartCursor', 'chartDot', 'chartFirstLabel', 'chartLastLabel']) {
       assert.match(html, new RegExp(`id="${id}"`), `${file} needs #${id}`);

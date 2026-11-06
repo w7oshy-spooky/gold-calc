@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const crypto = require('node:crypto');
 
-for (const page of ['index.html', 'en.html']) {
+for (const page of ['index.html']) {
   test(`${page} has a CSP that allows only its inline theme script`, () => {
     const html = fs.readFileSync(page, 'utf8');
     const policy = html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)">/)?.[1];
@@ -22,8 +22,3 @@ for (const page of ['index.html', 'en.html']) {
     );
   });
 }
-
-test('both pages use the same CSP', () => {
-  const read = (f) => fs.readFileSync(f, 'utf8').match(/Content-Security-Policy" content="([^"]+)"/)[1];
-  assert.equal(read('index.html'), read('en.html'));
-});

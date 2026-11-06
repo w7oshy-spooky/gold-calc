@@ -132,8 +132,8 @@ test('theme-ui supports system preference fallback when no storage is present', 
   assert.equal(doc.documentElement.getAttribute('data-theme'), 'light');
 });
 
-test('both index.html and en.html contain theme toggle button with accessible labels and icons', () => {
-  for (const file of ['index.html', 'en.html']) {
+test('index.html contain theme toggle button with accessible labels and icons', () => {
+  for (const file of ['index.html']) {
     const html = fs.readFileSync(file, 'utf8');
     assert.match(html, /id=["']themeToggle["']/);
     assert.match(html, /class=["'][^"']*theme-toggle/);

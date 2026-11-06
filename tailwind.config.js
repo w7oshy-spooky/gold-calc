@@ -2,6 +2,6 @@
  *  npx --yes tailwindcss@3.4.17 -c tailwind.config.js -o tailwind.css --minify
  */
 module.exports = {
-  content: ['./index.html', './en.html', './js/**/*.js'],
+  content: ['./index.html', './js/**/*.js'],
   corePlugins: { preflight: true },
 };

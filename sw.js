@@ -1,7 +1,7 @@
 'use strict';
 
 // CACHE_NAME is generated from the APP_SHELL contents: run `npm run stamp:sw` after changing any of them.
-const CACHE_NAME = 'gold-calc-shell-a1f3fd0f59';
+const CACHE_NAME = 'gold-calc-shell-c508e7949b';
 const NETWORK_TIMEOUT_MS = 3000;
 
 const APP_SHELL = [
@@ -21,6 +21,7 @@ const APP_SHELL = [
   'js/core/quick-input-parser.js',
   'gold-calculator.js',
   'js/i18n/translations.js',
+  'js/i18n/static-text.js',
   'js/ui/formatting.js',
   'js/market/price-cache.js',
   'js/market/live-price-client.js',
@@ -72,7 +73,7 @@ self.addEventListener('fetch', (event) => {
 
       const timer = setTimeout(() => {
         if (!resolved) {
-          caches.match(event.request).then((cached) => {
+          caches.match(event.request, { ignoreSearch: true }).then((cached) => {
             if (cached && !resolved) {
               resolved = true;
               resolve(cached);
@@ -97,7 +98,7 @@ self.addEventListener('fetch', (event) => {
           if (!resolved) {
             resolved = true;
             clearTimeout(timer);
-            caches.match(event.request).then((cached) => {
+            caches.match(event.request, { ignoreSearch: true }).then((cached) => {
               if (cached) resolve(cached);
               else if (event.request.mode === 'navigate') resolve(caches.match('index.html'));
             });

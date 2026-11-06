@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
 const arabic = fs.readFileSync('index.html', 'utf8');
-const english = fs.readFileSync('en.html', 'utf8');
+const english = fs.readFileSync('index.html', 'utf8');
 const app = fs.readFileSync('js/app.js', 'utf8');
 const marketUi = fs.readFileSync('js/ui/market-ui.js', 'utf8');
 const transactionUi = fs.readFileSync('js/ui/transaction-ui.js', 'utf8');
@@ -328,7 +328,7 @@ test('service worker precaches every script and stylesheet the pages load', () =
   assert.match(app, /navigator\.serviceWorker\.register\('sw\.js'\)/);
 });
 
-test('both index.html and en.html expose stone price separation controls symmetrically', () => {
+test('index.html expose stone price separation controls symmetrically', () => {
   const stoneIds = [
     'hasStonesToggle',
     'stoneWeightContainer',
@@ -347,6 +347,6 @@ test('both index.html and en.html expose stone price separation controls symmetr
 
   for (const id of stoneIds) {
     assert.match(arabic, new RegExp(`id=["']${id}["']`), `index.html must expose #${id}`);
-    assert.match(english, new RegExp(`id=["']${id}["']`), `en.html must expose #${id}`);
+    assert.match(english, new RegExp(`id=["']${id}["']`), `index.html must expose #${id}`);
   }
 });

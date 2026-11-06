@@ -6,15 +6,24 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0d0f12">
-  <meta name="description" content="حاسبة لشراء وبيع الذهب بالريال السعودي مع العيار والمصنعية والضريبة ومقارنة عرض المحل بالسعر المرجعي.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-hUslzzZLT4+OobC7NhMwhvYQ/p6mRyVY9hDj7Siwj5Q='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://gold-calc-live.vercel.app; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
-  <title>حاسبة الذهب</title>
+  <meta name="description" content="حاسبة لشراء وبيع الذهب بالريال السعودي مع العيار والمصنعية والضريبة ومقارنة عرض المحل بالسعر المرجعي." data-t-attr="content:s001">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-bAAtH1AvKJR9D/bV/3b4JIk0xSc1DuGv5svRo8xuKAU='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://gold-calc-live.vercel.app; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <title data-t="s002">حاسبة الذهب</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="tailwind.css">
   <link rel="stylesheet" href="styles.css">
   <script>
+    (function(){
+      try{
+        var q=(location.search.match(/[?&]lang=(ar|en)\b/)||[])[1];
+        if(q){localStorage.setItem('gold_lang',q);}
+        var l=q||localStorage.getItem('gold_lang')||'ar';
+        document.documentElement.lang=l;
+        document.documentElement.dir=l==='en'?'ltr':'rtl';
+      }catch(e){}
+    })();
     (function(){
       try{
         var t=localStorage.getItem('gold_theme')||(JSON.parse(localStorage.getItem('gold-calc-preferences-v1')||'{}')).theme;
@@ -26,37 +35,37 @@
 </head>
 <body>
   <header class="gradient-bg header-wrap pb-14 px-5 text-white text-center rounded-b-[2.5rem] shadow-lg">
-    <button type="button" id="themeToggle" class="theme-toggle" aria-label="التبديل إلى الوضع النهاري" title="تبديل الثيم">
+    <button type="button" id="themeToggle" class="theme-toggle" aria-label="التبديل إلى الوضع النهاري" title="تبديل الثيم" data-t-attr="aria-label:s003;title:s004">
       <svg class="theme-icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       <svg class="theme-icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
-    <a class="lang-switch" href="en.html" aria-label="فتح النسخة الإنجليزية">EN</a>
+    <a class="lang-switch" href="?lang=en" aria-label="فتح النسخة الإنجليزية" data-t-attr="href:s005;aria-label:s006" data-t="s007">EN</a>
     <div class="flex items-center justify-center gap-2 mb-1">
       <svg class="header-icon text-yellow-200" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9" cy="6" rx="6" ry="3"/><path d="M3 6v4c0 1.66 2.69 3 6 3s6-1.34 6-3V6"/><path d="M9 16c-3.31 0-6-1.34-6-3"/><path d="M3 10v4c0 1.66 2.69 3 6 3 .7 0 1.37-.06 2-.17"/><ellipse cx="15" cy="15" rx="6" ry="3"/><path d="M9 15v4c0 1.66 2.69 3 6 3s6-1.34 6-3v-4"/></g></svg>
-      <h1 class="text-2xl font-bold">حاسبة الذهب الذكية</h1>
+      <h1 class="text-2xl font-bold" data-t="s008">حاسبة الذهب الذكية</h1>
     </div>
-    <p class="text-yellow-100 text-sm opacity-90">احسب الشراء أو البيع وقارن عرض المحل بالسعر المرجعي</p>
-    <nav class="desktop-tab-bar" aria-label="تبويبات التنقل">
+    <p class="text-yellow-100 text-sm opacity-90" data-t="s009">احسب الشراء أو البيع وقارن عرض المحل بالسعر المرجعي</p>
+    <nav class="desktop-tab-bar" aria-label="تبويبات التنقل" data-t-attr="aria-label:s010">
       <div class="desktop-tab-pills">
         <button type="button" class="desktop-tab-btn active" data-tab-target="market">
           <span>📊</span>
-          <span data-i18n="tabMarket">أسعار الذهب</span>
+          <span data-i18n="tabMarket" data-t="s011">أسعار الذهب</span>
         </button>
         <button type="button" class="desktop-tab-btn" data-tab-target="auditor">
           <span>🔍</span>
-          <span data-i18n="tabAuditor">فحص العرض</span>
+          <span data-i18n="tabAuditor" data-t="s012">فحص العرض</span>
         </button>
         <button type="button" class="desktop-tab-btn" data-tab-target="calc">
           <span>⚖️</span>
-          <span data-i18n="tabCalc">الحاسبة</span>
+          <span data-i18n="tabCalc" data-t="s013">الحاسبة</span>
         </button>
         <button type="button" class="desktop-tab-btn" data-tab-target="vault">
           <span>💎</span>
-          <span data-i18n="tabVault">خزانتي</span>
+          <span data-i18n="tabVault" data-t="s014">خزانتي</span>
         </button>
         <button type="button" class="desktop-tab-btn" data-tab-target="all">
           <span>🌟</span>
-          <span data-i18n="tabAll">عرض شامل</span>
+          <span data-i18n="tabAll" data-t="s015">عرض شامل</span>
         </button>
       </div>
     </nav>
@@ -67,55 +76,55 @@
       <div class="mb-3">
         <p id="marketHeading" class="text-amber-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
           <span>⚙️</span>
-          <span>طريقة تحديد سعر الذهب</span>
+          <span data-t="s016">طريقة تحديد سعر الذهب</span>
         </p>
         <p class="text-[12px] text-gray-300 mt-1 leading-relaxed">
-          اختر كيف تريد تحديد السعر الأساسي: إما <strong class="text-amber-300">مباشر (LIVE)</strong> من البورصة العالمية لحظة بلحظة، أو <strong class="text-amber-300">إدخال يدوي</strong> بالجرام أو الأونصة.
+          <span data-t="s017">اختر كيف تريد تحديد السعر الأساسي: إما</span> <strong class="text-amber-300" data-t="s018">مباشر (LIVE)</strong> <span data-t="s019">من البورصة العالمية لحظة بلحظة، أو</span> <strong class="text-amber-300" data-t="s020">إدخال يدوي</strong> <span data-t="s021">بالجرام أو الأونصة.</span>
         </p>
       </div>
 
-      <div class="market-source-grid grid grid-cols-2 gap-2 mb-4" role="group" aria-label="طريقة تحديد سعر الذهب">
-        <button type="button" class="source-btn active" data-source="live" aria-pressed="true">⚡ مباشر LIVE</button>
-        <button type="button" class="source-btn" data-source="gram-sar" aria-pressed="false">✍️ يدوي بالجرام (ر.س)</button>
-        <button type="button" class="source-btn" data-source="ounce-usd" aria-pressed="false">💵 أونصة بالدولار ($)</button>
-        <button type="button" class="source-btn" data-source="ounce-sar" aria-pressed="false">🇸🇦 أونصة بالريال (ر.س)</button>
+      <div class="market-source-grid grid grid-cols-2 gap-2 mb-4" role="group" aria-label="طريقة تحديد سعر الذهب" data-t-attr="aria-label:s022">
+        <button type="button" class="source-btn active" data-source="live" aria-pressed="true" data-t="s023">⚡ مباشر LIVE</button>
+        <button type="button" class="source-btn" data-source="gram-sar" aria-pressed="false" data-t="s024">✍️ يدوي بالجرام (ر.س)</button>
+        <button type="button" class="source-btn" data-source="ounce-usd" aria-pressed="false" data-t="s025">💵 أونصة بالدولار ($)</button>
+        <button type="button" class="source-btn" data-source="ounce-sar" aria-pressed="false" data-t="s026">🇸🇦 أونصة بالريال (ر.س)</button>
       </div>
       <input type="hidden" id="priceSource" value="live">
 
       <div id="ounceUsdInputPanel">
-        <label for="ouncePriceUSD" class="block text-gray-600 text-xs font-bold mb-2">سعر الأونصة الترويسية (دولار)</label>
+        <label for="ouncePriceUSD" class="block text-gray-600 text-xs font-bold mb-2" data-t="s027">سعر الأونصة الترويسية (دولار)</label>
         <div class="relative mb-3">
           <input type="number" id="ouncePriceUSD" min="0" step="0.01" placeholder="مثال: 4300"
                  inputmode="decimal" autocomplete="off"
                  class="market-input bg-blue-50 border-blue-200 text-blue-800"
-                 style="padding-inline-start:2.8rem;">
+                 style="padding-inline-start:2.8rem;" data-t-attr="placeholder:s028">
           <span class="absolute start-3 top-1/2 -translate-y-1/2 text-blue-400 font-bold text-sm pointer-events-none">$</span>
         </div>
       </div>
 
       <div id="ounceSarInputPanel" hidden>
-        <label for="ouncePriceSAR" class="block text-gray-600 text-xs font-bold mb-2">سعر الأونصة الترويسية (ريال)</label>
+        <label for="ouncePriceSAR" class="block text-gray-600 text-xs font-bold mb-2" data-t="s029">سعر الأونصة الترويسية (ريال)</label>
         <div class="relative mb-3">
           <input type="number" id="ouncePriceSAR" min="0" step="0.01" placeholder="مثال: 16125"
                  inputmode="decimal" autocomplete="off"
                  class="market-input bg-blue-50 border-blue-200 text-blue-800"
-                 style="padding-inline-start:3.5rem;">
-          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-blue-400 font-bold text-xs pointer-events-none">ر.س</span>
+                 style="padding-inline-start:3.5rem;" data-t-attr="placeholder:s030">
+          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-blue-400 font-bold text-xs pointer-events-none" data-t="s031">ر.س</span>
         </div>
       </div>
 
       <div id="gramSarInputPanel" hidden>
-        <label for="gramPriceSAR" class="block text-gray-600 text-xs font-bold mb-2">سعر جرام الذهب الخام (ريال)</label>
+        <label for="gramPriceSAR" class="block text-gray-600 text-xs font-bold mb-2" data-t="s032">سعر جرام الذهب الخام (ريال)</label>
         <div class="relative mb-3">
           <input type="number" id="gramPriceSAR" min="0" step="0.01" placeholder="مثال: 518.43"
                  inputmode="decimal" autocomplete="off"
                  class="market-input bg-blue-50 border-blue-200 text-blue-800"
-                 style="padding-inline-start:3.5rem;">
-          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-blue-400 font-bold text-xs pointer-events-none">ر.س</span>
+                 style="padding-inline-start:3.5rem;" data-t-attr="placeholder:s033">
+          <span class="absolute start-3 top-1/2 -translate-y-1/2 text-blue-400 font-bold text-xs pointer-events-none" data-t="s034">ر.س</span>
         </div>
         <div class="mb-3">
-          <span class="block text-gray-600 text-xs font-bold mb-2">عيار الجرام المدخل</span>
-          <div class="grid grid-cols-4 gap-2" role="group" aria-label="عيار الجرام المدخل">
+          <span class="block text-gray-600 text-xs font-bold mb-2" data-t="s035">عيار الجرام المدخل</span>
+          <div class="grid grid-cols-4 gap-2" role="group" aria-label="عيار الجرام المدخل" data-t-attr="aria-label:s036">
             <button type="button" class="gram-karat-btn" data-val="18" aria-pressed="false">18</button>
             <button type="button" class="gram-karat-btn" data-val="21" aria-pressed="false">21</button>
             <button type="button" class="gram-karat-btn" data-val="22" aria-pressed="false">22</button>
@@ -132,37 +141,37 @@
 
     <section id="livePricePanel" class="input-card market-summary-card" data-tab="market" aria-labelledby="liveHeading">
       <div class="flex items-center justify-between gap-2 mb-3">
-        <p id="liveHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">🟡 أسعار الذهب المرجعية</p>
+        <p id="liveHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest" data-t="s037">🟡 أسعار الذهب المرجعية</p>
         <div class="flex items-center gap-1.5">
-          <button type="button" id="lockPriceBtn" class="lock-price-btn" aria-label="تثبيت السعر لحظة الفحص" aria-pressed="false">تثبيت السعر 🔓</button>
-          <button type="button" id="liveRefresh" class="live-refresh-btn" aria-label="تحديث السعر الحي الآن">تحديث</button>
+          <button type="button" id="lockPriceBtn" class="lock-price-btn" aria-label="تثبيت السعر لحظة الفحص" aria-pressed="false" data-t-attr="aria-label:s038" data-t="s039">تثبيت السعر 🔓</button>
+          <button type="button" id="liveRefresh" class="live-refresh-btn" aria-label="تحديث السعر الحي الآن" data-t-attr="aria-label:s040" data-t="s041">تحديث</button>
         </div>
       </div>
 
       <div class="live-status-row flex items-center justify-between gap-2 mb-3 text-xs">
         <span id="livePriceStatus" class="font-bold text-emerald-400 flex items-center gap-1.5" aria-live="polite">
           <span class="live-dot" aria-hidden="true"></span>
-          <span>LIVE · السعر الحي متصل</span>
+          <span data-t="s042">LIVE · السعر الحي متصل</span>
         </span>
-        <span class="text-gray-400 text-[11px]">آخر تحديث: <strong id="liveUpdatedAt" class="text-gray-200 font-mono">—</strong></span>
+        <span class="text-gray-400 text-[11px]"><span data-t="s043">آخر تحديث:</span> <strong id="liveUpdatedAt" class="text-gray-200 font-mono">—</strong></span>
       </div>
 
       <div id="goldTrendRow" class="gold-trend-row flex items-center justify-between flex-wrap gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 mb-3 text-xs">
         <div class="flex items-center gap-2">
-          <span class="text-gray-400 text-[11px] font-bold">مسار الذهب اليوم:</span>
+          <span class="text-gray-400 text-[11px] font-bold" data-t="s044">مسار الذهب اليوم:</span>
           <span id="goldTrendBadge" class="trend-badge inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-xs" data-trend="down">
             <span id="goldTrendIcon">↘</span>
-            <span id="goldTrendText">هابط</span>
+            <span id="goldTrendText" data-t="s045">هابط</span>
             <span id="goldTrendDiff" class="font-mono text-[11px] ltr-num">(-0.13%)</span>
           </span>
         </div>
-        <span id="goldTrendAdvice" class="text-[11px] text-gray-300 font-medium">💡 فرصة مناسبة للشراء (السعر منخفض اليوم)</span>
+        <span id="goldTrendAdvice" class="text-[11px] text-gray-300 font-medium" data-t="s046">💡 فرصة مناسبة للشراء (السعر منخفض اليوم)</span>
       </div>
 
       <div id="marketEquivalentPanel" class="mb-3 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs" hidden>
         <div class="flex items-center gap-1.5 text-gray-400 font-bold text-[11px]">
           <span class="text-amber-400">🌐</span>
-          <span>الأونصة العالمية:</span>
+          <span data-t="s047">الأونصة العالمية:</span>
         </div>
         <div class="font-mono text-gray-200 flex items-center gap-2 text-xs">
           <span class="text-amber-400 font-bold"><span id="equivalentOunceUSD">—</span> $</span>
@@ -179,24 +188,24 @@
 
       <div class="live-karat-grid grid grid-cols-4 gap-2 text-center">
         <div class="live-karat-cell p-2 rounded-xl bg-slate-900 border border-slate-800">
-          <p class="text-[10px] text-gray-400 font-bold mb-0.5">24 قيراط</p>
+          <p class="text-[10px] text-gray-400 font-bold mb-0.5" data-t="s048">24 قيراط</p>
           <strong id="liveKarat24" class="text-sm font-black text-amber-400 live-val">—</strong>
-          <span class="block text-[9px] text-gray-400">ر.س/جرام</span>
+          <span class="block text-[9px] text-gray-400" data-t="s049">ر.س/جرام</span>
         </div>
         <div class="live-karat-cell p-2 rounded-xl bg-slate-900 border border-slate-800">
-          <p class="text-[10px] text-gray-400 font-bold mb-0.5">22 قيراط</p>
+          <p class="text-[10px] text-gray-400 font-bold mb-0.5" data-t="s050">22 قيراط</p>
           <strong id="liveKarat22" class="text-sm font-black text-amber-400 live-val">—</strong>
-          <span class="block text-[9px] text-gray-400">ر.س/جرام</span>
+          <span class="block text-[9px] text-gray-400" data-t="s051">ر.س/جرام</span>
         </div>
         <div class="live-karat-cell p-2 rounded-xl bg-slate-900 border border-slate-800">
-          <p class="text-[10px] text-gray-400 font-bold mb-0.5">21 قيراط</p>
+          <p class="text-[10px] text-gray-400 font-bold mb-0.5" data-t="s052">21 قيراط</p>
           <strong id="liveKarat21" class="text-sm font-black text-amber-400 live-val">—</strong>
-          <span class="block text-[9px] text-gray-400">ر.س/جرام</span>
+          <span class="block text-[9px] text-gray-400" data-t="s053">ر.س/جرام</span>
         </div>
         <div class="live-karat-cell p-2 rounded-xl bg-slate-900 border border-slate-800">
-          <p class="text-[10px] text-gray-400 font-bold mb-0.5">18 قيراط</p>
+          <p class="text-[10px] text-gray-400 font-bold mb-0.5" data-t="s054">18 قيراط</p>
           <strong id="liveKarat18" class="text-sm font-black text-amber-400 live-val">—</strong>
-          <span class="block text-[9px] text-gray-400">ر.س/جرام</span>
+          <span class="block text-[9px] text-gray-400" data-t="s055">ر.س/جرام</span>
         </div>
       </div>
     </section>
@@ -204,22 +213,22 @@
     <section id="priceChartCard" class="input-card chart-card" data-tab="market" aria-labelledby="chartHeading">
       <div class="chart-header">
         <div>
-          <p id="chartHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">📊 حركة سعر الذهب اليوم</p>
+          <p id="chartHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest" data-t="s056">📊 حركة سعر الذهب اليوم</p>
           <div class="chart-price-row">
             <span id="chartPrice" class="chart-price-val">—</span>
-            <span class="text-xs text-gray-400">ر.س / أونصة</span>
+            <span class="text-xs text-gray-400" data-t="s057">ر.س / أونصة</span>
             <span id="chartChange" class="chart-change-pill" hidden>—</span>
           </div>
         </div>
-        <div class="chart-range-pills" role="group" aria-label="نطاق الرسم البياني">
-          <button type="button" class="chart-range-pill active" data-chart-range="0" aria-pressed="true">يوم</button>
-          <button type="button" class="chart-range-pill" data-chart-range="1" aria-pressed="false">أسبوع</button>
-          <button type="button" class="chart-range-pill" data-chart-range="2" aria-pressed="false">شهر</button>
-          <button type="button" class="chart-range-pill" data-chart-range="3" aria-pressed="false">سنة</button>
+        <div class="chart-range-pills" role="group" aria-label="نطاق الرسم البياني" data-t-attr="aria-label:s058">
+          <button type="button" class="chart-range-pill active" data-chart-range="0" aria-pressed="true" data-t="s059">يوم</button>
+          <button type="button" class="chart-range-pill" data-chart-range="1" aria-pressed="false" data-t="s060">أسبوع</button>
+          <button type="button" class="chart-range-pill" data-chart-range="2" aria-pressed="false" data-t="s061">شهر</button>
+          <button type="button" class="chart-range-pill" data-chart-range="3" aria-pressed="false" data-t="s062">سنة</button>
         </div>
       </div>
       <div class="chart-plot">
-        <svg id="chartSvg" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="رسم سعر الذهب">
+        <svg id="chartSvg" viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="رسم سعر الذهب" data-t-attr="aria-label:s063">
           <defs><linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8bf55" stop-opacity=".35"/><stop offset="1" stop-color="#e8bf55" stop-opacity="0"/></linearGradient></defs>
           <path id="chartArea" d="" fill="url(#chartFill)"/>
           <path id="chartLine" d="" fill="none" stroke="#e8bf55" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
@@ -228,43 +237,43 @@
         <div id="chartDot" class="chart-dot" hidden></div>
       </div>
       <div class="chart-axis"><span id="chartFirstLabel"></span><span id="chartLastLabel"></span></div>
-      <p class="mt-2 text-[10px] leading-relaxed text-gray-400">الرسم توضيحي لحركة السعر ولا يمثل بيانات تاريخية فعلية.</p>
+      <p class="mt-2 text-[10px] leading-relaxed text-gray-400" data-t="s064">الرسم توضيحي لحركة السعر ولا يمثل بيانات تاريخية فعلية.</p>
     </section>
 
     <section class="input-card transaction-card" data-tab="calc" aria-labelledby="transactionHeading">
-      <p id="transactionHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔄 نوع العملية</p>
-      <div class="grid grid-cols-2 gap-2" role="group" aria-label="نوع العملية">
-        <button type="button" class="mode-btn active" data-mode="buy" aria-pressed="true">شراء مجوهرات</button>
-        <button type="button" class="mode-btn" data-mode="sell" aria-pressed="false">بيع ذهب مستعمل</button>
+      <p id="transactionHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3" data-t="s065">🔄 نوع العملية</p>
+      <div class="grid grid-cols-2 gap-2" role="group" aria-label="نوع العملية" data-t-attr="aria-label:s066">
+        <button type="button" class="mode-btn active" data-mode="buy" aria-pressed="true" data-t="s067">شراء مجوهرات</button>
+        <button type="button" class="mode-btn" data-mode="sell" aria-pressed="false" data-t="s068">بيع ذهب مستعمل</button>
       </div>
       <input type="hidden" id="transactionMode" value="buy">
       <p id="transactionHelp" class="status-note mt-2 text-[11px] leading-relaxed text-gray-400"></p>
     </section>
 
     <section class="input-card item-card space-y-5" data-tab="auditor calc" aria-labelledby="itemHeading">
-      <p id="itemHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">⚖️ مواصفات القطعة</p>
+      <p id="itemHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest" data-t="s069">⚖️ مواصفات القطعة</p>
 
       <!-- Quick Natural Language Input -->
       <div class="col-span-full pb-3 border-b border-gray-700/60">
         <label for="quickInputBar" class="flex items-center justify-between text-xs font-bold text-amber-400 mb-1.5">
-          <span class="flex items-center gap-1.5"><span>⚡</span><span>فحص سريع بالكلام المباشر</span></span>
-          <span class="text-[10px] text-gray-400 font-normal">مثال: خاتم 21 وزن 6.5 بـ 2800</span>
+          <span class="flex items-center gap-1.5"><span>⚡</span><span data-t="s070">فحص سريع بالكلام المباشر</span></span>
+          <span class="text-[10px] text-gray-400 font-normal" data-t="s071">مثال: خاتم 21 وزن 6.5 بـ 2800</span>
         </label>
-        <input type="text" id="quickInputBar" placeholder="اكتبي أو الصقي: خاتم عيار 21 وزنه 6.5 جرام بـ 2800 ريال" class="quick-input-box text-xs" autocomplete="off">
+        <input type="text" id="quickInputBar" placeholder="اكتبي أو الصقي: خاتم عيار 21 وزنه 6.5 جرام بـ 2800 ريال" class="quick-input-box text-xs" autocomplete="off" data-t-attr="placeholder:s072">
       </div>
 
       <div>
-        <label for="weight" class="block text-gray-600 text-xs font-bold mb-2">الوزن (جرام)</label>
+        <label for="weight" class="block text-gray-600 text-xs font-bold mb-2" data-t="s073">الوزن (جرام)</label>
         <div class="flex items-center gap-2">
-          <button type="button" data-adjust-target="weight" data-adjust-amount="-0.5" class="step-btn text-xl" aria-label="إنقاص الوزن">−</button>
+          <button type="button" data-adjust-target="weight" data-adjust-amount="-0.5" class="step-btn text-xl" aria-label="إنقاص الوزن" data-t-attr="aria-label:s074">−</button>
           <input type="number" id="weight" value="15" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input text-xl">
-          <button type="button" data-adjust-target="weight" data-adjust-amount="0.5" class="step-btn text-xl" aria-label="زيادة الوزن">+</button>
+          <button type="button" data-adjust-target="weight" data-adjust-amount="0.5" class="step-btn text-xl" aria-label="زيادة الوزن" data-t-attr="aria-label:s075">+</button>
         </div>
       </div>
 
       <div>
-        <span class="block text-gray-600 text-xs font-bold mb-2">العيار</span>
-        <div class="grid grid-cols-4 gap-2" role="group" aria-label="العيار">
+        <span class="block text-gray-600 text-xs font-bold mb-2" data-t="s076">العيار</span>
+        <div class="grid grid-cols-4 gap-2" role="group" aria-label="العيار" data-t-attr="aria-label:s077">
           <button type="button" class="karat-btn" data-val="18" aria-pressed="false">18</button>
           <button type="button" class="karat-btn active" data-val="21" aria-pressed="true">21</button>
           <button type="button" class="karat-btn" data-val="22" aria-pressed="false">22</button>
@@ -276,50 +285,50 @@
       <div class="bg-gradient-to-l from-amber-50 to-yellow-50 rounded-xl p-3 border border-amber-100 flex justify-between items-center">
         <div class="flex items-center gap-1.5">
           <span class="live-dot" aria-hidden="true"></span>
-          <span class="text-gray-500 text-xs font-bold">سعر الجرام / عيار <span id="selectedKaratLabel" class="text-amber-600 font-black">21</span>ق</span>
+          <span class="text-gray-500 text-xs font-bold"><span data-t="s078">سعر الجرام / عيار</span> <span id="selectedKaratLabel" class="text-amber-600 font-black">21</span><span data-t="s079">ق</span></span>
         </div>
-        <div><span class="text-amber-700 font-black text-base live-val" id="karatPriceOutput">0.00</span> <span class="text-amber-400 text-xs">ر.س</span></div>
+        <div><span class="text-amber-700 font-black text-base live-val" id="karatPriceOutput">0.00</span> <span class="text-amber-400 text-xs" data-t="s080">ر.س</span></div>
       </div>
 
       <!-- Stone & Zircon Deductor -->
       <div class="pt-3 border-t border-gray-700/60">
         <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-300">
           <input type="checkbox" id="hasStonesToggle" class="rounded bg-slate-800 border-gray-600 text-amber-500 focus:ring-amber-400">
-          <span>💎 القطعة تحتوي على فصوص أو أحجار غير ذهبية</span>
+          <span data-t="s081">💎 القطعة تحتوي على فصوص أو أحجار غير ذهبية</span>
         </label>
         <div id="stoneWeightContainer" class="mt-2.5" hidden>
-          <label for="stoneWeightInput" class="block text-gray-400 text-[11px] mb-1 font-bold">وزن الفصوص التقريبي (جرام)</label>
-          <input type="number" id="stoneWeightInput" min="0" step="0.01" placeholder="مثال: 1.5" inputmode="decimal" autocomplete="off" class="num-input text-sm">
+          <label for="stoneWeightInput" class="block text-gray-400 text-[11px] mb-1 font-bold" data-t="s082">وزن الفصوص التقريبي (جرام)</label>
+          <input type="number" id="stoneWeightInput" min="0" step="0.01" placeholder="مثال: 1.5" inputmode="decimal" autocomplete="off" class="num-input text-sm" data-t-attr="placeholder:s083">
           <div id="stoneLossCallout" class="stone-callout mt-2.5 space-y-2.5" hidden>
             <div class="flex items-center justify-between pb-2 border-b border-amber-900/40">
               <span class="font-bold text-amber-300 text-xs flex items-center gap-1.5">
-                <span>💎</span> <span>تفصيل السعر (بالفصوص وبدونها)</span>
+                <span>💎</span> <span data-t="s084">تفصيل السعر (بالفصوص وبدونها)</span>
               </span>
               <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold">
-                الذهب الصافي: <span id="stoneGoldRatioValue">100</span>%
+                <span data-t="s085">الذهب الصافي:</span> <span id="stoneGoldRatioValue">100</span>%
               </span>
             </div>
 
             <div class="grid grid-cols-2 gap-2 text-[11px]">
               <!-- 1. السعر لو حُسبت الفصوص ذهباً -->
               <div class="p-2 rounded-lg bg-slate-900/80 border border-slate-700">
-                <div class="text-gray-400 font-semibold mb-1 text-[11px]">لو حُسبت الفصوص ذهباً <span class="text-[10px] text-gray-400 block font-normal">(طريقة المحل)</span></div>
+                <div class="text-gray-400 font-semibold mb-1 text-[11px]"><span data-t="s086">لو حُسبت الفصوص ذهباً</span> <span class="text-[10px] text-gray-400 block font-normal" data-t="s087">(طريقة المحل)</span></div>
                 <div class="text-white font-bold font-mono text-sm">
-                  <span id="stoneGrossPriceOutput">0.00</span> <span class="text-[10px] text-gray-400 font-normal">ر.س</span>
+                  <span id="stoneGrossPriceOutput">0.00</span> <span class="text-[10px] text-gray-400 font-normal" data-t="s088">ر.س</span>
                 </div>
                 <div class="text-[10px] text-gray-400 mt-1">
-                  الوزن الإجمالي: <span id="stoneGrossWeightLabel" class="font-mono text-gray-200">0.00</span> جم
+                  <span data-t="s089">الوزن الإجمالي:</span> <span id="stoneGrossWeightLabel" class="font-mono text-gray-200">0.00</span> <span data-t="s090">جم</span>
                 </div>
               </div>
 
               <!-- 2. السعر للذهب الصافي فقط بدون فصوص -->
               <div class="p-2 rounded-lg bg-emerald-950/40 border border-emerald-500/30">
-                <div class="text-emerald-400 font-semibold mb-1 text-[11px]">للذهب الصافي فقط <span class="text-[10px] text-emerald-400/70 block font-normal">(بدون فصوص)</span></div>
+                <div class="text-emerald-400 font-semibold mb-1 text-[11px]"><span data-t="s091">للذهب الصافي فقط</span> <span class="text-[10px] text-emerald-400/70 block font-normal" data-t="s092">(بدون فصوص)</span></div>
                 <div class="text-emerald-300 font-bold font-mono text-sm">
-                  <span id="stoneNetPriceOutput">0.00</span> <span class="text-[10px] text-emerald-400/70 font-normal">ر.س</span>
+                  <span id="stoneNetPriceOutput">0.00</span> <span class="text-[10px] text-emerald-400/70 font-normal" data-t="s093">ر.س</span>
                 </div>
                 <div class="text-[10px] text-emerald-400/80 mt-1">
-                  وزن الذهب الصافي: <span id="stoneNetWeightLabel" class="font-mono font-bold text-emerald-300">0.00</span> جم
+                  <span data-t="s094">وزن الذهب الصافي:</span> <span id="stoneNetWeightLabel" class="font-mono font-bold text-emerald-300">0.00</span> <span data-t="s095">جم</span>
                 </div>
               </div>
             </div>
@@ -327,14 +336,14 @@
             <!-- الفارق المدفوع للفصوص والتنبيه -->
             <div class="p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] space-y-1">
               <div class="flex justify-between items-center text-amber-300">
-                <span class="font-semibold">فارق ما تدفعه للفصوص بسعر الذهب:</span>
-                <span class="font-bold font-mono text-amber-400"><span id="stoneLossAmount">0.00</span> ر.س</span>
+                <span class="font-semibold" data-t="s096">فارق ما تدفعه للفصوص بسعر الذهب:</span>
+                <span class="font-bold font-mono text-amber-400"><span id="stoneLossAmount">0.00</span> <span data-t="s097">ر.س</span></span>
               </div>
               <p class="text-[10px] text-amber-200/90 leading-relaxed mt-1">
-                ⚠️ <strong>تنبيه تجاري:</strong> محلات الذهب تسقط الفصوص وتخصم وزنها عند البيع. اطلب من البائع خصم الفصوص والتفاوض على سعر الذهب الصافي (<span id="stoneNetPriceHint" class="font-mono font-bold text-emerald-300">0.00</span> ر.س).
+                ⚠️ <strong data-t="s098">تنبيه تجاري:</strong> <span data-t="s099">محلات الذهب تسقط الفصوص وتخصم وزنها عند البيع. اطلب من البائع خصم الفصوص والتفاوض على سعر الذهب الصافي (</span><span id="stoneNetPriceHint" class="font-mono font-bold text-emerald-300">0.00</span> <span data-t="s100">ر.س).</span>
               </p>
               <div id="stoneZirconRegulationWarning" class="text-[10px] text-rose-300 font-semibold pt-1 border-t border-rose-500/20" hidden>
-                🚨 <strong>تنبيه نظامي:</strong> نسبة الفصوص (<span id="stoneZirconRatio" class="font-mono font-bold">0</span>%) تتجاوز الحد المسموح به نظاماً (5%). يجب حسمها من الوزن قبل احتساب السعر وفق لائحة وزارة التجارة.
+                🚨 <strong data-t="s101">تنبيه نظامي:</strong> <span data-t="s102">نسبة الفصوص (</span><span id="stoneZirconRatio" class="font-mono font-bold">0</span><span data-t="s103">%) تتجاوز الحد المسموح به نظاماً (5%). يجب حسمها من الوزن قبل احتساب السعر وفق لائحة وزارة التجارة.</span>
               </div>
             </div>
           </div>
@@ -343,17 +352,17 @@
     </section>
 
     <section id="buyCostsPanel" class="input-card purchase-card space-y-5" data-tab="calc" aria-labelledby="extrasHeading">
-      <p id="extrasHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">💼 تكاليف الشراء</p>
+      <p id="extrasHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest" data-t="s104">💼 تكاليف الشراء</p>
 
       <div>
         <div class="flex justify-between items-center mb-2">
-          <label for="workmanship" class="text-gray-600 text-xs font-bold">المصنعية (ر.س / جرام)</label>
+          <label for="workmanship" class="text-gray-600 text-xs font-bold" data-t="s105">المصنعية (ر.س / جرام)</label>
           <div class="flex items-center gap-2">
             <div class="labor-tax-toggle flex items-center bg-slate-800 p-0.5 rounded-lg border border-slate-700 text-[10px] font-bold">
-              <button type="button" id="laborTaxExclBtn" class="tax-mode-btn px-2 py-0.5 rounded text-gray-400 hover:text-white font-bold" data-labor-tax="exclusive" aria-pressed="false">بدون الضريبة</button>
-              <button type="button" id="laborTaxInclBtn" class="tax-mode-btn active px-2 py-0.5 rounded bg-amber-400 text-slate-900 font-bold" data-labor-tax="inclusive" aria-pressed="true">شامل الضريبة</button>
+              <button type="button" id="laborTaxExclBtn" class="tax-mode-btn px-2 py-0.5 rounded text-gray-400 hover:text-white font-bold" data-labor-tax="exclusive" aria-pressed="false" data-t="s106">بدون الضريبة</button>
+              <button type="button" id="laborTaxInclBtn" class="tax-mode-btn active px-2 py-0.5 rounded bg-amber-400 text-slate-900 font-bold" data-labor-tax="inclusive" aria-pressed="true" data-t="s107">شامل الضريبة</button>
             </div>
-            <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="workmanshipLabel">35</span> ر.س</span>
+            <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="workmanshipLabel">35</span> <span data-t="s108">ر.س</span></span>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -365,8 +374,8 @@
 
       <div>
         <div class="flex justify-between items-center mb-2">
-          <label for="profit" class="text-gray-600 text-xs font-bold">هامش ربح إضافي اختياري (ر.س / جرام)</label>
-          <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="profitLabel">0</span> ر.س</span>
+          <label for="profit" class="text-gray-600 text-xs font-bold" data-t="s109">هامش ربح إضافي اختياري (ر.س / جرام)</label>
+          <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="profitLabel">0</span> <span data-t="s110">ر.س</span></span>
         </div>
         <div class="flex items-center gap-2">
           <button type="button" data-adjust-target="profit" data-adjust-amount="-1" class="step-btn text-xl">−</button>
@@ -377,144 +386,144 @@
     </section>
 
     <section id="vatPanel" class="input-card vat-card" data-tab="calc" aria-labelledby="vatHeading">
-      <p id="vatHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🧾 ضريبة القيمة المضافة</p>
+      <p id="vatHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3" data-t="s111">🧾 ضريبة القيمة المضافة</p>
       <div class="flex justify-between items-center mb-3">
-        <span class="text-gray-600 text-sm font-bold">نسبة الضريبة</span>
+        <span class="text-gray-600 text-sm font-bold" data-t="s112">نسبة الضريبة</span>
         <span class="bg-amber-100 text-amber-700 font-black text-xl px-4 py-1 rounded-xl"><span id="taxLabel">15</span>%</span>
       </div>
-      <input type="range" id="taxRange" min="0" max="25" step="1" value="15" aria-label="نسبة الضريبة">
+      <input type="range" id="taxRange" min="0" max="25" step="1" value="15" aria-label="نسبة الضريبة" data-t-attr="aria-label:s113">
       <input type="hidden" id="tax" value="15">
       <div class="flex justify-between text-[10px] text-gray-400 mt-1 px-0.5"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%</span></div>
       <div class="country-vat-presets flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-gray-700/60">
-        <button type="button" class="country-vat-btn active text-[10px] font-bold px-2 py-1 rounded-lg border border-amber-400 bg-amber-400/10 text-amber-300" data-vat="15" data-country="sa">🇸🇦 السعودية 15%</button>
-        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="5" data-country="ae">🇦🇪 الإمارات 5%</button>
-        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="10" data-country="bh">🇧🇭 البحرين 10%</button>
-        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="5" data-country="om">🇴🇲 عُمان 5%</button>
-        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="0" data-country="kw">🇰🇼 الكويت/قطر 0%</button>
-        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="14" data-country="eg">🇪🇬 مصر 14%</button>
+        <button type="button" class="country-vat-btn active text-[10px] font-bold px-2 py-1 rounded-lg border border-amber-400 bg-amber-400/10 text-amber-300" data-vat="15" data-country="sa" data-t="s114">🇸🇦 السعودية 15%</button>
+        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="5" data-country="ae" data-t="s115">🇦🇪 الإمارات 5%</button>
+        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="10" data-country="bh" data-t="s116">🇧🇭 البحرين 10%</button>
+        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="5" data-country="om" data-t="s117">🇴🇲 عُمان 5%</button>
+        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="0" data-country="kw" data-t="s118">🇰🇼 الكويت/قطر 0%</button>
+        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="14" data-country="eg" data-t="s119">🇪🇬 مصر 14%</button>
       </div>
-      <p id="bullionNotice" class="text-[11px] font-bold text-amber-400 mt-2 p-1.5 rounded-lg bg-amber-950/40 border border-amber-800/50 flex items-center gap-1.5" hidden><span>✨</span><span>سبيكة 24 قيراط استثمارية معفاة من الضريبة (0%)</span></p>
+      <p id="bullionNotice" class="text-[11px] font-bold text-amber-400 mt-2 p-1.5 rounded-lg bg-amber-950/40 border border-amber-800/50 flex items-center gap-1.5" hidden><span>✨</span><span data-t="s120">سبيكة 24 قيراط استثمارية معفاة من الضريبة (0%)</span></p>
     </section>
 
     <section id="sellDeductionPanel" class="input-card sell-card" data-tab="calc" aria-labelledby="sellHeading" hidden>
-      <p id="sellHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🏷️ خصم المشتري عند البيع</p>
+      <p id="sellHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3" data-t="s121">🏷️ خصم المشتري عند البيع</p>
       <div class="flex justify-between items-center mb-2">
-        <label for="sellDeduction" class="text-gray-600 text-xs font-bold">الخصم من قيمة الذهب الخام</label>
+        <label for="sellDeduction" class="text-gray-600 text-xs font-bold" data-t="s122">الخصم من قيمة الذهب الخام</label>
         <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="sellDeductionLabel">0</span>%</span>
       </div>
       <input type="number" id="sellDeduction" value="0" min="0" max="100" step="0.1" inputmode="decimal" autocomplete="off" class="num-input">
-      <p class="mt-2 text-[11px] leading-relaxed text-gray-400">أدخل النسبة التي يخصمها المشتري أو المحل من قيمة الذهب الخام. لا توجد مصنعية أو ضريبة مضافة في وضع البيع.</p>
+      <p class="mt-2 text-[11px] leading-relaxed text-gray-400" data-t="s123">أدخل النسبة التي يخصمها المشتري أو المحل من قيمة الذهب الخام. لا توجد مصنعية أو ضريبة مضافة في وضع البيع.</p>
     </section>
 
     <section id="invoicePanel" class="input-card invoice-card" data-tab="calc" aria-labelledby="invoiceHeading">
       <div class="flex items-center justify-between gap-2 mb-3">
-        <p id="invoiceHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">🧾 الفاتورة <span id="invoiceCount" class="invoice-count">0</span></p>
-        <button type="button" id="clearInvoice" class="invoice-clear-btn" disabled>مسح الفاتورة</button>
+        <p id="invoiceHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest"><span data-t="s124">🧾 الفاتورة</span> <span id="invoiceCount" class="invoice-count">0</span></p>
+        <button type="button" id="clearInvoice" class="invoice-clear-btn" disabled data-t="s125">مسح الفاتورة</button>
       </div>
-      <button type="button" id="addToInvoice" class="action-btn action-btn-primary w-full">➕ أضف القطعة الحالية</button>
+      <button type="button" id="addToInvoice" class="action-btn action-btn-primary w-full" data-t="s126">➕ أضف القطعة الحالية</button>
       <p id="invoiceStatus" class="status-note mt-2 text-[11px] font-bold text-center text-emerald-700" aria-live="polite"></p>
-      <p id="invoiceEmpty" class="text-[11px] leading-relaxed text-gray-400">أضف القطع واحدة تلو الأخرى لحساب طقم كامل. يمكنك أيضًا إضافة ذهب قديم في وضع البيع ليُخصم من الإجمالي (بدل).</p>
-      <ol id="invoiceList" class="invoice-list" aria-label="قطع الفاتورة"></ol>
+      <p id="invoiceEmpty" class="text-[11px] leading-relaxed text-gray-400" data-t="s127">أضف القطع واحدة تلو الأخرى لحساب طقم كامل. يمكنك أيضًا إضافة ذهب قديم في وضع البيع ليُخصم من الإجمالي (بدل).</p>
+      <ol id="invoiceList" class="invoice-list" aria-label="قطع الفاتورة" data-t-attr="aria-label:s128"></ol>
       <div id="invoiceTotals" class="invoice-totals mt-3" hidden>
-        <div id="invoiceBuyRow" class="flex justify-between text-xs"><span class="text-gray-500">إجمالي الشراء</span><strong id="invoiceBuyTotal" class="invoice-num text-gray-800">—</strong></div>
-        <div id="invoiceSellRow" class="flex justify-between text-xs"><span class="text-gray-500">قيمة الذهب المستبدل</span><strong id="invoiceSellTotal" class="invoice-num text-emerald-700">—</strong></div>
+        <div id="invoiceBuyRow" class="flex justify-between text-xs"><span class="text-gray-500" data-t="s129">إجمالي الشراء</span><strong id="invoiceBuyTotal" class="invoice-num text-gray-800">—</strong></div>
+        <div id="invoiceSellRow" class="flex justify-between text-xs"><span class="text-gray-500" data-t="s130">قيمة الذهب المستبدل</span><strong id="invoiceSellTotal" class="invoice-num text-emerald-700">—</strong></div>
         <div class="flex justify-between items-baseline pt-2 border-t border-gray-200"><span id="invoiceNetLabel" class="text-sm font-black text-gray-800">—</span><strong id="invoiceNet" class="invoice-num text-lg font-black text-amber-700">—</strong></div>
       </div>
       <div class="mt-2.5 flex items-center justify-between">
-        <span class="sharia-badge">🛡️ استبدال شرعي: فصل العقدين واحتساب 15% ضريبة على الشراء الجديد فقط</span>
+        <span class="sharia-badge" data-t="s131">🛡️ استبدال شرعي: فصل العقدين واحتساب 15% ضريبة على الشراء الجديد فقط</span>
       </div>
-      <p class="mt-2 text-[10px] leading-relaxed text-gray-400">تُحسب كل القطع بسعر السوق الحالي، ويبقى للقطعة عيارها ووزنها ومصنعيتها وضريبتها.</p>
+      <p class="mt-2 text-[10px] leading-relaxed text-gray-400" data-t="s132">تُحسب كل القطع بسعر السوق الحالي، ويبقى للقطعة عيارها ووزنها ومصنعيتها وضريبتها.</p>
     </section>
 
     <section id="comparisonPanel" class="input-card comparison-card" data-tab="auditor calc" aria-labelledby="compareHeading">
-      <p id="compareHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">🔎 مقارنة عرض المحل</p>
-      <label id="quotedTotalLabel" for="quotedTotal" class="block text-gray-600 text-xs font-bold mb-2">السعر الإجمالي المعروض من المحل (ر.س)</label>
-      <input type="number" id="quotedTotal" min="0" step="0.01" placeholder="أدخل العرض للمقارنة" inputmode="decimal" autocomplete="off" class="num-input">
+      <p id="compareHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3" data-t="s133">🔎 مقارنة عرض المحل</p>
+      <label id="quotedTotalLabel" for="quotedTotal" class="block text-gray-600 text-xs font-bold mb-2" data-t="s134">السعر الإجمالي المعروض من المحل (ر.س)</label>
+      <input type="number" id="quotedTotal" min="0" step="0.01" placeholder="أدخل العرض للمقارنة" inputmode="decimal" autocomplete="off" class="num-input" data-t-attr="placeholder:s135">
 
       <div class="comparison-result mt-3" aria-live="polite">
-        <p id="comparisonStatus" class="font-bold text-sm text-gray-700">أدخل عرض المحل لبدء المقارنة.</p>
+        <p id="comparisonStatus" class="font-bold text-sm text-gray-700" data-t="s136">أدخل عرض المحل لبدء المقارنة.</p>
         <div class="grid grid-cols-2 gap-2 mt-2 text-xs">
-          <div class="comparison-metric"><span class="text-gray-400">الفرق</span><strong id="comparisonDifference">—</strong></div>
-          <div class="comparison-metric"><span class="text-gray-400">النسبة</span><strong id="comparisonPercent">—</strong></div>
+          <div class="comparison-metric"><span class="text-gray-400" data-t="s137">الفرق</span><strong id="comparisonDifference">—</strong></div>
+          <div class="comparison-metric"><span class="text-gray-400" data-t="s138">النسبة</span><strong id="comparisonPercent">—</strong></div>
         </div>
       </div>
 
       <!-- Stealth Auditor Section -->
       <div id="stealthAuditorSection" class="mt-4 pt-3 border-t border-gray-700/60">
-        <p class="text-amber-400 text-[11px] font-bold uppercase tracking-widest mb-2">⚡ تفكيك عرض المحل (كاشف المصنعية)</p>
+        <p class="text-amber-400 text-[11px] font-bold uppercase tracking-widest mb-2" data-t="s139">⚡ تفكيك عرض المحل (كاشف المصنعية)</p>
         <div class="grid grid-cols-2 gap-2 text-xs mb-2.5">
-          <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">الذهب الصافي</span><strong id="auditorRawGoldOutput" class="text-slate-200 font-mono">—</strong></div>
-          <div class="auditor-metric"><span id="auditorVatLabel" class="text-gray-400 block text-[10px]">ض.ق.م (15%)</span><strong id="auditorVatOutput" class="text-slate-200 font-mono">—</strong></div>
-          <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">إجمالي المصنعية والربح</span><strong id="auditorLaborOutput" class="text-slate-200 font-mono">—</strong></div>
-          <div class="auditor-metric"><span class="text-gray-400 block text-[10px]">المصنعية للجرام</span><strong id="auditorLaborPerGramOutput" class="text-amber-400 font-mono font-bold">—</strong></div>
+          <div class="auditor-metric"><span class="text-gray-400 block text-[10px]" data-t="s140">الذهب الصافي</span><strong id="auditorRawGoldOutput" class="text-slate-200 font-mono">—</strong></div>
+          <div class="auditor-metric"><span id="auditorVatLabel" class="text-gray-400 block text-[10px]" data-t="s141">ض.ق.م (15%)</span><strong id="auditorVatOutput" class="text-slate-200 font-mono">—</strong></div>
+          <div class="auditor-metric"><span class="text-gray-400 block text-[10px]" data-t="s142">إجمالي المصنعية والربح</span><strong id="auditorLaborOutput" class="text-slate-200 font-mono">—</strong></div>
+          <div class="auditor-metric"><span class="text-gray-400 block text-[10px]" data-t="s143">المصنعية للجرام</span><strong id="auditorLaborPerGramOutput" class="text-amber-400 font-mono font-bold">—</strong></div>
         </div>
-        <div id="auditorBenchmarkBadge" class="benchmark-badge benchmark-neutral">أدخل عرض المحل لكشف المصنعية</div>
+        <div id="auditorBenchmarkBadge" class="benchmark-badge benchmark-neutral" data-t="s144">أدخل عرض المحل لكشف المصنعية</div>
 
         <!-- Bargaining Advice Container -->
         <div id="bargainingAdviceContainer" class="bargain-advice-card mt-3" hidden>
           <div class="flex items-center justify-between mb-1.5 text-xs">
-            <span class="text-amber-400 font-bold">💡 نطاق السعر العادل:</span>
+            <span class="text-amber-400 font-bold" data-t="s145">💡 نطاق السعر العادل:</span>
             <strong id="fairPriceRangeOutput" class="font-mono text-white">—</strong>
           </div>
           <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-gray-200 mt-2">
-            <p class="text-[10px] text-gray-400 mb-1">جملتك المقترحة للبائع في المحل:</p>
+            <p class="text-[10px] text-gray-400 mb-1" data-t="s146">جملتك المقترحة للبائع في المحل:</p>
             <p id="bargainAdviceText" class="font-bold text-amber-300 leading-relaxed text-xs">—</p>
-            <button type="button" id="copyBargainAdviceBtn" class="mt-2 text-[10px] font-bold px-2 py-1 rounded bg-amber-400 text-slate-900">📋 نسخ الجملة</button>
+            <button type="button" id="copyBargainAdviceBtn" class="mt-2 text-[10px] font-bold px-2 py-1 rounded bg-amber-400 text-slate-900" data-t="s147">📋 نسخ الجملة</button>
           </div>
-          <button type="button" id="shareCardBtn" class="action-btn action-btn-primary w-full mt-2.5 text-xs">📸 مشاركة الفحص كصورة (واتساب وسناب)</button>
+          <button type="button" id="shareCardBtn" class="action-btn action-btn-primary w-full mt-2.5 text-xs" data-t="s148">📸 مشاركة الفحص كصورة (واتساب وسناب)</button>
         </div>
       </div>
-      <p class="mt-2 text-[10px] leading-relaxed text-gray-400">المقارنة مرجعية فقط؛ قد تختلف عروض المحلات بسبب المصنعية والأحجار والعروض والسياسة التجارية والمعاملة الضريبية.</p>
+      <p class="mt-2 text-[10px] leading-relaxed text-gray-400" data-t="s149">المقارنة مرجعية فقط؛ قد تختلف عروض المحلات بسبب المصنعية والأحجار والعروض والسياسة التجارية والمعاملة الضريبية.</p>
     </section>
 
-    <aside class="input-card note-card text-[11px] leading-relaxed text-gray-500" data-tab="auditor calc" aria-label="ملاحظة">
-      <strong class="text-gray-700">ملاحظة:</strong> سعر LIVE سعر فوري إرشادي للذهب الخام XAU/USD ويُحوّل إلى الريال السعودي. النتائج تقديرية، وقد يختلف سعر التنفيذ الفعلي لدى المحلات بسبب فرق الشراء والبيع والمصنعية والأحجار والعروض والمعاملة الضريبية.
+    <aside class="input-card note-card text-[11px] leading-relaxed text-gray-500" data-tab="auditor calc" aria-label="ملاحظة" data-t-attr="aria-label:s150">
+      <strong class="text-gray-700" data-t="s151">ملاحظة:</strong> <span data-t="s152">سعر LIVE سعر فوري إرشادي للذهب الخام XAU/USD ويُحوّل إلى الريال السعودي. النتائج تقديرية، وقد يختلف سعر التنفيذ الفعلي لدى المحلات بسبب فرق الشراء والبيع والمصنعية والأحجار والعروض والمعاملة الضريبية.</span>
     </aside>
 
     <section class="input-card actions-card" data-tab="auditor calc" aria-labelledby="actionsHeading">
-      <p id="actionsHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3">⚡ إجراءات سريعة</p>
+      <p id="actionsHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3" data-t="s153">⚡ إجراءات سريعة</p>
       <div class="grid grid-cols-2 gap-2">
-        <button type="button" id="shareSummary" class="action-btn action-btn-primary">📋 مشاركة الملخص</button>
-        <button type="button" id="resetInputs" class="action-btn">↺ إعادة الضبط</button>
+        <button type="button" id="shareSummary" class="action-btn action-btn-primary" data-t="s154">📋 مشاركة الملخص</button>
+        <button type="button" id="resetInputs" class="action-btn" data-t="s155">↺ إعادة الضبط</button>
       </div>
       <p id="actionStatus" class="status-note mt-2 text-[11px] font-bold text-center text-emerald-700" aria-live="polite"></p>
-      <p class="text-[10px] leading-relaxed text-gray-400 text-center">تُحفظ إدخالاتك على هذا الجهاز فقط لتجدها عند العودة.</p>
+      <p class="text-[10px] leading-relaxed text-gray-400 text-center" data-t="s156">تُحفظ إدخالاتك على هذا الجهاز فقط لتجدها عند العودة.</p>
     </section>
 
     <!-- Vault & Zakat Card -->
     <section id="vaultSection" class="input-card vault-card" data-tab="vault" aria-labelledby="vaultHeading">
       <div class="flex items-center justify-between gap-2 mb-3">
-        <p id="vaultHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest">💎 خزانتي والزكاة</p>
-        <button type="button" id="openVaultModalBtn" class="action-btn action-btn-primary text-xs py-1 px-3">➕ إضافة قطعة</button>
+        <p id="vaultHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest" data-t="s157">💎 خزانتي والزكاة</p>
+        <button type="button" id="openVaultModalBtn" class="action-btn action-btn-primary text-xs py-1 px-3" data-t="s158">➕ إضافة قطعة</button>
       </div>
       <div class="grid grid-cols-2 gap-2 mb-3 text-center">
         <div class="p-2 rounded-xl bg-slate-900 border border-slate-800">
-          <span class="block text-[10px] text-gray-400">إجمالي الذهب</span>
-          <strong id="vaultTotalWeight" class="text-xs font-bold text-white">0.00 جرام</strong>
+          <span class="block text-[10px] text-gray-400" data-t="s159">إجمالي الذهب</span>
+          <strong id="vaultTotalWeight" class="text-xs font-bold text-white" data-t="s160">0.00 جرام</strong>
         </div>
         <div class="p-2 rounded-xl bg-slate-900 border border-slate-800">
-          <span class="block text-[10px] text-gray-400">القيمة السوقية</span>
-          <strong id="vaultMarketValue" class="text-xs font-bold text-amber-400">0.00 ر.س</strong>
+          <span class="block text-[10px] text-gray-400" data-t="s161">القيمة السوقية</span>
+          <strong id="vaultMarketValue" class="text-xs font-bold text-amber-400" data-t="s162">0.00 ر.س</strong>
         </div>
       </div>
       <div id="vaultZakatNotice" class="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-800/80 mb-3 text-xs" hidden>
         <div class="flex items-center justify-between">
-          <span class="text-emerald-300 font-bold">✨ بلغ النصاب الشرعي (85 جم عيار 24)</span>
-          <span class="text-[10px] text-emerald-400 font-bold">الزكاة (2.5% بالسعر الحالي): <strong id="vaultZakatAmount" class="font-mono text-sm text-emerald-200">0.00 ر.س</strong></span>
+          <span class="text-emerald-300 font-bold" data-t="s163">✨ بلغ النصاب الشرعي (85 جم عيار 24)</span>
+          <span class="text-[10px] text-emerald-400 font-bold"><span data-t="s164">الزكاة (2.5% بالسعر الحالي):</span> <strong id="vaultZakatAmount" class="font-mono text-sm text-emerald-200" data-t="s165">0.00 ر.س</strong></span>
         </div>
       </div>
-      <p id="vaultEmptyMsg" class="text-[11px] leading-relaxed text-gray-400 text-center py-2">خزانتك خالية. أضيفي قطعك الذهبية لتتابعي قيمتها اللحظية وزكاتها.</p>
-      <ul id="vaultList" class="space-y-1.5" aria-label="قطع الذهب في الخزانة"></ul>
+      <p id="vaultEmptyMsg" class="text-[11px] leading-relaxed text-gray-400 text-center py-2" data-t="s166">خزانتك خالية. أضيفي قطعك الذهبية لتتابعي قيمتها اللحظية وزكاتها.</p>
+      <ul id="vaultList" class="space-y-1.5" aria-label="قطع الذهب في الخزانة" data-t-attr="aria-label:s167"></ul>
 
       <!-- Vault Backup & Restore Controls -->
       <div class="pt-3 mt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
         <button type="button" id="exportVaultBackupBtn" class="action-btn text-[11px] py-1.5 px-3 flex-1 bg-slate-900 hover:bg-slate-800 text-gray-300 hover:text-white border border-slate-700/80 rounded-xl flex items-center justify-center gap-1.5 transition">
           <span>📥</span>
-          <span id="exportVaultBackupLabel">تصدير نسخة احتياطية</span>
+          <span id="exportVaultBackupLabel" data-t="s168">تصدير نسخة احتياطية</span>
         </button>
         <label for="importVaultBackupInput" class="action-btn text-[11px] py-1.5 px-3 flex-1 bg-slate-900 hover:bg-slate-800 text-gray-300 hover:text-white border border-slate-700/80 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition text-center">
           <span>📤</span>
-          <span id="importVaultBackupLabel">استعادة نسخة</span>
+          <span id="importVaultBackupLabel" data-t="s169">استعادة نسخة</span>
         </label>
         <input type="file" id="importVaultBackupInput" accept=".json,application/json" class="hidden">
       </div>
@@ -524,29 +533,29 @@
       <div class="mt-1 p-2.5 rounded-xl bg-slate-900/70 border border-slate-800 text-[11px] text-gray-300 leading-relaxed flex items-start gap-2">
         <span class="text-base flex-shrink-0">💡</span>
         <div>
-          <strong class="text-amber-400 block mb-0.5">كيف تحمي بيانات خزانك؟</strong>
-          <span>اضغط <strong>«تصدير نسخة»</strong> لتحميل ملف بقطعك وفواتيرك واحفظه في (iCloud أو Google Drive أو في جهازك). وإذا غيرت جهازك اضغط <strong>«استعادة»</strong> لترجع بياناتك فوراً.</span>
+          <strong class="text-amber-400 block mb-0.5" data-t="s170">كيف تحمي بيانات خزانك؟</strong>
+          <span><span data-t="s171">اضغط</span> <strong data-t="s172">«تصدير نسخة»</strong> <span data-t="s173">لتحميل ملف بقطعك وفواتيرك واحفظه في (iCloud أو Google Drive أو في جهازك). وإذا غيرت جهازك اضغط</span> <strong data-t="s174">«استعادة»</strong> <span data-t="s175">لترجع بياناتك فوراً.</span></span>
         </div>
       </div>
     </section>
 
   <div class="bottom-receipt dashboard-result" data-tab="auditor calc">
-    <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="ملخص السعر">
+    <section class="bg-slate-900 text-white rounded-2xl px-5 pt-4 pb-3 shadow-2xl border-t-4 border-amber-500 max-w-md mx-auto" aria-label="ملخص السعر" data-t-attr="aria-label:s176">
       <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 mb-3">
-        <div class="flex justify-between text-[11px]"><span id="summaryPrimaryLabel" class="text-slate-400">تكلفة الذهب</span><span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span></div>
-        <div class="flex justify-between text-[11px]"><span id="summarySecondaryLabel" class="text-slate-400">مصنعية + ربح</span><span class="text-slate-200 font-mono" id="laborCostOutput">0.00</span></div>
-        <div id="summarySubtotalRow" class="flex justify-between text-[11px]"><span id="summarySubtotalLabel" class="text-slate-400">قبل الضريبة</span><span class="text-slate-200 font-mono" id="subtotalOutput">0.00</span></div>
-        <div id="summaryTaxRow" class="flex justify-between text-[11px]"><span class="text-red-400">ض.ق.م (<span id="taxValueLabel">15</span>%)</span><span class="text-red-300 font-mono">+<span id="vatOutput">0.00</span></span></div>
+        <div class="flex justify-between text-[11px]"><span id="summaryPrimaryLabel" class="text-slate-400" data-t="s177">تكلفة الذهب</span><span class="text-slate-200 font-mono" id="goldCostOutput">0.00</span></div>
+        <div class="flex justify-between text-[11px]"><span id="summarySecondaryLabel" class="text-slate-400" data-t="s178">مصنعية + ربح</span><span class="text-slate-200 font-mono" id="laborCostOutput">0.00</span></div>
+        <div id="summarySubtotalRow" class="flex justify-between text-[11px]"><span id="summarySubtotalLabel" class="text-slate-400" data-t="s179">قبل الضريبة</span><span class="text-slate-200 font-mono" id="subtotalOutput">0.00</span></div>
+        <div id="summaryTaxRow" class="flex justify-between text-[11px]"><span class="text-red-400"><span data-t="s180">ض.ق.م (</span><span id="taxValueLabel">15</span>%)</span><span class="text-red-300 font-mono">+<span id="vatOutput">0.00</span></span></div>
       </div>
       <div id="summaryInvoiceRow" class="flex justify-between items-center text-[11px] mb-3 px-2 py-1.5 rounded-lg bg-slate-800" hidden><span id="summaryInvoiceLabel" class="text-amber-300 font-bold">—</span><span class="text-white font-mono font-bold" id="summaryInvoiceNet">0.00</span></div>
       <div class="border-t border-slate-700 pt-3 flex justify-between items-center">
         <div>
-          <p id="finalAmountLabel" class="text-amber-500 text-[10px] uppercase font-bold tracking-widest mb-0.5">السعر النهائي للدفع</p>
-          <div class="flex items-baseline gap-1"><span class="text-3xl font-black font-mono live-val" id="finalTotalOutput">0.00</span><span class="text-sm text-slate-400">ر.س</span></div>
+          <p id="finalAmountLabel" class="text-amber-500 text-[10px] uppercase font-bold tracking-widest mb-0.5" data-t="s181">السعر النهائي للدفع</p>
+          <div class="flex items-baseline gap-1"><span class="text-3xl font-black font-mono live-val" id="finalTotalOutput">0.00</span><span class="text-sm text-slate-400" data-t="s182">ر.س</span></div>
         </div>
         <div class="bg-slate-800 px-3 py-2 rounded-xl text-center">
-          <p class="text-[10px] text-slate-500 mb-0.5">الوزن / العيار</p>
-          <p class="text-sm font-bold text-amber-400"><span id="summaryWeight">15</span>ج · <span id="summaryKarat">21</span>ق</p>
+          <p class="text-[10px] text-slate-500 mb-0.5" data-t="s183">الوزن / العيار</p>
+          <p class="text-sm font-bold text-amber-400"><span id="summaryWeight">15</span><span data-t="s184">ج ·</span> <span id="summaryKarat">21</span><span data-t="s185">ق</span></p>
         </div>
       </div>
     </section>
@@ -558,71 +567,71 @@
   <div id="vaultItemModal" class="vault-modal-backdrop" hidden>
     <div class="vault-modal-dialog space-y-3">
       <div class="flex items-center justify-between border-b border-slate-700 pb-2">
-        <h3 class="text-sm font-bold text-white">إضافة قطعة ذهب للخزانة</h3>
+        <h3 class="text-sm font-bold text-white" data-t="s186">إضافة قطعة ذهب للخزانة</h3>
         <button type="button" id="closeVaultModalBtn" class="text-gray-400 hover:text-white p-1">✕</button>
       </div>
       <div>
-        <label for="vaultPieceName" class="block text-[11px] text-gray-300 mb-1 font-bold">اسم أو وصف القطعة</label>
-        <input type="text" id="vaultPieceName" placeholder="مثال: سوارة لازوردي عيار 21" class="quick-input-box text-xs">
+        <label for="vaultPieceName" class="block text-[11px] text-gray-300 mb-1 font-bold" data-t="s187">اسم أو وصف القطعة</label>
+        <input type="text" id="vaultPieceName" placeholder="مثال: سوارة لازوردي عيار 21" class="quick-input-box text-xs" data-t-attr="placeholder:s188">
       </div>
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label for="vaultPieceWeight" class="block text-[11px] text-gray-300 mb-1 font-bold">الوزن (جرام)</label>
+          <label for="vaultPieceWeight" class="block text-[11px] text-gray-300 mb-1 font-bold" data-t="s189">الوزن (جرام)</label>
           <input type="number" id="vaultPieceWeight" step="0.01" min="0" placeholder="0.00" inputmode="decimal" dir="ltr" class="quick-input-box text-xs font-mono" onfocus="this.select()">
         </div>
         <div>
-          <label for="vaultPieceKarat" class="block text-[11px] text-gray-300 mb-1 font-bold">العيار</label>
+          <label for="vaultPieceKarat" class="block text-[11px] text-gray-300 mb-1 font-bold" data-t="s190">العيار</label>
           <select id="vaultPieceKarat" class="quick-input-box text-xs">
-            <option value="18">18 قيراط</option>
-            <option value="21" selected>21 قيراط</option>
-            <option value="22">22 قيراط</option>
-            <option value="24">24 قيراط</option>
+            <option value="18" data-t="s191">18 قيراط</option>
+            <option value="21" selected data-t="s192">21 قيراط</option>
+            <option value="22" data-t="s193">22 قيراط</option>
+            <option value="24" data-t="s194">24 قيراط</option>
           </select>
         </div>
       </div>
       <div class="grid grid-cols-2 gap-2">
         <div>
-          <label for="vaultPiecePrice" class="block text-[11px] text-gray-300 mb-1 font-bold">سعر الشراء (اختياري)</label>
+          <label for="vaultPiecePrice" class="block text-[11px] text-gray-300 mb-1 font-bold" data-t="s195">سعر الشراء (اختياري)</label>
           <input type="number" id="vaultPiecePrice" step="0.01" min="0" placeholder="0.00" inputmode="decimal" dir="ltr" class="quick-input-box text-xs font-mono" onfocus="this.select()">
         </div>
         <div>
-          <label for="vaultPieceDate" class="block text-[11px] text-gray-300 mb-1 font-bold">تاريخ الشراء (اختياري)</label>
+          <label for="vaultPieceDate" class="block text-[11px] text-gray-300 mb-1 font-bold" data-t="s196">تاريخ الشراء (اختياري)</label>
           <input type="date" id="vaultPieceDate" class="quick-input-box text-xs dir-ltr">
         </div>
       </div>
       <div>
-        <label for="vaultPieceCategory" class="block text-[11px] text-gray-300 mb-1 font-bold">الغرض من الذهب</label>
+        <label for="vaultPieceCategory" class="block text-[11px] text-gray-300 mb-1 font-bold" data-t="s197">الغرض من الذهب</label>
         <select id="vaultPieceCategory" class="quick-input-box text-xs">
-          <option value="personal_jewelry">💎 زينة شخصية (معفاة من الزكاة عند الجمهور)</option>
-          <option value="investment_gold">💰 ادخار أو سبائك (تجب الزكاة إذا بلغ النصاب وحال الحول)</option>
+          <option value="personal_jewelry" data-t="s198">💎 زينة شخصية (معفاة من الزكاة عند الجمهور)</option>
+          <option value="investment_gold" data-t="s199">💰 ادخار أو سبائك (تجب الزكاة إذا بلغ النصاب وحال الحول)</option>
         </select>
       </div>
       <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-700/60">
         <div>
           <label for="vaultPiecePhoto" class="flex flex-col items-center justify-center p-2.5 rounded-xl border border-dashed border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-center cursor-pointer transition">
             <span class="text-lg">📷</span>
-            <span class="text-[11px] font-bold text-gray-200 mt-0.5">صورة القطعة</span>
-            <span id="vaultPhotoStatus" class="text-[9px] text-amber-400">اضغط للاختيار</span>
+            <span class="text-[11px] font-bold text-gray-200 mt-0.5" data-t="s200">صورة القطعة</span>
+            <span id="vaultPhotoStatus" class="text-[9px] text-amber-400" data-t="s201">اضغط للاختيار</span>
           </label>
           <input type="file" id="vaultPiecePhoto" accept="image/*" class="hidden">
           <div class="flex justify-center mt-1">
-            <img id="vaultPhotoPreview" alt="معاينة القطعة" class="w-14 h-14 object-cover rounded-lg border border-amber-400/40" hidden>
+            <img id="vaultPhotoPreview" alt="معاينة القطعة" class="w-14 h-14 object-cover rounded-lg border border-amber-400/40" hidden data-t-attr="alt:s202">
           </div>
         </div>
         <div>
           <label for="vaultPieceInvoice" class="flex flex-col items-center justify-center p-2.5 rounded-xl border border-dashed border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-center cursor-pointer transition">
             <span class="text-lg">🧾</span>
-            <span class="text-[11px] font-bold text-gray-200 mt-0.5">صورة الفاتورة</span>
-            <span id="vaultInvoiceStatus" class="text-[9px] text-amber-400">اضغط للاختيار</span>
+            <span class="text-[11px] font-bold text-gray-200 mt-0.5" data-t="s203">صورة الفاتورة</span>
+            <span id="vaultInvoiceStatus" class="text-[9px] text-amber-400" data-t="s204">اضغط للاختيار</span>
           </label>
           <input type="file" id="vaultPieceInvoice" accept="image/*" class="hidden">
           <div class="flex justify-center mt-1">
-            <img id="vaultInvoicePreview" alt="معاينة الفاتورة" class="w-14 h-14 object-cover rounded-lg border border-amber-400/40" hidden>
+            <img id="vaultInvoicePreview" alt="معاينة الفاتورة" class="w-14 h-14 object-cover rounded-lg border border-amber-400/40" hidden data-t-attr="alt:s205">
           </div>
         </div>
       </div>
       <p id="vaultStatus" class="text-xs text-red-400 font-bold"></p>
-      <button type="button" id="saveVaultPieceBtn" class="action-btn action-btn-primary w-full text-xs py-2 mt-2">حفظ في الخزانة</button>
+      <button type="button" id="saveVaultPieceBtn" class="action-btn action-btn-primary w-full text-xs py-2 mt-2" data-t="s206">حفظ في الخزانة</button>
     </div>
   </div>
 
@@ -630,31 +639,31 @@
   <div id="vaultDetailModal" class="vault-modal-backdrop" hidden>
     <div class="vault-modal-dialog space-y-4 max-w-sm">
       <div class="flex items-center justify-between border-b border-slate-700 pb-2">
-        <h3 id="vaultDetailTitle" class="text-base font-bold text-white truncate">تفاصيل القطعة</h3>
+        <h3 id="vaultDetailTitle" class="text-base font-bold text-white truncate" data-t="s207">تفاصيل القطعة</h3>
         <button type="button" id="closeVaultDetailModalBtn" class="text-gray-400 hover:text-white p-1 text-base">✕</button>
       </div>
 
       <!-- Photos Row -->
       <div id="vaultDetailPhotosRow" class="grid grid-cols-2 gap-2" hidden>
         <div id="vaultDetailPiecePhotoBox" class="p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-center cursor-pointer hover:border-amber-400/50 transition" hidden>
-          <img id="vaultDetailPieceImg" src="" alt="صورة القطعة" class="w-full h-24 object-cover rounded-lg mb-1">
-          <span class="text-[10px] text-amber-300 font-bold">📷 صورة القطعة (تكبير)</span>
+          <img id="vaultDetailPieceImg" src="" alt="صورة القطعة" class="w-full h-24 object-cover rounded-lg mb-1" data-t-attr="alt:s208">
+          <span class="text-[10px] text-amber-300 font-bold" data-t="s209">📷 صورة القطعة (تكبير)</span>
         </div>
         <div id="vaultDetailInvoicePhotoBox" class="p-1.5 rounded-xl bg-slate-900 border border-slate-800 text-center cursor-pointer hover:border-amber-400/50 transition" hidden>
-          <img id="vaultDetailInvoiceImg" src="" alt="صورة الفاتورة" class="w-full h-24 object-cover rounded-lg mb-1">
-          <span class="text-[10px] text-amber-300 font-bold">🧾 الفاتورة (تكبير)</span>
+          <img id="vaultDetailInvoiceImg" src="" alt="صورة الفاتورة" class="w-full h-24 object-cover rounded-lg mb-1" data-t-attr="alt:s210">
+          <span class="text-[10px] text-amber-300 font-bold" data-t="s211">🧾 الفاتورة (تكبير)</span>
         </div>
       </div>
 
       <!-- Metrics Grid -->
       <div class="grid grid-cols-2 gap-2 text-xs">
         <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-          <span class="block text-[10px] text-gray-400">الوزن والعيار</span>
+          <span class="block text-[10px] text-gray-400" data-t="s212">الوزن والعيار</span>
           <strong id="vaultDetailWeightKarat" class="text-sm font-bold text-white font-mono">—</strong>
           <span id="vaultDetailPureWeight" class="block text-[10px] text-gray-400 mt-0.5">—</span>
         </div>
         <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-          <span class="block text-[10px] text-gray-400">القيمة السوقية الحالية</span>
+          <span class="block text-[10px] text-gray-400" data-t="s213">القيمة السوقية الحالية</span>
           <strong id="vaultDetailMarketValue" class="text-sm font-bold text-amber-400 font-mono">—</strong>
           <span id="vaultDetailProfitLoss" class="block text-[10px] font-mono mt-0.5">—</span>
         </div>
@@ -663,15 +672,15 @@
       <!-- Info Card -->
       <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1.5 text-xs">
         <div class="flex justify-between items-center text-gray-300">
-          <span class="text-gray-400">سعر الشراء:</span>
+          <span class="text-gray-400" data-t="s214">سعر الشراء:</span>
           <strong id="vaultDetailPurchasePrice" class="font-mono text-white">—</strong>
         </div>
         <div class="flex justify-between items-center text-gray-300">
-          <span class="text-gray-400">تاريخ الشراء:</span>
+          <span class="text-gray-400" data-t="s215">تاريخ الشراء:</span>
           <strong id="vaultDetailPurchaseDate" class="font-mono text-white">—</strong>
         </div>
         <div class="flex justify-between items-center text-gray-300">
-          <span class="text-gray-400">الغرض وحكم الزكاة:</span>
+          <span class="text-gray-400" data-t="s216">الغرض وحكم الزكاة:</span>
           <span id="vaultDetailCategory" class="font-bold">—</span>
         </div>
       </div>
@@ -680,11 +689,11 @@
       <div class="flex items-center gap-2 pt-2 border-t border-slate-700/60">
         <button type="button" id="editVaultPieceBtn" class="action-btn text-xs py-2 flex-1 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl font-bold flex items-center justify-center gap-1.5">
           <span>✏️</span>
-          <span>تعديل القطعة</span>
+          <span data-t="s217">تعديل القطعة</span>
         </button>
         <button type="button" id="deleteVaultPieceBtn" class="action-btn text-xs py-2 px-4 bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/80 rounded-xl font-bold flex items-center justify-center gap-1.5">
           <span>🗑️</span>
-          <span>حذف</span>
+          <span data-t="s218">حذف</span>
         </button>
       </div>
     </div>
@@ -694,11 +703,11 @@
   <div id="imageViewerModal" class="vault-modal-backdrop" hidden>
     <div class="vault-modal-dialog space-y-3 max-w-sm text-center">
       <div class="flex items-center justify-between border-b border-slate-700 pb-2">
-        <h4 id="imageViewerTitle" class="text-sm font-bold text-white">معاينة الصورة</h4>
+        <h4 id="imageViewerTitle" class="text-sm font-bold text-white" data-t="s219">معاينة الصورة</h4>
         <button type="button" id="closeImageViewerBtn" class="text-gray-400 hover:text-white p-1 text-base font-bold">✕</button>
       </div>
       <div class="flex justify-center bg-black/80 rounded-xl p-2 border border-slate-800 max-h-[65vh] overflow-auto">
-        <img id="imageViewerImg" src="" alt="معاينة" class="max-h-[60vh] w-auto object-contain rounded-lg">
+        <img id="imageViewerImg" src="" alt="معاينة" class="max-h-[60vh] w-auto object-contain rounded-lg" data-t-attr="alt:s220">
       </div>
     </div>
   </div>
@@ -707,11 +716,11 @@
   <div id="deleteConfirmModal" class="vault-modal-backdrop" hidden>
     <div class="vault-modal-dialog space-y-3 max-w-xs text-center">
       <span class="text-3xl block">⚠️</span>
-      <h4 class="text-sm font-bold text-white">تأكيد حذف القطعة</h4>
-      <p id="deleteConfirmText" class="text-xs text-gray-300 leading-relaxed">هل أنت متأكد من حذف هذه القطعة من الخزانة؟ لا يمكن التراجع عن هذا الإجراء.</p>
+      <h4 class="text-sm font-bold text-white" data-t="s221">تأكيد حذف القطعة</h4>
+      <p id="deleteConfirmText" class="text-xs text-gray-300 leading-relaxed" data-t="s222">هل أنت متأكد من حذف هذه القطعة من الخزانة؟ لا يمكن التراجع عن هذا الإجراء.</p>
       <div class="flex items-center gap-2 pt-2">
-        <button type="button" id="cancelDeleteBtn" class="action-btn text-xs py-2 flex-1 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl font-bold">إلغاء</button>
-        <button type="button" id="confirmDeleteBtn" class="action-btn text-xs py-2 flex-1 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold">نعم، احذف</button>
+        <button type="button" id="cancelDeleteBtn" class="action-btn text-xs py-2 flex-1 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl font-bold" data-t="s223">إلغاء</button>
+        <button type="button" id="confirmDeleteBtn" class="action-btn text-xs py-2 flex-1 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold" data-t="s224">نعم، احذف</button>
       </div>
     </div>
   </div>
@@ -720,25 +729,25 @@
   <div id="shareModal" class="vault-modal-backdrop" hidden>
     <div class="vault-modal-dialog space-y-3 max-w-sm">
       <div class="flex items-center justify-between border-b border-slate-700 pb-2">
-        <h3 id="shareModalHeading" class="text-sm font-bold text-amber-400">بطاقة المشاركة الفاخرة</h3>
+        <h3 id="shareModalHeading" class="text-sm font-bold text-amber-400" data-t="s225">بطاقة المشاركة الفاخرة</h3>
         <button type="button" id="closeShareModalBtn" class="text-gray-400 hover:text-white p-1 text-base font-bold">✕</button>
       </div>
       <div class="flex justify-center bg-black/60 rounded-xl p-2 border border-slate-800">
-        <img id="shareModalPreview" src="" alt="معاينة بطاقة الذهب" class="max-h-[46vh] rounded-lg shadow-xl object-contain w-auto">
+        <img id="shareModalPreview" src="" alt="معاينة بطاقة الذهب" class="max-h-[46vh] rounded-lg shadow-xl object-contain w-auto" data-t-attr="alt:s226">
       </div>
       <div class="space-y-2 pt-1">
         <button type="button" id="shareModalNativeBtn" class="action-btn action-btn-primary w-full py-2.5 text-xs font-bold flex items-center justify-center gap-2">
           <span>📸</span>
-          <span id="shareModalNativeBtnLabel">مشاركة الصورة</span>
+          <span id="shareModalNativeBtnLabel" data-t="s227">مشاركة الصورة</span>
         </button>
         <div class="grid grid-cols-2 gap-2">
           <button type="button" id="shareModalDownloadBtn" class="action-btn text-xs py-2 flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl">
             <span>⬇️</span>
-            <span id="shareModalDownloadBtnLabel">تحميل PNG</span>
+            <span id="shareModalDownloadBtnLabel" data-t="s228">تحميل PNG</span>
           </button>
           <button type="button" id="shareModalCopyBtn" class="action-btn text-xs py-2 flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 rounded-xl">
             <span>📋</span>
-            <span id="shareModalCopyBtnLabel">نسخ النص</span>
+            <span id="shareModalCopyBtnLabel" data-t="s229">نسخ النص</span>
           </button>
         </div>
         <p id="shareModalStatus" class="text-center text-[11px] text-amber-400 min-h-[1.25rem]"></p>
@@ -747,22 +756,22 @@
   </div>
 
   <!-- Mobile Bottom Navigation Bar (< 1100px) -->
-  <nav id="bottomNavBar" class="mobile-bottom-nav" aria-label="شريط التنقل الرئيسي">
+  <nav id="bottomNavBar" class="mobile-bottom-nav" aria-label="شريط التنقل الرئيسي" data-t-attr="aria-label:s230">
     <button type="button" class="bottom-nav-btn active" data-tab-target="market">
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-      <span class="bottom-nav-label" data-i18n="tabMarket">أسعار الذهب</span>
+      <span class="bottom-nav-label" data-i18n="tabMarket" data-t="s231">أسعار الذهب</span>
     </button>
     <button type="button" class="bottom-nav-btn" data-tab-target="auditor">
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
-      <span class="bottom-nav-label" data-i18n="tabAuditor">فحص العرض</span>
+      <span class="bottom-nav-label" data-i18n="tabAuditor" data-t="s232">فحص العرض</span>
     </button>
     <button type="button" class="bottom-nav-btn" data-tab-target="calc">
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 7h8"/><path d="M12 7v10"/><path d="M8 17h8"/></svg>
-      <span class="bottom-nav-label" data-i18n="tabCalc">الحاسبة</span>
+      <span class="bottom-nav-label" data-i18n="tabCalc" data-t="s233">الحاسبة</span>
     </button>
     <button type="button" class="bottom-nav-btn" data-tab-target="vault">
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20"/><path d="m10 3 2 6-4 12"/></svg>
-      <span class="bottom-nav-label" data-i18n="tabVault">خزانتي</span>
+      <span class="bottom-nav-label" data-i18n="tabVault" data-t="s234">خزانتي</span>
     </button>
   </nav>
 
@@ -770,6 +779,7 @@
   <script src="js/core/quick-input-parser.js"></script>
   <script src="gold-calculator.js"></script>
   <script src="js/i18n/translations.js"></script>
+  <script src="js/i18n/static-text.js"></script>
   <script src="js/ui/formatting.js"></script>
   <script src="js/market/price-cache.js"></script>
   <script src="js/market/live-price-client.js"></script>
