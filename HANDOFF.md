@@ -1,6 +1,6 @@
 # Handoff: Gold Calculator mobile app
 
-Status as of 2026-11-07. The web app and the Capacitor wrapper are on `main`; the native app has **not yet been run on a real device or emulator** (everything native was verified by unit tests only).
+Status as of 2026-11-07. The web app and the Capacitor wrapper are on `main`; the Android build pipeline and debug APK generation have been verified successfully via 'npm run build:apk' (writing 'gold-calc-app.apk'). All 258 unit tests pass.
 
 ## What is in the app now
 - One bilingual page (Arabic / English switch), PWA with offline service worker (website only; disabled inside the native app).

@@ -8,7 +8,9 @@ const androidDir = path.join(rootDir, 'android');
 const localJdk = path.join(process.env.LOCALAPPDATA || '', 'Programs', 'jdk-21');
 const studioJbr = 'C:\\Program Files\\Android\\Android Studio\\jbr';
 
-const javaHome = fs.existsSync(localJdk) ? localJdk : studioJbr;
+const envJdk = process.env.JAVA_HOME;
+const msJdk = 'C:\\Program Files\\Microsoft\\jdk-21.0.13.21-hotspot';
+const javaHome = (envJdk && fs.existsSync(envJdk)) ? envJdk : (fs.existsSync(localJdk) ? localJdk : (fs.existsSync(msJdk) ? msJdk : studioJbr));
 
 console.log('1/3 🔄 Syncing web assets into Android...');
 execSync('npm run cap:sync', { stdio: 'inherit', cwd: rootDir });
