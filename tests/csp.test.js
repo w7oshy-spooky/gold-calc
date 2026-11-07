@@ -15,7 +15,8 @@ for (const page of ['index.html']) {
 
     const inline = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
     assert.equal(inline.length, 1, 'expected exactly one inline script');
-    const hash = crypto.createHash('sha256').update(inline[0][1], 'utf8').digest('base64');
+    const normalizedScript = inline[0][1].replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const hash = crypto.createHash('sha256').update(normalizedScript, 'utf8').digest('base64');
     assert.ok(
       policy.includes(`'sha256-${hash}'`),
       `Inline script changed. Update its hash in the CSP to sha256-${hash}`,
