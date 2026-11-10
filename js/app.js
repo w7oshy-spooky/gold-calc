@@ -23,6 +23,7 @@
     'GoldVaultUI',
     'GoldNavigationUI',
     'GoldThemeUI',
+    'GoldGuideUI',
   ];
 
   if (requiredGlobals.some((name) => !globalThis[name])) {
@@ -389,6 +390,15 @@
     vibrate,
     onChange(tab) {
       if (tab === 'calc') calculate();
+    },
+  }) : null;
+
+  const guideUi = globalThis.GoldGuideUI ? globalThis.GoldGuideUI.createGuideUI({
+    document,
+    window: globalThis.window,
+    vibrate,
+    onSelectTab(tab) {
+      if (navigationUi) navigationUi.setActiveTab(tab);
     },
   }) : null;
 

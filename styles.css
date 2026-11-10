@@ -39,7 +39,7 @@ body .header-wrap{
   background:transparent;box-shadow:none;border-radius:0;color:var(--text);text-align:start;
   padding:max(1.25rem,env(safe-area-inset-top)) 1rem 1rem;position:relative;
 }
-body .header-wrap>div{justify-content:flex-start;gap:.75rem;margin-bottom:.35rem;padding-inline-end:7.5rem}
+body .header-wrap>div{justify-content:flex-start;gap:.75rem;margin-bottom:.35rem;padding-inline-end:10rem}
 body .header-wrap>div::before{
   content:"Au";display:flex;align-items:center;justify-content:center;flex:0 0 auto;
   width:34px;height:34px;border-radius:10px;background:var(--gold);color:var(--gold-ink);
@@ -69,6 +69,15 @@ html[lang=en] .theme-toggle{inset-inline-end:calc(1rem + 96px)}
 .theme-toggle .theme-icon-sun{display:block}
 [data-theme="light"] .theme-toggle .theme-icon-sun{display:none}
 [data-theme="light"] .theme-toggle .theme-icon-moon{display:block}
+html[lang=en] .help-btn{inset-inline-end:calc(1rem + 140px)}
+.help-btn{
+  position:absolute;top:max(1.1rem,env(safe-area-inset-top));inset-inline-end:calc(1rem + 98px);min-width:38px;min-height:38px;
+  display:flex;align-items:center;justify-content:center;padding:.25rem;border-radius:10px;
+  background:var(--card);color:var(--gold);border:1px solid var(--line-strong);font-size:.9rem;cursor:pointer;
+  transition:all .15s ease;
+}
+.help-btn:hover{color:var(--gold-soft);border-color:var(--gold)}
+.help-btn:focus-visible{outline:3px solid #e8bf5580;outline-offset:2px}
 
 /* ---- Cards ---- */
 body .page-content{margin-top:.25rem}
@@ -385,6 +394,13 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
   html[lang=en] .theme-toggle{
     inset-inline-end:calc(1.5rem + 96px);
   }
+  .help-btn{
+    inset-inline-end:calc(1.5rem + 98px);
+    top:1.5rem;
+  }
+  html[lang=en] .help-btn{
+    inset-inline-end:calc(1.5rem + 140px);
+  }
 }
 
 /* Counter Stealth Auditor & Stone Deductor */
@@ -498,6 +514,40 @@ main:not([data-active-tab="calc"]):not([data-active-tab="auditor"]):not([data-ac
   }
 }
 
+/* Quick Intent Navigation on Market tab */
+.quick-intent-card{
+  background:linear-gradient(135deg,rgba(212,175,55,0.14),rgba(19,26,36,0.92));
+  border:1px solid rgba(212,175,55,0.3);
+}
+.quick-intent-btn{
+  background:rgba(19,24,34,0.85);
+  border:1px solid rgba(45,55,72,0.75);
+  cursor:pointer;
+}
+.quick-intent-btn:hover{
+  border-color:var(--gold);
+  background:rgba(26,32,44,0.95);
+}
+.quick-intent-btn:active{transform:scale(.98)}
+
+/* Quick Guide / Onboarding Modal */
+.guide-modal-dialog{
+  max-width:30rem;
+}
+.guide-step-card{
+  background:#131822;
+  border:1px solid #2d3748;
+  transition:border-color .15s ease;
+}
+.guide-step-card:hover{
+  border-color:rgba(212,175,55,0.35);
+}
+.guide-action-btn{
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.guide-action-btn:active{transform:scale(.98)}
+
 /* ===== Daytime / Light Theme Overrides ===== */
 [data-theme="light"] body{background:var(--bg)!important;color:var(--text)}
 [data-theme="light"] .input-card{
@@ -604,6 +654,44 @@ main:not([data-active-tab="calc"]):not([data-active-tab="auditor"]):not([data-ac
 [data-theme="light"] .lock-price-btn{background:var(--field);border-color:var(--line-strong);color:var(--muted)}
 [data-theme="light"] .lock-price-btn.active,[data-theme="light"] .lock-price-btn.locked{background:#d97706;border-color:#b45309;color:#ffffff}
 [data-theme="light"] .bargain-advice-card{background:#fffdf9;border:1px solid #edd59b}
+
+/* Quick guide and quick intent in light mode */
+[data-theme="light"] .help-btn{
+  background:#ffffff;border-color:#ded8cd;color:#b8860b;
+}
+[data-theme="light"] .help-btn:hover{
+  border-color:#b8860b;color:#8a6408;
+}
+[data-theme="light"] .quick-intent-card{
+  background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(250,245,235,0.95));
+  border-color:rgba(212,175,55,0.35);
+}
+[data-theme="light"] .quick-intent-btn{
+  background:#ffffff;
+  border-color:#e2ddd3;
+  color:#181613;
+}
+[data-theme="light"] .quick-intent-btn:hover{
+  background:#f7f5f0;
+  border-color:var(--gold);
+}
+[data-theme="light"] .quick-intent-btn .text-slate-200{color:#181613}
+[data-theme="light"] .guide-step-card{
+  background:#fcfbf8;
+  border-color:#e2ddd3;
+  color:#181613;
+}
+[data-theme="light"] .guide-step-card .text-gray-300,
+[data-theme="light"] .guide-step-card .text-gray-400{
+  color:var(--muted);
+}
+[data-theme="light"] .guide-step-card .text-slate-200{color:#181613}
+[data-theme="light"] .guide-step-card .bg-slate-900{background:#fcfbf8}
+[data-theme="light"] .guide-step-card .bg-slate-800{
+  background:#f0ece4;
+  color:#181613;
+  border-color:#ded8cd;
+}
 
 /* Vault modals */
 [data-theme="light"] .vault-modal-backdrop{background:rgba(15,20,30,0.45);backdrop-filter:blur(6px)}
