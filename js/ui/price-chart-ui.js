@@ -223,9 +223,11 @@
     }
 
     elements.svg.addEventListener('mousemove', onMove);
+    elements.svg.addEventListener('touchstart', onMove, { passive: true });
     elements.svg.addEventListener('touchmove', onMove, { passive: true });
     elements.svg.addEventListener('mouseleave', onLeave);
     elements.svg.addEventListener('touchend', onLeave);
+    elements.svg.addEventListener('touchcancel', onLeave);
     rangeButtons.forEach((button, index) => {
       button.addEventListener('click', () => {
         rangeIndex = index;

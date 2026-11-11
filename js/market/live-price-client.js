@@ -14,14 +14,17 @@
     if (typeof rootRef.GOLD_CALC_API_BASE === 'string' && rootRef.GOLD_CALC_API_BASE) {
       return rootRef.GOLD_CALC_API_BASE.replace(/\/+$/, '');
     }
-    const isCapacitor = Boolean(
-      rootRef.Capacitor?.isNativePlatform?.() ||
-      (rootRef.location?.protocol && ['capacitor:', 'ionic:', 'file:'].includes(rootRef.location.protocol))
-    );
-    if (isCapacitor) {
-      return 'https://gold-calc-live.vercel.app';
+    // Node.js test environment has no window.location
+    if (!rootRef || !rootRef.location || typeof rootRef.location !== 'object') {
+      return '';
     }
-    return '';
+    // When hosted on the Vercel backend itself, use relative /api/gold-price
+    if (rootRef.location.hostname === 'gold-calc-live.vercel.app') {
+      return '';
+    }
+    // In Capacitor, mobile APK, localhost dev, or any external static host,
+    // call the live Vercel backend directly.
+    return 'https://gold-calc-live.vercel.app';
   }
 
   function createLivePriceClient({

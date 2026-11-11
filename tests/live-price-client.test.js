@@ -128,3 +128,22 @@ test('uses configured or injected apiBaseUrl when passed', async () => {
   await client.fetchQuote();
   assert.equal(requestedUrl, 'https://custom-domain.com/api/gold-price');
 });
+
+test('resolveApiBaseUrl routes to Vercel backend unless already on Vercel', () => {
+  const { resolveApiBaseUrl } = require('../js/market/live-price-client.js');
+
+  // Node environment or missing location
+  assert.equal(resolveApiBaseUrl({ rootRef: {} }), '');
+
+  // Hosted on Vercel itself uses relative URL
+  assert.equal(resolveApiBaseUrl({ rootRef: { location: { hostname: 'gold-calc-live.vercel.app' } } }), '');
+
+  // Localhost, Capacitor, GitHub Pages, or external domains use Vercel backend
+  assert.equal(resolveApiBaseUrl({ rootRef: { location: { hostname: 'localhost' } } }), 'https://gold-calc-live.vercel.app');
+  assert.equal(resolveApiBaseUrl({ rootRef: { location: { hostname: 'w7oshy-spooky.github.io' } } }), 'https://gold-calc-live.vercel.app');
+
+  // Custom global or parameter override takes precedence
+  assert.equal(resolveApiBaseUrl({ rootRef: { GOLD_CALC_API_BASE: 'https://api.example.com/' } }), 'https://api.example.com');
+  assert.equal(resolveApiBaseUrl({ apiBaseUrl: 'https://param.example.com/' }), 'https://param.example.com');
+});
+
