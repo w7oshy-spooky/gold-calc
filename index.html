@@ -398,12 +398,15 @@
       </div>
     </section>
 
-    <section id="buyCostsPanel" class="input-card purchase-card space-y-5" data-tab="calc" aria-labelledby="extrasHeading">
-      <p id="extrasHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest" data-t="s104">💼 تكاليف الشراء</p>
+    <section id="buyCostsPanel" class="input-card purchase-card space-y-4" data-tab="calc" aria-labelledby="extrasHeading">
+      <div class="flex items-center justify-between">
+        <p id="extrasHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest" data-t="s104">💼 تكاليف الشراء</p>
+        <span class="text-[11px] text-amber-400 font-bold">المصنعية للجرام</span>
+      </div>
 
       <div>
         <div class="flex justify-between items-center mb-2">
-          <label for="workmanship" class="text-gray-600 text-xs font-bold" data-t="s105">المصنعية (ر.س / جرام)</label>
+          <label for="workmanship" class="text-gray-300 text-xs font-bold" data-t="s105">المصنعية (ر.س / جرام)</label>
           <div class="flex items-center gap-2">
             <div class="labor-tax-toggle flex items-center bg-slate-800 p-0.5 rounded-lg border border-slate-700 text-[10px] font-bold">
               <button type="button" id="laborTaxExclBtn" class="tax-mode-btn px-2 py-0.5 rounded text-gray-400 hover:text-white font-bold" data-labor-tax="exclusive" aria-pressed="false" data-t="s106">بدون الضريبة</button>
@@ -419,46 +422,68 @@
         </div>
       </div>
 
-      <div>
-        <div class="flex justify-between items-center mb-2">
-          <label for="profit" class="text-gray-600 text-xs font-bold" data-t="s109">هامش ربح إضافي اختياري (ر.س / جرام)</label>
-          <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="profitLabel">0</span> <span data-t="s110">ر.س</span></span>
+      <details class="calc-sub-accordion">
+        <summary class="text-xs text-amber-400 font-bold cursor-pointer flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <span>➕</span>
+            <span data-t="s109">هامش ربح إضافي اختياري (ر.س / جرام)</span>
+          </span>
+          <span class="bg-gray-100 text-gray-700 text-xs font-black px-2 py-0.5 rounded-lg"><span id="profitLabel">0</span> <span data-t="s110">ر.س</span></span>
+        </summary>
+        <div class="pt-2.5">
+          <div class="flex items-center gap-2">
+            <button type="button" data-adjust-target="profit" data-adjust-amount="-1" class="step-btn text-xl">−</button>
+            <input type="number" id="profit" value="0" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input">
+            <button type="button" data-adjust-target="profit" data-adjust-amount="1" class="step-btn text-xl">+</button>
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <button type="button" data-adjust-target="profit" data-adjust-amount="-1" class="step-btn text-xl">−</button>
-          <input type="number" id="profit" value="0" min="0" step="0.01" inputmode="decimal" autocomplete="off" class="num-input">
-          <button type="button" data-adjust-target="profit" data-adjust-amount="1" class="step-btn text-xl">+</button>
-        </div>
-      </div>
+      </details>
     </section>
 
     <section id="vatPanel" class="input-card vat-card" data-tab="calc" aria-labelledby="vatHeading">
-      <p id="vatHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3" data-t="s111">🧾 ضريبة القيمة المضافة</p>
-      <div class="flex justify-between items-center mb-3">
-        <span class="text-gray-600 text-sm font-bold" data-t="s112">نسبة الضريبة</span>
+      <div class="flex justify-between items-center">
+        <div>
+          <p id="vatHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest" data-t="s111">🧾 ضريبة القيمة المضافة</p>
+          <span class="text-[11px] text-emerald-400 font-medium">🇸🇦 15% مطبقة نظاماً</span>
+        </div>
         <span class="bg-amber-100 text-amber-700 font-black text-xl px-4 py-1 rounded-xl"><span id="taxLabel">15</span>%</span>
       </div>
-      <input type="range" id="taxRange" min="0" max="25" step="1" value="15" aria-label="نسبة الضريبة" data-t-attr="aria-label:s113">
-      <input type="hidden" id="tax" value="15">
-      <div class="flex justify-between text-[10px] text-gray-400 mt-1 px-0.5"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%</span></div>
-      <div class="country-vat-presets flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-gray-700/60">
-        <button type="button" class="country-vat-btn active text-[10px] font-bold px-2 py-1 rounded-lg border border-amber-400 bg-amber-400/10 text-amber-300" data-vat="15" data-country="sa" data-t="s114">🇸🇦 السعودية 15%</button>
-        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="5" data-country="ae" data-t="s115">🇦🇪 الإمارات 5%</button>
-        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="10" data-country="bh" data-t="s116">🇧🇭 البحرين 10%</button>
-        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="5" data-country="om" data-t="s117">🇴🇲 عُمان 5%</button>
-        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="0" data-country="kw" data-t="s118">🇰🇼 الكويت/قطر 0%</button>
-        <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="14" data-country="eg" data-t="s119">🇪🇬 مصر 14%</button>
-      </div>
+
+      <details class="calc-sub-accordion mt-2.5">
+        <summary class="text-[11px] text-gray-400 hover:text-amber-300 font-bold cursor-pointer flex items-center justify-between">
+          <span data-t="s112">نسبة الضريبة</span>
+          <span class="text-[10px] text-amber-400">⚙️ تغيير الدولة أو النسبة</span>
+        </summary>
+        <div class="pt-2">
+          <input type="range" id="taxRange" min="0" max="25" step="1" value="15" aria-label="نسبة الضريبة" data-t-attr="aria-label:s113">
+          <input type="hidden" id="tax" value="15">
+          <div class="flex justify-between text-[10px] text-gray-400 mt-1 px-0.5"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span><span>25%</span></div>
+          <div class="country-vat-presets flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-gray-700/60">
+            <button type="button" class="country-vat-btn active text-[10px] font-bold px-2 py-1 rounded-lg border border-amber-400 bg-amber-400/10 text-amber-300" data-vat="15" data-country="sa" data-t="s114">🇸🇦 السعودية 15%</button>
+            <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="5" data-country="ae" data-t="s115">🇦🇪 الإمارات 5%</button>
+            <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="10" data-country="bh" data-t="s116">🇧🇭 البحرين 10%</button>
+            <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="5" data-country="om" data-t="s117">🇴🇲 عُمان 5%</button>
+            <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="0" data-country="kw" data-t="s118">🇰🇼 الكويت/قطر 0%</button>
+            <button type="button" class="country-vat-btn text-[10px] font-bold px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 hover:border-amber-400" data-vat="14" data-country="eg" data-t="s119">🇪🇬 مصر 14%</button>
+          </div>
+        </div>
+      </details>
       <p id="bullionNotice" class="text-[11px] font-bold text-amber-400 mt-2 p-1.5 rounded-lg bg-amber-950/40 border border-amber-800/50 flex items-center gap-1.5" hidden><span>✨</span><span data-t="s120">سبيكة 24 قيراط استثمارية معفاة من الضريبة (0%)</span></p>
     </section>
 
     <section id="sellDeductionPanel" class="input-card sell-card" data-tab="calc" aria-labelledby="sellHeading" hidden>
-      <p id="sellHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3" data-t="s121">🏷️ خصم المشتري عند البيع</p>
-      <div class="flex justify-between items-center mb-2">
-        <label for="sellDeduction" class="text-gray-600 text-xs font-bold" data-t="s122">الخصم من قيمة الذهب الخام</label>
+      <div class="flex items-center justify-between mb-2">
+        <p id="sellHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest" data-t="s121">🏷️ خصم المشتري عند البيع</p>
         <span class="bg-gray-100 text-gray-700 text-xs font-black px-2.5 py-1 rounded-lg"><span id="sellDeductionLabel">0</span>%</span>
       </div>
-      <input type="number" id="sellDeduction" value="0" min="0" max="100" step="0.1" inputmode="decimal" autocomplete="off" class="num-input">
+      <div class="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs mb-3 flex items-center gap-2">
+        <span class="text-base">🛡️</span>
+        <span class="font-medium">بيع الذهب المستعمل معفى من الضريبة (0%) والمصنعية. المبلغ الظاهر هو صافي ما تستلمه كاش.</span>
+      </div>
+      <div class="mb-2">
+        <label for="sellDeduction" class="block text-gray-300 text-xs font-bold mb-1.5" data-t="s122">الخصم من قيمة الذهب الخام</label>
+        <input type="number" id="sellDeduction" value="0" min="0" max="100" step="0.1" inputmode="decimal" autocomplete="off" class="num-input">
+      </div>
       <p class="mt-2 text-[11px] leading-relaxed text-gray-400" data-t="s123">أدخل النسبة التي يخصمها المشتري أو المحل من قيمة الذهب الخام. لا توجد مصنعية أو ضريبة مضافة في وضع البيع.</p>
     </section>
 
@@ -483,11 +508,20 @@
     </section>
 
     <section id="comparisonPanel" class="input-card comparison-card" data-tab="auditor calc" aria-labelledby="compareHeading">
-      <p id="compareHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-3" data-t="s133">🔎 مقارنة عرض المحل</p>
-      <label id="quotedTotalLabel" for="quotedTotal" class="block text-gray-600 text-xs font-bold mb-2" data-t="s134">السعر الإجمالي المعروض من المحل (ر.س)</label>
-      <input type="number" id="quotedTotal" min="0" step="0.01" placeholder="أدخل العرض للمقارنة" inputmode="decimal" autocomplete="off" class="num-input" data-t-attr="placeholder:s135">
+      <div class="flex items-center justify-between mb-3">
+        <p id="compareHeading" class="text-amber-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5" data-t="s133">
+          <span>🔍</span>
+          <span>مقارنة عرض المحل</span>
+        </p>
+        <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold">كاشف المصنعية والمكاسرة</span>
+      </div>
 
-      <div class="comparison-result mt-3" aria-live="polite">
+      <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 mb-3">
+        <label id="quotedTotalLabel" for="quotedTotal" class="block text-gray-200 text-xs font-bold mb-1.5" data-t="s134">السعر الإجمالي المعروض من المحل (ر.س)</label>
+        <input type="number" id="quotedTotal" min="0" step="0.01" placeholder="أدخل العرض للمقارنة" inputmode="decimal" autocomplete="off" class="num-input text-xl font-bold" data-t-attr="placeholder:s135">
+      </div>
+
+      <div class="comparison-result" aria-live="polite">
         <p id="comparisonStatus" class="font-bold text-sm text-gray-700" data-t="s136">أدخل عرض المحل لبدء المقارنة.</p>
         <div class="grid grid-cols-2 gap-2 mt-2 text-xs">
           <div class="comparison-metric"><span class="text-gray-400" data-t="s137">الفرق</span><strong id="comparisonDifference">—</strong></div>
@@ -512,7 +546,7 @@
             <span class="text-amber-400 font-bold" data-t="s145">💡 نطاق السعر العادل:</span>
             <strong id="fairPriceRangeOutput" class="font-mono text-white">—</strong>
           </div>
-          <div class="p-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-gray-200 mt-2">
+          <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-gray-200 mt-2">
             <p class="text-[10px] text-gray-400 mb-1" data-t="s146">جملتك المقترحة للبائع في المحل:</p>
             <p id="bargainAdviceText" class="font-bold text-amber-300 leading-relaxed text-xs">—</p>
             <button type="button" id="copyBargainAdviceBtn" class="mt-2 text-[10px] font-bold px-2 py-1 rounded bg-amber-400 text-slate-900" data-t="s147">📋 نسخ الجملة</button>

@@ -418,6 +418,37 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
 .sharia-badge{display:inline-flex;align-items:center;gap:0.35rem;background:#10281e;color:#5fd49a;border:1px solid #1c523b;border-radius:0.5rem;padding:0.25rem 0.5rem;font-size:0.65rem;font-weight:700}
 .country-vat-btn{cursor:pointer;transition:all 0.15s ease}.country-vat-btn:active{transform:scale(0.96)}.tax-mode-btn{cursor:pointer;transition:all 0.15s ease}.tax-mode-btn:active{transform:scale(0.96)}
 
+/* Collapsible secondary calc options (details/summary) */
+.calc-sub-accordion{
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:0.85rem;
+  padding:0.65rem 0.85rem;
+  transition:all 0.2s ease;
+}
+.calc-sub-accordion[open]{
+  border-color:var(--line-strong);
+  background:rgba(28,34,43,0.6);
+}
+[data-theme="light"] .calc-sub-accordion{
+  background:var(--field);
+  border-color:var(--line);
+}
+[data-theme="light"] .calc-sub-accordion[open]{
+  background:#ffffff;
+  border-color:var(--line-strong);
+}
+.calc-sub-accordion summary{
+  cursor:pointer;
+  outline:none;
+  user-select:none;
+  list-style:none;
+}
+.calc-sub-accordion summary::-webkit-details-marker,
+.calc-sub-accordion summary::marker{
+  display:none;
+}
+
 /* Quick Input, Price Lock, Bargaining Advice & Vault */
 .quick-input-card{background:linear-gradient(135deg,#181e28 0%,#11161f 100%);border:1px solid #334155}
 .quick-input-box{background:#0b0e14;border:1px solid #2d3748;color:#f8fafc;padding:0.75rem 1rem;border-radius:0.85rem;width:100%;font-size:0.875rem}
