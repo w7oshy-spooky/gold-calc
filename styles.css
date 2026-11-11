@@ -184,7 +184,7 @@ html[dir=rtl] .chart-change{text-align:right}
 .chart-axis{display:flex;justify-content:space-between;margin-top:.4rem;font-size:.7rem;color:var(--muted);direction:ltr}
 
 /* ---- Bottom receipt (gold result card) ---- */
-.bottom-receipt{position:fixed;bottom:0;left:0;right:0;padding:.5rem 1rem calc(.75rem + env(safe-area-inset-bottom));z-index:50;background:linear-gradient(to top,#0d0f12 70%,transparent)}
+.bottom-receipt{position:static;padding:0;z-index:1;background:transparent;width:100%}
 .bottom-receipt>section{
   background:linear-gradient(160deg,#f1cf6e,#d4a62f);color:var(--gold-ink);border:none;border-radius:1.4rem;
   box-shadow:0 14px 34px #d4a62f2e;
@@ -200,7 +200,7 @@ html[dir=rtl] .chart-change{text-align:right}
 .bottom-receipt .font-mono{font-family:var(--font-num);direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
 .bottom-receipt #finalTotalOutput{font-weight:800;letter-spacing:-.02em}
 
-.page-content{padding-bottom:calc(245px + env(safe-area-inset-bottom))}
+.page-content{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 .status-note{min-height:1.25rem}
 
 /* ---- Invoice ---- */
@@ -217,7 +217,7 @@ html[dir=rtl] .chart-change{text-align:right}
 .invoice-remove-btn:focus-visible,.invoice-clear-btn:focus-visible{outline:3px solid #e8bf5580;outline-offset:2px}
 .invoice-totals{display:flex;flex-direction:column;gap:.4rem;padding:.75rem;border:1px solid #e8bf5540;border-radius:.75rem;background:#e8bf5510}
 .invoice-num{direction:ltr;unicode-bidi:isolate;font-family:var(--font-num)}
-body:has(#summaryInvoiceRow:not([hidden])) .page-content{padding-bottom:calc(285px + env(safe-area-inset-bottom))}
+body:has(#summaryInvoiceRow:not([hidden])) .page-content{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 
 /* ---- Actions ---- */
 .action-btn{
@@ -235,12 +235,12 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
 .header-icon{display:inline-block;flex:0 0 auto}
 
 @media(max-width:360px){.live-karat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-height:680px){.page-content{padding-bottom:calc(220px + env(safe-area-inset-bottom))}}
+@media(max-height:680px){.page-content{padding-bottom:calc(76px + env(safe-area-inset-bottom))}}
 
 @media(min-width:768px) and (max-width:1099px){
   .page-content{max-width:760px!important}
-  .bottom-receipt{left:50%;right:auto;width:min(760px,100%);transform:translateX(-50%);background:transparent}
-  .bottom-receipt>section{max-width:720px!important}
+  .bottom-receipt{left:auto;right:auto;width:100%;transform:none;background:transparent}
+  .bottom-receipt>section{max-width:720px!important;margin-inline:auto}
 }
 
 @media(min-width:1100px){
@@ -501,16 +501,27 @@ main:not([data-active-tab="calc"]):not([data-active-tab="auditor"]):not([data-ac
 
 /* Mobile-only layout rules (< 1100px) */
 @media(max-width:1099px){
-  /* Dock bottom receipt above mobile nav bar when in calc or auditor tab */
-  .bottom-receipt{
-    bottom:calc(58px + env(safe-area-inset-bottom))!important;
-  }
   .page-content{
-    padding-bottom:calc(80px + env(safe-area-inset-bottom))!important;
+    display:flex!important;
+    flex-direction:column!important;
+    gap:1rem!important;
+    padding-bottom:calc(76px + env(safe-area-inset-bottom))!important;
   }
-  main[data-active-tab="calc"].page-content,
-  main[data-active-tab="auditor"].page-content{
-    padding-bottom:calc(200px + env(safe-area-inset-bottom))!important;
+  .page-content>*+*{margin-top:0!important}
+
+  .bottom-receipt{
+    position:static!important;
+    bottom:auto!important;
+    width:100%!important;
+    padding:0!important;
+    background:transparent!important;
+    order:8;
+  }
+  .actions-card{
+    order:9;
+  }
+  .note-card{
+    order:10;
   }
 }
 
@@ -589,7 +600,7 @@ main:not([data-active-tab="calc"]):not([data-active-tab="auditor"]):not([data-ac
 
 /* Bottom receipt in light mode */
 [data-theme="light"] .bottom-receipt{
-  background:linear-gradient(to top,#f7f6f2 70%,transparent);
+  background:transparent;
 }
 [data-theme="light"] .bottom-receipt>section{
   background:linear-gradient(155deg,#f8d87a 0%,#d89f1d 100%);
