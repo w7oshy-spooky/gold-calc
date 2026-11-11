@@ -700,6 +700,27 @@
     setInterval(refreshLiveInBackground, 15 * 1000);
     document.addEventListener('visibilitychange', refreshLiveInBackground);
 
+    document.querySelectorAll('[data-set-karat]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const k = Number(btn.dataset.setKarat);
+        if ([18, 21, 22, 24].includes(k)) {
+          vibrate();
+          transactionUi.setKarat(k);
+          auditorUi.setKarat(k);
+          calculate();
+          savePreferences();
+        }
+      });
+    });
+
+    const quickRefreshBtn = document.getElementById('quickPriceRefreshBtn');
+    if (quickRefreshBtn) {
+      quickRefreshBtn.addEventListener('click', () => {
+        vibrate();
+        fetchLiveGoldPrice({ force: true });
+      });
+    }
+
     document.querySelectorAll('.num-input, .market-input').forEach((input) => {
       input.addEventListener('focus', () => {
         setTimeout(() => {

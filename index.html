@@ -51,7 +51,7 @@
     <p class="text-yellow-100 text-sm opacity-90" data-t="s009">احسب الشراء أو البيع وقارن عرض المحل بالسعر المرجعي</p>
     <nav class="desktop-tab-bar" aria-label="تبويبات التنقل" data-t-attr="aria-label:s010">
       <div class="desktop-tab-pills">
-        <button type="button" class="desktop-tab-btn active" data-tab-target="market">
+        <button type="button" class="desktop-tab-btn" data-tab-target="market">
           <span>📊</span>
           <span data-i18n="tabMarket" data-t="s011">أسعار الذهب</span>
         </button>
@@ -59,7 +59,7 @@
           <span>🔍</span>
           <span data-i18n="tabAuditor" data-t="s012">فحص العرض</span>
         </button>
-        <button type="button" class="desktop-tab-btn" data-tab-target="calc">
+        <button type="button" class="desktop-tab-btn active" data-tab-target="calc">
           <span>⚖️</span>
           <span data-i18n="tabCalc" data-t="s013">الحاسبة</span>
         </button>
@@ -75,7 +75,49 @@
     </nav>
   </header>
 
-  <main class="page-content desktop-dashboard px-4 -mt-8 space-y-4 max-w-md mx-auto" data-active-tab="market">
+  <main class="page-content desktop-dashboard px-4 -mt-8 space-y-4 max-w-md mx-auto" data-active-tab="calc">
+    <!-- Quick Live Gold Price Ticker (Visible on Calculator & Inspection) -->
+    <section id="quickPriceBar" class="input-card quick-price-bar" data-tab="calc auditor" aria-label="أسعار الذهب المباشرة" data-t-attr="aria-label:s037">
+      <div class="quick-price-header">
+        <div class="quick-price-title-wrap">
+          <span id="topBarLiveDot" class="live-dot" data-state="live" aria-hidden="true"></span>
+          <span class="quick-price-title" data-t="s037">🟡 أسعار الذهب المرجعية</span>
+          <span id="quickPriceStatusBadge" class="quick-price-badge">مباشر</span>
+        </div>
+        <div class="quick-price-actions">
+          <button type="button" class="quick-price-market-btn" data-tab-target="market" title="عرض تفاصيل السوق والشارت" data-t-attr="title:s056">
+            <span>📊</span>
+            <span data-t="s056">الشارت والسوق</span>
+          </button>
+          <button type="button" id="quickPriceRefreshBtn" class="quick-price-refresh-btn" aria-label="تحديث السعر المباشر" title="تحديث السعر الآن" data-t-attr="aria-label:s040;title:s040">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="quick-price-grid">
+        <button type="button" class="quick-karat-pill" data-set-karat="24" title="تطبيق عيار 24 في الحاسبة" data-t-attr="title:s048">
+          <span class="quick-karat-label" data-t="s048">24 قيراط</span>
+          <strong id="topBarKarat24" class="quick-karat-val">—</strong>
+          <span class="quick-karat-unit" data-t="s049">ر.س/جرام</span>
+        </button>
+        <button type="button" class="quick-karat-pill" data-set-karat="22" title="تطبيق عيار 22 في الحاسبة" data-t-attr="title:s050">
+          <span class="quick-karat-label" data-t="s050">22 قيراط</span>
+          <strong id="topBarKarat22" class="quick-karat-val">—</strong>
+          <span class="quick-karat-unit" data-t="s051">ر.س/جرام</span>
+        </button>
+        <button type="button" class="quick-karat-pill quick-karat-pill-featured" data-set-karat="21" title="تطبيق عيار 21 في الحاسبة" data-t-attr="title:s052">
+          <span class="quick-karat-label font-bold text-amber-300 flex items-center gap-0.5"><span data-t="s052">21 قيراط</span> ⭐</span>
+          <strong id="topBarKarat21" class="quick-karat-val text-amber-300">—</strong>
+          <span class="quick-karat-unit text-amber-400/80" data-t="s053">ر.س/جرام</span>
+        </button>
+        <button type="button" class="quick-karat-pill" data-set-karat="18" title="تطبيق عيار 18 في الحاسبة" data-t-attr="title:s054">
+          <span class="quick-karat-label" data-t="s054">18 قيراط</span>
+          <strong id="topBarKarat18" class="quick-karat-val">—</strong>
+          <span class="quick-karat-unit" data-t="s055">ر.س/جرام</span>
+        </button>
+      </div>
+    </section>
+
     <section class="input-card market-card" data-tab="market" aria-labelledby="marketHeading">
       <div id="quickIntentCard" class="quick-intent-card p-3 rounded-2xl mb-4 border shadow-sm">
         <div class="flex items-center justify-between mb-2">
@@ -939,7 +981,7 @@
 
   <!-- Mobile Bottom Navigation Bar (< 1100px) -->
   <nav id="bottomNavBar" class="mobile-bottom-nav" aria-label="شريط التنقل الرئيسي" data-t-attr="aria-label:s230">
-    <button type="button" class="bottom-nav-btn active" data-tab-target="market">
+    <button type="button" class="bottom-nav-btn" data-tab-target="market">
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
       <span class="bottom-nav-label" data-i18n="tabMarket" data-t="s231">أسعار الذهب</span>
     </button>
@@ -947,7 +989,7 @@
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>
       <span class="bottom-nav-label" data-i18n="tabAuditor" data-t="s232">فحص العرض</span>
     </button>
-    <button type="button" class="bottom-nav-btn" data-tab-target="calc">
+    <button type="button" class="bottom-nav-btn active" data-tab-target="calc">
       <svg class="bottom-nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 7h8"/><path d="M12 7v10"/><path d="M8 17h8"/></svg>
       <span class="bottom-nav-label" data-i18n="tabCalc" data-t="s233">الحاسبة</span>
     </button>

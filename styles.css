@@ -142,6 +142,30 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;heigh
 .live-karat-grid strong{font-family:var(--font-num);font-size:.72rem;color:var(--gold);text-align:center;white-space:nowrap}
 @keyframes livePulse{50%{opacity:.35}}
 
+/* ---- Quick Top Price Bar ---- */
+.quick-price-bar{padding:.75rem .85rem;border:1px solid var(--line);border-radius:1.15rem;background:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.15);margin-bottom:.25rem}
+.quick-price-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.5rem;padding-bottom:.45rem;border-bottom:1px solid var(--line)}
+.quick-price-title-wrap{display:flex;align-items:center;gap:.45rem}
+.quick-price-title{font-size:.75rem;font-weight:800;color:var(--gold)}
+.quick-price-badge{font-size:.65rem;font-weight:700;padding:.1rem .45rem;border-radius:9999px;background:rgba(148,163,184,.12);color:var(--muted);border:1px solid var(--line)}
+.quick-price-actions{display:flex;align-items:center;gap:.35rem}
+.quick-price-market-btn{display:inline-flex;align-items:center;gap:.25rem;padding:.25rem .55rem;border-radius:.55rem;font-size:.7rem;font-weight:700;color:var(--gold);background:rgba(232,191,85,.1);border:1px solid rgba(232,191,85,.25);cursor:pointer;transition:all .15s ease}
+.quick-price-market-btn:hover{background:rgba(232,191,85,.2);border-color:var(--gold)}
+.quick-price-refresh-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:.5rem;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s ease}
+.quick-price-refresh-btn:hover{color:var(--gold);border-color:var(--gold)}
+.quick-price-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.35rem}
+.quick-karat-pill{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.4rem .2rem;border-radius:.75rem;background:var(--bg);border:1px solid var(--line);cursor:pointer;transition:all .15s ease;user-select:none}
+.quick-karat-pill:hover{border-color:rgba(232,191,85,.5);transform:translateY(-1px)}
+.quick-karat-pill.quick-karat-pill-featured{background:rgba(232,191,85,.08);border-color:rgba(232,191,85,.4)}
+.quick-karat-pill.quick-karat-pill-featured:hover{border-color:var(--gold)}
+.quick-karat-label{font-size:.65rem;font-weight:700;color:var(--muted)}
+.quick-karat-pill-featured .quick-karat-label{color:var(--gold)}
+.quick-karat-val{font-size:.8rem;font-weight:800;font-family:var(--font-num);font-variant-numeric:tabular-nums;color:var(--text);margin:.12rem 0}
+.quick-karat-pill-featured .quick-karat-val{color:var(--gold);font-size:.85rem}
+.quick-karat-unit{font-size:.58rem;color:var(--muted)}
+
+main[data-active-tab="all"] .quick-price-bar{display:none!important}
+
 /* ---- Quote comparison ---- */
 .comparison-result{padding:.75rem;border:1px solid var(--line);border-radius:.75rem;background:var(--bg)}
 .comparison-metric{display:flex;flex-direction:column;gap:.2rem;padding:.55rem;border-radius:.6rem;background:var(--card);border:1px solid var(--line)}
@@ -676,6 +700,11 @@ main:not([data-active-tab="calc"]):not([data-active-tab="auditor"]):not([data-ac
 [data-theme="light"] #chartLine{stroke:var(--gold)}
 [data-theme="light"] #chartFill stop:first-child{stop-color:var(--gold);stop-opacity:.25}
 [data-theme="light"] #chartDot{border-color:#ffffff}
+
+/* Quick price bar */
+[data-theme="light"] .quick-price-bar{background:#ffffff;box-shadow:0 4px 12px rgba(0,0,0,0.06)}
+[data-theme="light"] .quick-karat-pill{background:#f8fafc}
+[data-theme="light"] .quick-karat-pill.quick-karat-pill-featured{background:#fffbeb;border-color:#fde68a}
 
 /* Auditor benchmarks & stone */
 [data-theme="light"] .benchmark-neutral{background:#f1f5f9;color:#475569;border-color:#cbd5e1}

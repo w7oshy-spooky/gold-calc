@@ -6,7 +6,7 @@
   'use strict';
 
   const VALID_TABS = ['market', 'auditor', 'calc', 'vault', 'all'];
-  const DEFAULT_TAB = 'market';
+  const DEFAULT_TAB = 'calc';
   const STORAGE_KEY = 'gold_active_tab';
 
   function createNavigationUI({

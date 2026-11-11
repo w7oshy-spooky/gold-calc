@@ -197,11 +197,20 @@
               ouncePriceUsd: priceUsdOunceOrPrices,
             });
 
+      const top24 = document.getElementById('topBarKarat24');
+      const top22 = document.getElementById('topBarKarat22');
+      const top21 = document.getElementById('topBarKarat21');
+      const top18 = document.getElementById('topBarKarat18');
+
       if (!prices || !Number.isFinite(prices.gram24kSar)) {
         elements.liveKarat24.textContent = "—";
         elements.liveKarat22.textContent = "—";
         elements.liveKarat21.textContent = "—";
         elements.liveKarat18.textContent = "—";
+        if (top24) top24.textContent = "—";
+        if (top22) top22.textContent = "—";
+        if (top21) top21.textContent = "—";
+        if (top18) top18.textContent = "—";
         return;
       }
 
@@ -209,6 +218,11 @@
       elements.liveKarat22.textContent = formatting.formatMoney(prices.gram22kSar);
       elements.liveKarat21.textContent = formatting.formatMoney(prices.gram21kSar);
       elements.liveKarat18.textContent = formatting.formatMoney(prices.gram18kSar);
+
+      if (top24) top24.textContent = formatting.formatMoney(prices.gram24kSar);
+      if (top22) top22.textContent = formatting.formatMoney(prices.gram22kSar);
+      if (top21) top21.textContent = formatting.formatMoney(prices.gram21kSar);
+      if (top18) top18.textContent = formatting.formatMoney(prices.gram18kSar);
     }
 
     function renderLiveStatus(quote, state) {
@@ -234,6 +248,16 @@
 
       const dot = elements.livePricePanel.querySelector('.live-dot');
       if (dot) dot.dataset.state = elements.livePriceStatus.dataset.state;
+      const topDot = document.getElementById('topBarLiveDot');
+      if (topDot) topDot.dataset.state = elements.livePriceStatus.dataset.state;
+
+      const topStatus = document.getElementById('quickPriceStatusBadge');
+      if (topStatus) {
+        if (state === 'loading') topStatus.textContent = copy.liveLoading || (locale === 'en' ? 'Loading...' : 'جاري التحميل...');
+        else if (state === 'cached') topStatus.textContent = copy.liveCached || (locale === 'en' ? 'Cached' : 'محفوظ');
+        else if (state === 'error') topStatus.textContent = copy.liveUnavailable || (locale === 'en' ? 'Offline' : 'غير متاح');
+        else topStatus.textContent = quote?.stale ? (copy.liveStale || (locale === 'en' ? 'Stale' : 'سابق')) : (copy.liveReady || (locale === 'en' ? 'Live' : 'مباشر'));
+      }
     }
 
     function setLiveQuoteInput(priceUsdOunce) {

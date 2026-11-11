@@ -61,27 +61,27 @@ test('navigation-ui initializes with default or stored tab and switches tabs', (
     onChange: (t) => { changedTab = t; },
   });
 
-  // Default is market
-  assert.equal(nav.getActiveTab(), 'market');
-  assert.equal(main.getAttribute('data-active-tab'), 'market');
-  assert.ok(btnMarket.classList.has('active'));
-  assert.ok(!btnCalc.classList.has('active'));
-
-  // Switch to calc via click
-  btnCalc.click();
+  // Default is calc
   assert.equal(nav.getActiveTab(), 'calc');
   assert.equal(main.getAttribute('data-active-tab'), 'calc');
-  assert.ok(!btnAuditor.classList.has('active'));
   assert.ok(btnCalc.classList.has('active'));
-  assert.equal(stored['gold_active_tab'], 'calc');
-  assert.equal(vibrateCalled, true);
-  assert.equal(changedTab, 'calc');
+  assert.ok(!btnMarket.classList.has('active'));
 
-  // Switch to market via setActiveTab
-  nav.setActiveTab('market');
+  // Switch to market via click
+  btnMarket.click();
   assert.equal(nav.getActiveTab(), 'market');
   assert.equal(main.getAttribute('data-active-tab'), 'market');
+  assert.ok(!btnCalc.classList.has('active'));
   assert.ok(btnMarket.classList.has('active'));
+  assert.equal(stored['gold_active_tab'], 'market');
+  assert.equal(vibrateCalled, true);
+  assert.equal(changedTab, 'market');
+
+  // Switch to calc via setActiveTab
+  nav.setActiveTab('calc');
+  assert.equal(nav.getActiveTab(), 'calc');
+  assert.equal(main.getAttribute('data-active-tab'), 'calc');
+  assert.ok(btnCalc.classList.has('active'));
 });
 
 test('navigation-ui falls back gracefully for invalid tab', () => {
@@ -93,6 +93,6 @@ test('navigation-ui falls back gracefully for invalid tab', () => {
 
   const nav = navApi.createNavigationUI({ document: doc });
   nav.setActiveTab('invalid_nonexistent_tab');
-  assert.equal(nav.getActiveTab(), 'market');
-  assert.equal(main.getAttribute('data-active-tab'), 'market');
+  assert.equal(nav.getActiveTab(), 'calc');
+  assert.equal(main.getAttribute('data-active-tab'), 'calc');
 });
