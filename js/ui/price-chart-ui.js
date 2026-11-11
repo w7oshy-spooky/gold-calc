@@ -59,7 +59,7 @@
     return (dayKey * 17 + rangeIndex * 31) % 2147483647 || 7;
   }
 
-  function createPriceChartUI({ document, locale, formatting, now = () => new Date(), onTrend }) {
+  function createPriceChartUI({ document, locale, formatting, now = () => new Date(), onTrend, onKaratChange }) {
     const requireElement = (id) => {
       const element = document.getElementById(id);
       if (!element) throw new Error(`Missing required price chart element #${id}`);
@@ -81,11 +81,38 @@
     const emptyMessage = document.getElementById('chartEmpty');
     const setEmptyMessage = (visible) => { if (emptyMessage) emptyMessage.hidden = !visible; };
     const rangeButtons = Array.from(document.querySelectorAll('[data-chart-range]'));
+    const karatButtons = Array.from(document.querySelectorAll('[data-chart-karat]'));
+    const unitLabel = document.getElementById('chartUnitLabel');
 
     let rangeIndex = 0;
     let hoverIndex = null;
+    let selectedKarat = 24;
+    let currentPrices = { gram24kSar: 0, gram22kSar: 0, gram21kSar: 0, gram18kSar: 0 };
     let price = 0;
     let lastRendered = null;
+
+    function getPriceForKarat(karat) {
+      if (karat === 18) return currentPrices.gram18kSar;
+      if (karat === 21) return currentPrices.gram21kSar;
+      if (karat === 22) return currentPrices.gram22kSar;
+      return currentPrices.gram24kSar;
+    }
+
+    function updateKaratButtons() {
+      karatButtons.forEach((button) => {
+        const k = Number(button.dataset.chartKarat);
+        const active = k === selectedKarat;
+        button.setAttribute('aria-pressed', String(active));
+        button.classList.toggle('active', active);
+      });
+    }
+
+    function updateUnitLabel() {
+      if (!unitLabel) return;
+      const base = locale === 'en' ? 'SAR / g' : 'ر.س / جرام';
+      const suffix = locale === 'en' ? `(${selectedKarat}K)` : `(عيار ${selectedKarat})`;
+      unitLabel.textContent = `${base} ${suffix}`;
+    }
 
     function labelFor(range, series, index) {
       const date = new Date(now().getTime() - (series.length - 1 - index) * range.stepMinutes * 60000);
@@ -110,6 +137,7 @@
       elements.dot.hidden = true;
       elements.firstLabel.textContent = '';
       elements.lastLabel.textContent = '';
+      if (unitLabel) unitLabel.textContent = locale === 'en' ? 'SAR / g' : 'ر.س / جرام';
       setEmptyMessage(true);
       if (typeof onTrend === 'function') onTrend(null);
     }
@@ -123,10 +151,13 @@
 
     function draw() {
       updateRangeButtons();
+      updateKaratButtons();
+      price = getPriceForKarat(selectedKarat);
       if (!(price > 0)) {
         renderEmpty();
         return;
       }
+      updateUnitLabel();
       const range = RANGES[rangeIndex];
       const series = buildSeries(price, range, getDaySeed(now(), rangeIndex));
       const paths = buildPaths(series);
@@ -203,16 +234,65 @@
       });
     });
 
-    function render(price24k) {
-      const next = Number(price24k) > 0 ? Number(price24k) : 0;
-      // calculate() runs on every keystroke; the chart only depends on the market price.
-      if (next === lastRendered) return;
-      lastRendered = next;
-      price = next;
+    karatButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const k = Number(button.dataset.chartKarat);
+        if ([18, 21, 22, 24].includes(k) && k !== selectedKarat) {
+          selectedKarat = k;
+          hoverIndex = null;
+          draw();
+          if (typeof onKaratChange === 'function') onKaratChange(k);
+        }
+      });
+    });
+
+    function render(pricesOr24k, options = {}) {
+      let prices;
+      if (typeof pricesOr24k === 'number' || typeof pricesOr24k === 'string') {
+        const p = Number(pricesOr24k) > 0 ? Number(pricesOr24k) : 0;
+        prices = {
+          gram24kSar: p,
+          gram22kSar: p * (22 / 24),
+          gram21kSar: p * (21 / 24),
+          gram18kSar: p * (18 / 24),
+        };
+      } else if (pricesOr24k && typeof pricesOr24k === 'object') {
+        prices = {
+          gram24kSar: Number(pricesOr24k.gram24kSar) > 0 ? Number(pricesOr24k.gram24kSar) : 0,
+          gram22kSar: Number(pricesOr24k.gram22kSar) > 0 ? Number(pricesOr24k.gram22kSar) : 0,
+          gram21kSar: Number(pricesOr24k.gram21kSar) > 0 ? Number(pricesOr24k.gram21kSar) : 0,
+          gram18kSar: Number(pricesOr24k.gram18kSar) > 0 ? Number(pricesOr24k.gram18kSar) : 0,
+        };
+      } else {
+        prices = { gram24kSar: 0, gram22kSar: 0, gram21kSar: 0, gram18kSar: 0 };
+      }
+
+      currentPrices = prices;
+
+      if (options.activeKarat && [18, 21, 22, 24].includes(Number(options.activeKarat))) {
+        selectedKarat = Number(options.activeKarat);
+      }
+
+      const p = getPriceForKarat(selectedKarat);
+      const nextKey = `${p.toFixed(2)}_${selectedKarat}_${rangeIndex}`;
+      if (nextKey === lastRendered && p > 0) return;
+      lastRendered = nextKey;
       draw();
     }
 
-    return { render };
+    return {
+      render,
+      getSelectedKarat: () => selectedKarat,
+      setSelectedKarat(k) {
+        const num = Number(k);
+        if ([18, 21, 22, 24].includes(num) && num !== selectedKarat) {
+          selectedKarat = num;
+          hoverIndex = null;
+          draw();
+          if (typeof onKaratChange === 'function') onKaratChange(num);
+        }
+      },
+    };
   }
 
   return { createPriceChartUI, buildSeries, buildPaths, summarize, getDaySeed, RANGES };

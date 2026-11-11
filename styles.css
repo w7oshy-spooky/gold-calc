@@ -171,11 +171,12 @@ html[dir=rtl] .chart-change{text-align:right}
 .trend-badge[data-trend=down]{background:rgba(239,68,68,.15);color:var(--bad);border:1px solid rgba(239,68,68,.35)}
 .trend-badge[data-trend=stable]{background:rgba(148,163,184,.15);color:var(--muted);border:1px solid rgba(148,163,184,.35)}
 .ltr-num,#goldTrendDiff{direction:ltr!important;unicode-bidi:isolate;display:inline-block}
-.chart-ranges,.chart-range-pills{display:inline-flex;align-items:center;gap:4px;padding:3px;background:var(--bg);border:1px solid var(--line);border-radius:12px}
-.chart-range-btn,.chart-range-pill{min-height:32px;min-width:44px;padding:.25rem .75rem;border:none;border-radius:8px;background:transparent;color:var(--muted);font-family:inherit;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s ease;display:inline-flex;align-items:center;justify-content:center}
-.chart-range-btn:hover,.chart-range-pill:hover{color:var(--text)}
-.chart-range-btn.active,.chart-range-pill.active{background:var(--gold);color:var(--gold-ink);font-weight:800;box-shadow:0 1px 3px rgba(0,0,0,.3)}
-.chart-range-btn:focus-visible,.chart-range-pill:focus-visible{outline:3px solid #e8bf5580;outline-offset:2px}
+.chart-ranges,.chart-range-pills,.chart-karat-pills{display:inline-flex;align-items:center;gap:4px;padding:3px;background:var(--bg);border:1px solid var(--line);border-radius:12px}
+.chart-range-btn,.chart-range-pill,.chart-karat-btn{min-height:32px;min-width:38px;padding:.25rem .6rem;border:none;border-radius:8px;background:transparent;color:var(--muted);font-family:inherit;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s ease;display:inline-flex;align-items:center;justify-content:center}
+.chart-range-btn{min-width:44px}
+.chart-range-btn:hover,.chart-range-pill:hover,.chart-karat-btn:hover{color:var(--text)}
+.chart-range-btn.active,.chart-range-pill.active,.chart-karat-btn.active{background:var(--gold);color:var(--gold-ink);font-weight:800;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.chart-range-btn:focus-visible,.chart-range-pill:focus-visible,.chart-karat-btn:focus-visible{outline:3px solid #e8bf5580;outline-offset:2px}
 .chart-plot{position:relative;margin-top:.9rem;direction:ltr}
 .chart-plot svg{display:block;width:100%;height:180px;touch-action:pan-y;cursor:crosshair}
 .chart-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;margin:0;padding:0 1rem;text-align:center;direction:inherit;font-size:.8rem;color:var(--muted,#8b94a3);pointer-events:none}
@@ -227,7 +228,7 @@ body:has(#summaryInvoiceRow:not([hidden])) .page-content{padding-bottom:calc(76p
 }
 .action-btn:active{transform:scale(.96)}
 .action-btn-primary{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
-.action-btn:focus-visible,.step-btn:focus-visible,.karat-btn:focus-visible,.gram-karat-btn:focus-visible,.source-btn:focus-visible,.mode-btn:focus-visible,.live-refresh-btn:focus-visible,.lang-switch:focus-visible{outline:3px solid #e8bf5580;outline-offset:2px}
+.action-btn:focus-visible,.step-btn:focus-visible,.karat-btn:focus-visible,.gram-karat-btn:focus-visible,.chart-karat-btn:focus-visible,.source-btn:focus-visible,.mode-btn:focus-visible,.live-refresh-btn:focus-visible,.lang-switch:focus-visible{outline:3px solid #e8bf5580;outline-offset:2px}
 #actionStatus[data-state=error],#invoiceStatus[data-state=error]{color:var(--gold)}
 html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:ltr;unicode-bidi:isolate;text-align:right}
 .warning-text{color:var(--gold)}
@@ -636,10 +637,10 @@ main:not([data-active-tab="calc"]):not([data-active-tab="auditor"]):not([data-ac
 
 /* Chart */
 [data-theme="light"] .gold-trend-row{background:var(--field);border-color:var(--line)}
-[data-theme="light"] .chart-ranges{background:var(--field);border-color:var(--line)}
-[data-theme="light"] .chart-range-btn{color:var(--muted)}
-[data-theme="light"] .chart-range-btn:hover{color:var(--text)}
-[data-theme="light"] .chart-range-btn.active{background:var(--gold);color:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
+[data-theme="light"] .chart-ranges,[data-theme="light"] .chart-range-pills,[data-theme="light"] .chart-karat-pills{background:var(--field);border-color:var(--line)}
+[data-theme="light"] .chart-range-btn,[data-theme="light"] .chart-karat-btn{color:var(--muted)}
+[data-theme="light"] .chart-range-btn:hover,[data-theme="light"] .chart-karat-btn:hover{color:var(--text)}
+[data-theme="light"] .chart-range-btn.active,[data-theme="light"] .chart-karat-btn.active{background:var(--gold);color:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
 [data-theme="light"] #chartLine{stroke:var(--gold)}
 [data-theme="light"] #chartFill stop:first-child{stop-color:var(--gold);stop-opacity:.25}
 [data-theme="light"] #chartDot{border-color:#ffffff}

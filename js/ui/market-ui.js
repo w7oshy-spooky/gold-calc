@@ -101,7 +101,8 @@
       const karat = priceConverter.normalizeKarat(value);
       elements.gramInputKarat.value = karat;
       gramKaratButtons.forEach((button) => {
-        const active = Number(button.dataset.gramKarat) === karat;
+        const btnKarat = Number(button.dataset.gramKarat || button.dataset.val);
+        const active = btnKarat === karat;
         button.classList.toggle('active', active);
         button.setAttribute('aria-pressed', String(active));
       });
@@ -284,7 +285,8 @@
 
     gramKaratButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        const karat = setGramInputKarat(button.dataset.gramKarat);
+        const val = button.dataset.gramKarat || button.dataset.val;
+        const karat = setGramInputKarat(val);
         onChange({ type: 'gram-karat', karat });
       });
     });

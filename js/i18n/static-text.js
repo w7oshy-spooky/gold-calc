@@ -64,7 +64,7 @@
       s054: "18 Karat",
       s055: "SAR/g",
       s056: "📊 Today's Gold Price Trend",
-      s057: "SAR / oz",
+      s057: "SAR / g",
       s058: "Chart range",
       s059: "1D",
       s060: "1W",
@@ -273,7 +273,8 @@
       s263: "Close User Guide",
       s264: "At the shop",
       s265: "Before market visit",
-      s266: "Direct LIVE"
+      s266: "Direct LIVE",
+      s267: "Chart karat"
   };
 
   const DICTIONARIES = { en: EN };

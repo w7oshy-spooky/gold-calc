@@ -81,3 +81,68 @@ test('index.html has the chart waiting message with a translation', () => {
   const html = fs.readFileSync('index.html', 'utf8');
   assert.match(html, /id="chartEmpty"[^>]*hidden/);
 });
+
+test('chart card exposes karat selection buttons for 18, 21, 22, 24', () => {
+  const html = fs.readFileSync('index.html', 'utf8');
+  for (const karat of ['18', '21', '22', '24']) {
+    assert.match(html, new RegExp(`data-chart-karat=["']${karat}["']`));
+  }
+  assert.match(html, /id=["']chartUnitLabel["']/);
+  assert.match(html, /ر\.س \/ جرام/);
+});
+
+test('chart renders specific karat price and updates unit label when activeKarat is specified', () => {
+  const { createPriceChartUI } = require('../js/ui/price-chart-ui.js');
+  const makeElement = () => ({
+    textContent: '',
+    hidden: false,
+    style: {},
+    dataset: {},
+    attrs: {},
+    classList: {
+      classes: new Set(),
+      toggle(cls, val) {
+        if (val) this.classes.add(cls);
+        else this.classes.delete(cls);
+      },
+    },
+    setAttribute(name, value) { this.attrs[name] = value; },
+    removeAttribute(name) { delete this.attrs[name]; },
+    addEventListener() {},
+  });
+  const ids = ['chartPrice', 'chartChange', 'chartSvg', 'chartArea', 'chartLine', 'chartCursor', 'chartDot', 'chartFirstLabel', 'chartLastLabel', 'chartEmpty', 'chartUnitLabel'];
+  const byId = Object.fromEntries(ids.map((id) => [id, makeElement()]));
+
+  const karatButtons = [18, 21, 22, 24].map((k) => {
+    const el = makeElement();
+    el.dataset.chartKarat = String(k);
+    return el;
+  });
+
+  const document = {
+    getElementById: (id) => byId[id] || null,
+    querySelectorAll: (selector) => (selector === '[data-chart-karat]' ? karatButtons : []),
+  };
+  const formatting = { formatMoney: (value) => Number(value).toFixed(2) };
+
+  const chart = createPriceChartUI({ document, locale: 'ar', formatting });
+
+  // Prices where 21K is 500 SAR/g and 24K is 571.43 SAR/g
+  const prices = {
+    gram24kSar: 571.43,
+    gram22kSar: 523.81,
+    gram21kSar: 500.00,
+    gram18kSar: 428.57,
+  };
+
+  chart.render(prices, { activeKarat: 21 });
+  assert.equal(byId.chartPrice.textContent, '500.00');
+  assert.equal(byId.chartUnitLabel.textContent, 'ر.س / جرام (عيار 21)');
+  assert.equal(chart.getSelectedKarat(), 21);
+
+  // Switch to 24K
+  chart.setSelectedKarat(24);
+  assert.equal(byId.chartPrice.textContent, '571.43');
+  assert.equal(byId.chartUnitLabel.textContent, 'ر.س / جرام (عيار 24)');
+  assert.equal(chart.getSelectedKarat(), 24);
+});

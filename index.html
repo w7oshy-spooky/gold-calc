@@ -152,10 +152,10 @@
         <div class="mb-3">
           <span class="block text-gray-600 text-xs font-bold mb-2" data-t="s035">عيار الجرام المدخل</span>
           <div class="grid grid-cols-4 gap-2" role="group" aria-label="عيار الجرام المدخل" data-t-attr="aria-label:s036">
-            <button type="button" class="gram-karat-btn" data-val="18" aria-pressed="false">18</button>
-            <button type="button" class="gram-karat-btn" data-val="21" aria-pressed="false">21</button>
-            <button type="button" class="gram-karat-btn" data-val="22" aria-pressed="false">22</button>
-            <button type="button" class="gram-karat-btn active" data-val="24" aria-pressed="true">24</button>
+            <button type="button" class="gram-karat-btn" data-val="18" data-gram-karat="18" aria-pressed="false">18</button>
+            <button type="button" class="gram-karat-btn" data-val="21" data-gram-karat="21" aria-pressed="false">21</button>
+            <button type="button" class="gram-karat-btn" data-val="22" data-gram-karat="22" aria-pressed="false">22</button>
+            <button type="button" class="gram-karat-btn active" data-val="24" data-gram-karat="24" aria-pressed="true">24</button>
             <input type="hidden" id="gramInputKarat" value="24">
           </div>
         </div>
@@ -243,15 +243,23 @@
           <p id="chartHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest" data-t="s056">📊 حركة سعر الذهب اليوم</p>
           <div class="chart-price-row">
             <span id="chartPrice" class="chart-price-val">—</span>
-            <span class="text-xs text-gray-400" data-t="s057">ر.س / أونصة</span>
+            <span id="chartUnitLabel" class="text-xs text-gray-400" data-t="s057">ر.س / جرام</span>
             <span id="chartChange" class="chart-change-pill" hidden>—</span>
           </div>
         </div>
-        <div class="chart-range-pills" role="group" aria-label="نطاق الرسم البياني" data-t-attr="aria-label:s058">
-          <button type="button" class="chart-range-pill active" data-chart-range="0" aria-pressed="true" data-t="s059">يوم</button>
-          <button type="button" class="chart-range-pill" data-chart-range="1" aria-pressed="false" data-t="s060">أسبوع</button>
-          <button type="button" class="chart-range-pill" data-chart-range="2" aria-pressed="false" data-t="s061">شهر</button>
-          <button type="button" class="chart-range-pill" data-chart-range="3" aria-pressed="false" data-t="s062">سنة</button>
+        <div class="chart-controls flex flex-wrap items-center gap-2">
+          <div class="chart-karat-pills" role="group" aria-label="عيار الرسم البياني" data-t-attr="aria-label:s267">
+            <button type="button" class="chart-karat-btn" data-chart-karat="18" aria-pressed="false">18</button>
+            <button type="button" class="chart-karat-btn" data-chart-karat="21" aria-pressed="false">21</button>
+            <button type="button" class="chart-karat-btn" data-chart-karat="22" aria-pressed="false">22</button>
+            <button type="button" class="chart-karat-btn active" data-chart-karat="24" aria-pressed="true">24</button>
+          </div>
+          <div class="chart-range-pills" role="group" aria-label="نطاق الرسم البياني" data-t-attr="aria-label:s058">
+            <button type="button" class="chart-range-pill active" data-chart-range="0" aria-pressed="true" data-t="s059">يوم</button>
+            <button type="button" class="chart-range-pill" data-chart-range="1" aria-pressed="false" data-t="s060">أسبوع</button>
+            <button type="button" class="chart-range-pill" data-chart-range="2" aria-pressed="false" data-t="s061">شهر</button>
+            <button type="button" class="chart-range-pill" data-chart-range="3" aria-pressed="false" data-t="s062">سنة</button>
+          </div>
         </div>
       </div>
       <div class="chart-plot">

@@ -76,6 +76,15 @@ test('equivalent USD ounce output preserves the previous number-only display', (
   );
 });
 
+test('both pages expose gram-karat buttons with data-val and data-gram-karat', () => {
+  for (const html of [arabic, english]) {
+    for (const karat of ['18', '21', '22', '24']) {
+      assert.match(html, new RegExp(`class="gram-karat-btn[^"]*"[^>]*data-val="${karat}"`));
+      assert.match(html, new RegExp(`class="gram-karat-btn[^"]*"[^>]*data-gram-karat="${karat}"`));
+    }
+  }
+});
+
 test('market UI module exposes only its factory as public API', () => {
   assert.deepEqual(Object.keys(marketUiApi).sort(), ['createMarketUI']);
 });

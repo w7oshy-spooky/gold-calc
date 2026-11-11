@@ -331,6 +331,9 @@
     onTrend(trendData) {
       marketUi.renderGoldTrend(trendData);
     },
+    onKaratChange(karat) {
+      vibrate();
+    },
   });
 
   const auditorUi = globalThis.GoldAuditorUI.createAuditorUI({
@@ -488,13 +491,18 @@
     return safeMode;
   }
 
-  function getPrice24k() {
-    const prices = priceConverter.deriveMarketPrices(marketUi.getMarketInput());
+  function derivePrices() {
+    const market = marketUi.getMarketInput();
+    const prices = priceConverter.deriveMarketPrices(market);
     marketUi.renderMarketEquivalents(prices);
     if (isLiveSource()) {
       marketUi.renderLiveKaratPrices(prices);
     }
-    return prices.gram24kSar;
+    return { market, prices };
+  }
+
+  function getPrice24k() {
+    return derivePrices().prices.gram24kSar;
   }
 
   function savePreferences() {
@@ -533,8 +541,11 @@
   }
 
   function calculate() {
-    const price24k = getPrice24k();
-    priceChartUi.render(price24k);
+    const { market, prices } = derivePrices();
+    const price24k = prices.gram24kSar;
+    priceChartUi.render(prices, {
+      activeKarat: market.source === 'gram-sar' ? Number(market.gramKarat) : undefined,
+    });
     const input = transactionUi.getTransactionInput();
     const result = core.calculateTransaction({
       mode: input.mode,
