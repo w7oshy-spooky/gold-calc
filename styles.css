@@ -630,6 +630,7 @@ main:not([data-active-tab="calc"]):not([data-active-tab="auditor"]):not([data-ac
 [data-theme="light"] .market-summary-card .live-karat-grid>div{
   background:#ffffff;border-color:var(--line);
 }
+[data-theme="light"] #gramConversionPreview{background:#f8fafc;border-color:#e2e8f0}
 [data-theme="light"] .comparison-card{background:var(--card)}
 [data-theme="light"] .comparison-result{background:var(--field)}
 [data-theme="light"] .comparison-metric{background:var(--card);border-color:var(--line)}

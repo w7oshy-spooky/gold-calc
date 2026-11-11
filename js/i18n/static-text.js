@@ -39,11 +39,11 @@
       s029: "Troy ounce price (SAR)",
       s030: "Example: 16125",
       s031: "SAR",
-      s032: "Raw gold gram price (SAR)",
+      s032: "Gold gram price (SAR)",
       s033: "Example: 518.43",
       s034: "SAR",
-      s035: "Entered gram karat",
-      s036: "Entered gram karat",
+      s035: "Karat of entered price",
+      s036: "Karat of entered price",
       s037: "🟡 Reference Gold Prices",
       s038: "Lock live price during inspection",
       s039: "Lock Price 🔓",
@@ -274,7 +274,8 @@
       s264: "At the shop",
       s265: "Before market visit",
       s266: "Direct LIVE",
-      s267: "Chart karat"
+      s267: "Chart karat",
+      s268: "Calculated pure 24K price:"
   };
 
   const DICTIONARIES = { en: EN };

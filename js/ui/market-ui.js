@@ -56,6 +56,12 @@
       goldTrendDiff: document.getElementById('goldTrendDiff'),
       goldTrendAdvice: document.getElementById('goldTrendAdvice'),
       lockPriceBtn: document.getElementById('lockPriceBtn'),
+      gramConversionPreview: document.getElementById('gramConversionPreview'),
+      gramPreview24k: document.getElementById('gramPreview24k'),
+      gramPreviewFormula: document.getElementById('gramPreviewFormula'),
+      liveHeading: document.getElementById('liveHeading'),
+      liveControlsRow: document.getElementById('liveControlsRow'),
+      liveStatusRow: document.getElementById('liveStatusRow'),
     };
 
     let isPriceLockedState = false;
@@ -85,7 +91,21 @@
       elements.gramSarInputPanel.hidden = !gramSarMode;
       elements.ouncePriceUSD.readOnly = liveMode;
       elements.marketPrice.readOnly = true;
-      elements.livePricePanel.hidden = !liveMode;
+      elements.livePricePanel.hidden = false;
+      if (elements.lockPriceBtn) elements.lockPriceBtn.hidden = !liveMode;
+      if (elements.liveRefresh) elements.liveRefresh.hidden = !liveMode;
+      if (elements.liveControlsRow) elements.liveControlsRow.hidden = !liveMode;
+      if (elements.liveStatusRow) elements.liveStatusRow.hidden = !liveMode;
+      else if (elements.livePriceStatus) {
+        const row = elements.livePriceStatus.closest('.live-status-row');
+        if (row) row.hidden = !liveMode;
+      }
+      if (elements.goldTrendRow) elements.goldTrendRow.hidden = !liveMode;
+      if (elements.liveHeading) {
+        elements.liveHeading.textContent = liveMode
+          ? (locale === 'ar' ? '🟡 أسعار الذهب المرجعية (مباشر)' : '🟡 Live Reference Gold Prices')
+          : (locale === 'ar' ? '🟡 أسعار عيارات الذهب المحسوبة' : '🟡 Calculated Karat Gold Prices');
+      }
       elements.priceModeHelp.textContent = liveMode
         ? copy.liveMode
         : ounceUsdMode
@@ -340,6 +360,33 @@
       });
     }
 
+    function renderGramConversionPreview(marketInput, prices) {
+      if (!elements.gramConversionPreview) return;
+      const source = marketInput?.source || elements.priceSource.value;
+      const isGramSar = source === 'gram-sar';
+      const enteredPrice = Number(elements.gramPriceSAR.value);
+      if (!isGramSar || !(enteredPrice > 0) || !(prices?.gram24kSar > 0)) {
+        elements.gramConversionPreview.hidden = true;
+        return;
+      }
+      elements.gramConversionPreview.hidden = false;
+      const karat = Number(elements.gramInputKarat.value) || 24;
+      if (elements.gramPreview24k) {
+        elements.gramPreview24k.textContent = formatting.formatMoney(prices.gram24kSar);
+      }
+      if (elements.gramPreviewFormula) {
+        if (karat === 24) {
+          elements.gramPreviewFormula.textContent = locale === 'ar'
+            ? 'عيار 24 هو الذهب الصافي الخام (100% ذهب خالص).'
+            : '24K is pure raw gold (100% purity).';
+        } else {
+          elements.gramPreviewFormula.textContent = locale === 'ar'
+            ? `الحسبة: ${formatting.formatMoney(enteredPrice)} × (24 ÷ ${karat}) = ${formatting.formatMoney(prices.gram24kSar)} ر.س / جرام`
+            : `Formula: ${formatting.formatMoney(enteredPrice)} × (24 ÷ ${karat}) = ${formatting.formatMoney(prices.gram24kSar)} SAR / g`;
+        }
+      }
+    }
+
     return {
       getMarketInput,
       getPriceSource,
@@ -351,6 +398,7 @@
       renderLiveStatus,
       renderLiveKaratPrices,
       renderLiveQuoteKaratPrices: renderLiveKaratPrices,
+      renderGramConversionPreview,
       setLiveQuoteInput,
       clearLiveQuoteInput,
       setLiveRefreshDisabled,

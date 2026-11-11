@@ -495,8 +495,9 @@
     const market = marketUi.getMarketInput();
     const prices = priceConverter.deriveMarketPrices(market);
     marketUi.renderMarketEquivalents(prices);
-    if (isLiveSource()) {
-      marketUi.renderLiveKaratPrices(prices);
+    marketUi.renderLiveKaratPrices(prices);
+    if (typeof marketUi.renderGramConversionPreview === 'function') {
+      marketUi.renderGramConversionPreview(market, prices);
     }
     return { market, prices };
   }

@@ -141,23 +141,34 @@
       </div>
 
       <div id="gramSarInputPanel" hidden>
-        <label for="gramPriceSAR" class="block text-gray-600 text-xs font-bold mb-2" data-t="s032">سعر جرام الذهب الخام (ريال)</label>
+        <label for="gramPriceSAR" class="block text-gray-600 text-xs font-bold mb-2" data-t="s032">سعر جرام الذهب (ريال)</label>
         <div class="relative mb-3">
-          <input type="number" id="gramPriceSAR" min="0" step="0.01" placeholder="مثال: 518.43"
+          <input type="number" id="gramPriceSAR" min="0" step="0.01" placeholder="مثال: 500"
                  inputmode="decimal" autocomplete="off"
                  class="market-input bg-blue-50 border-blue-200 text-blue-800"
                  style="padding-inline-start:3.5rem;" data-t-attr="placeholder:s033">
           <span class="absolute start-3 top-1/2 -translate-y-1/2 text-blue-400 font-bold text-xs pointer-events-none" data-t="s034">ر.س</span>
         </div>
         <div class="mb-3">
-          <span class="block text-gray-600 text-xs font-bold mb-2" data-t="s035">عيار الجرام المدخل</span>
-          <div class="grid grid-cols-4 gap-2" role="group" aria-label="عيار الجرام المدخل" data-t-attr="aria-label:s036">
+          <span class="block text-gray-600 text-xs font-bold mb-2" data-t="s035">عيار السعر المدخل</span>
+          <div class="grid grid-cols-4 gap-2" role="group" aria-label="عيار السعر المدخل" data-t-attr="aria-label:s036">
             <button type="button" class="gram-karat-btn" data-val="18" data-gram-karat="18" aria-pressed="false">18</button>
             <button type="button" class="gram-karat-btn" data-val="21" data-gram-karat="21" aria-pressed="false">21</button>
             <button type="button" class="gram-karat-btn" data-val="22" data-gram-karat="22" aria-pressed="false">22</button>
             <button type="button" class="gram-karat-btn active" data-val="24" data-gram-karat="24" aria-pressed="true">24</button>
             <input type="hidden" id="gramInputKarat" value="24">
           </div>
+        </div>
+
+        <div id="gramConversionPreview" class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs mb-3" hidden>
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <span class="text-amber-400 font-bold flex items-center gap-1">
+              <span>✨</span>
+              <span id="gramPreviewTitle" data-t="s268">سعر عيار 24 الصافي المحسوب:</span>
+            </span>
+            <span class="font-mono font-black text-amber-400 text-sm"><span id="gramPreview24k">—</span> <span class="text-xs font-normal text-gray-400" data-t="s049">ر.س/جرام</span></span>
+          </div>
+          <p id="gramPreviewFormula" class="text-[11px] text-gray-400 font-mono"></p>
         </div>
       </div>
 
@@ -169,13 +180,13 @@
     <section id="livePricePanel" class="input-card market-summary-card" data-tab="market" aria-labelledby="liveHeading">
       <div class="flex items-center justify-between gap-2 mb-3">
         <p id="liveHeading" class="text-gray-400 text-[11px] font-bold uppercase tracking-widest" data-t="s037">🟡 أسعار الذهب المرجعية</p>
-        <div class="flex items-center gap-1.5">
+        <div id="liveControlsRow" class="flex items-center gap-1.5">
           <button type="button" id="lockPriceBtn" class="lock-price-btn" aria-label="تثبيت السعر لحظة الفحص" aria-pressed="false" data-t-attr="aria-label:s038" data-t="s039">تثبيت السعر 🔓</button>
           <button type="button" id="liveRefresh" class="live-refresh-btn" aria-label="تحديث السعر الحي الآن" data-t-attr="aria-label:s040" data-t="s041">تحديث</button>
         </div>
       </div>
 
-      <div class="live-status-row flex items-center justify-between gap-2 mb-3 text-xs">
+      <div id="liveStatusRow" class="live-status-row flex items-center justify-between gap-2 mb-3 text-xs">
         <span id="livePriceStatus" class="font-bold text-emerald-400 flex items-center gap-1.5" aria-live="polite">
           <span class="live-dot" aria-hidden="true"></span>
           <span data-t="s042">LIVE · السعر الحي متصل</span>
