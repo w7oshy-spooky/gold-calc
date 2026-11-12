@@ -408,6 +408,7 @@
     return {
       min,
       max,
+      defaultLabor: Math.round((min + max) / 2),
       tierKey: tier.tierKey,
       pieceFamily,
       icon: family.icon,

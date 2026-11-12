@@ -66,6 +66,21 @@
   let liveFallbackNotice = '';
   let invoiceItems = [];
   let lastInvoice = null;
+  let userManuallyEditedWorkmanship = false;
+
+  function syncInferredWorkmanship(targetFamily) {
+    if (!core.inferLaborBenchmark || typeof transactionUi === 'undefined' || !transactionUi) return;
+    const family = targetFamily || (typeof auditorUi !== 'undefined' && auditorUi?.getPieceFamily ? auditorUi.getPieceFamily() : 'ring_earring');
+    const input = transactionUi.getTransactionInput();
+    const inferred = core.inferLaborBenchmark({
+      pieceFamily: family,
+      weight: input.weight,
+      karat: input.karat,
+    });
+    if (inferred && Number.isFinite(inferred.defaultLabor) && inferred.defaultLabor > 0) {
+      transactionUi.applyInput({ workmanshipPerGram: inferred.defaultLabor });
+    }
+  }
 
   function vibrate(ms = 8) {
     if ('vibrate' in navigator) navigator.vibrate(ms);
@@ -100,6 +115,11 @@
     copy,
     onChange(change) {
       if (change.type === 'karat' || change.type === 'adjust' || change.type === 'labor-tax-mode') vibrate();
+      if ((change.type === 'input' && change.id === 'workmanship') || (change.type === 'adjust' && change.id === 'workmanship')) {
+        userManuallyEditedWorkmanship = true;
+      } else if (!userManuallyEditedWorkmanship && (change.type === 'karat' || change.id === 'weight' || (change.type === 'adjust' && change.id === 'weight'))) {
+        syncInferredWorkmanship();
+      }
       calculate();
     },
   });
@@ -342,7 +362,11 @@
     formatting,
     copy,
     async onChange(change) {
-      if (change.type === 'karat' || change.type === 'stone-toggle') vibrate();
+      if (change.type === 'karat' || change.type === 'stone-toggle' || change.type === 'piece-family') vibrate();
+      if (change.type === 'piece-family') {
+        userManuallyEditedWorkmanship = false;
+        syncInferredWorkmanship(change.pieceFamily);
+      }
       if (change.type === 'share-card') {
         vibrate();
         if (cardCanvasGenerator) {
@@ -682,6 +706,8 @@
       }
       if (parsed.pieceFamily && auditorUi.setPieceFamily) {
         auditorUi.setPieceFamily(parsed.pieceFamily);
+        userManuallyEditedWorkmanship = false;
+        syncInferredWorkmanship(parsed.pieceFamily);
       }
       if (parsed.hasStones) {
         const toggle = document.getElementById('hasStonesToggle');
@@ -710,6 +736,9 @@
           vibrate();
           transactionUi.setKarat(k);
           auditorUi.setKarat(k);
+          if (!userManuallyEditedWorkmanship) {
+            syncInferredWorkmanship();
+          }
           calculate();
           savePreferences();
         }

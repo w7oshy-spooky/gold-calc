@@ -102,3 +102,14 @@ test('index.html contains piece family group and buttons', () => {
   assert.match(html, /data-family=["']set_bridal["']/);
   assert.match(html, /data-family=["']bullion["']/);
 });
+
+test('inferLaborBenchmark provides fair defaultLabor per gram for calculator auto-fill', () => {
+  const lightRing = core.inferLaborBenchmark({ pieceFamily: 'ring_earring', weight: 2, karat: 21 });
+  assert.equal(lightRing.defaultLabor, 45);
+
+  const heavyBangle = core.inferLaborBenchmark({ pieceFamily: 'bangle', weight: 50, karat: 21 });
+  assert.equal(heavyBangle.defaultLabor, 19);
+
+  const medBullion = core.inferLaborBenchmark({ pieceFamily: 'bullion', weight: 20, karat: 24 });
+  assert.equal(medBullion.defaultLabor, 14);
+});
