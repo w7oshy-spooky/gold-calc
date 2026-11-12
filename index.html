@@ -351,6 +351,33 @@
         <input type="text" id="quickInputBar" placeholder="خاتم 21 وزنه 6.5 جرام بـ 2800" class="quick-input-box text-xs" autocomplete="off" data-t-attr="placeholder:s072">
       </div>
 
+      <!-- Piece Family Selector -->
+      <div>
+        <span class="block text-gray-400 text-xs font-bold mb-2" id="pieceFamilyLabel" data-t="s269">نوع القطعة (لتقدير المصنعية العادلة)</span>
+        <div class="grid grid-cols-5 gap-1.5" role="group" aria-labelledby="pieceFamilyLabel" id="pieceFamilyGroup">
+          <button type="button" class="piece-family-btn active" data-family="ring_earring" title="خواتم، أخراس، حلق، دبل" data-t-attr="title:s270">
+            <span class="text-base block pointer-events-none">💍</span>
+            <span class="text-[10px] block leading-tight font-medium pointer-events-none" data-t="s271">خاتم/حلق</span>
+          </button>
+          <button type="button" class="piece-family-btn" data-family="bangle" title="بناجر، غوايش، أساور عريضة" data-t-attr="title:s272">
+            <span class="text-base block pointer-events-none">⭕</span>
+            <span class="text-[10px] block leading-tight font-medium pointer-events-none" data-t="s273">بناجر/سوار</span>
+          </button>
+          <button type="button" class="piece-family-btn" data-family="chain" title="سلاسل، شوكر، خلاخل" data-t-attr="title:s274">
+            <span class="text-base block pointer-events-none">📿</span>
+            <span class="text-[10px] block leading-tight font-medium pointer-events-none" data-t="s275">سلسلة/عقد</span>
+          </button>
+          <button type="button" class="piece-family-btn" data-family="set_bridal" title="أطقم شبكة، كف، تراثي" data-t-attr="title:s276">
+            <span class="text-base block pointer-events-none">👑</span>
+            <span class="text-[10px] block leading-tight font-medium pointer-events-none" data-t="s277">طقم/تراثي</span>
+          </button>
+          <button type="button" class="piece-family-btn" data-family="bullion" title="سبائك، ليرات، جنيهات" data-t-attr="title:s278">
+            <span class="text-base block pointer-events-none">🪙</span>
+            <span class="text-[10px] block leading-tight font-medium pointer-events-none" data-t="s279">سبيكة/جنيه</span>
+          </button>
+        </div>
+      </div>
+
       <div>
         <label for="weight" class="block text-gray-600 text-xs font-bold mb-2" data-t="s073">الوزن (جرام)</label>
         <div class="flex items-center gap-2">

@@ -95,6 +95,13 @@
         italian: 'إيطالي / تركي دقيق (45-80 ر.س/ج) — مصنعية عالية',
         luxury: 'ماركات / صياغة خاصة (80+ ر.س/ج) — بريميوم',
       },
+      pieceFamilies: {
+        ring_earring: 'خاتم / حلق 💍',
+        bangle: 'بناجر / أساور ⭕',
+        chain: 'سلسلة / عقد 📿',
+        set_bridal: 'طقم / تراثي 👑',
+        bullion: 'سبيكة / جنيه 🪙',
+      },
       stoneLabels: {
         toggle: 'القطعة تحتوي على فصوص أو أحجار',
         weight: 'وزن الفصوص التقريبي (جرام)',
@@ -296,6 +303,13 @@
         gulf: 'Gulf / Bahraini craft (25-45 SAR/g) — Standard',
         italian: 'Italian / intricate (45-80 SAR/g) — High labor',
         luxury: 'Luxury brands / designer (80+ SAR/g) — Premium',
+      },
+      pieceFamilies: {
+        ring_earring: 'Ring / Earring 💍',
+        bangle: 'Bangles / Bracelet ⭕',
+        chain: 'Chain / Necklace 📿',
+        set_bridal: 'Bridal Set / Craft 👑',
+        bullion: 'Bullion / Coin 🪙',
       },
       stoneLabels: {
         toggle: 'Item contains stones or zircon',

@@ -337,18 +337,109 @@
     luxury: { min: 80, max: 150 },
   });
 
+  const JEWELRY_PIECE_FAMILIES = Object.freeze({
+    ring_earring: {
+      id: 'ring_earring',
+      icon: '💍',
+      tiers: [
+        { maxWeight: 3, min: 35, max: 55, tierKey: 'light' },
+        { maxWeight: 6, min: 25, max: 40, tierKey: 'medium' },
+        { maxWeight: Infinity, min: 20, max: 30, tierKey: 'heavy' },
+      ],
+    },
+    bangle: {
+      id: 'bangle',
+      icon: '⭕',
+      tiers: [
+        { maxWeight: 15, min: 25, max: 35, tierKey: 'light' },
+        { maxWeight: 35, min: 18, max: 28, tierKey: 'medium' },
+        { maxWeight: Infinity, min: 15, max: 22, tierKey: 'heavy' },
+      ],
+    },
+    chain: {
+      id: 'chain',
+      icon: '📿',
+      tiers: [
+        { maxWeight: 5, min: 35, max: 55, tierKey: 'light' },
+        { maxWeight: 15, min: 25, max: 40, tierKey: 'medium' },
+        { maxWeight: Infinity, min: 18, max: 28, tierKey: 'heavy' },
+      ],
+    },
+    set_bridal: {
+      id: 'set_bridal',
+      icon: '👑',
+      tiers: [
+        { maxWeight: 30, min: 35, max: 55, tierKey: 'light' },
+        { maxWeight: 70, min: 28, max: 45, tierKey: 'medium' },
+        { maxWeight: Infinity, min: 22, max: 38, tierKey: 'heavy' },
+      ],
+    },
+    bullion: {
+      id: 'bullion',
+      icon: '🪙',
+      tiers: [
+        { maxWeight: 5, min: 18, max: 35, tierKey: 'small' },
+        { maxWeight: 50, min: 10, max: 18, tierKey: 'medium' },
+        { maxWeight: Infinity, min: 4, max: 10, tierKey: 'large' },
+      ],
+    },
+  });
+
+  function inferLaborBenchmark({ pieceFamily = 'general', weight = 0, karat = 21 } = {}) {
+    const family = JEWELRY_PIECE_FAMILIES[pieceFamily];
+    const safeWeight = Math.max(0, Number(weight) || 0);
+    const safeKarat = Number(karat) || 21;
+
+    if (!family) {
+      const min = safeKarat === 18 ? 35 : 25;
+      const max = safeKarat === 18 ? 70 : 45;
+      return { min, max, tierKey: 'standard', pieceFamily: 'general', icon: '⚖️' };
+    }
+
+    const tier = family.tiers.find((t) => safeWeight <= t.maxWeight) || family.tiers[family.tiers.length - 1];
+    let min = tier.min;
+    let max = tier.max;
+
+    if (safeKarat === 18 && pieceFamily !== 'bullion') {
+      min += 10;
+      max += 15;
+    }
+
+    return {
+      min,
+      max,
+      tierKey: tier.tierKey,
+      pieceFamily,
+      icon: family.icon,
+    };
+  }
+
   const NISAB_GOLD_24K_GRAMS = 85;
 
-  function generateBargainingAdvice({ audit, targetCategory = null } = {}) {
+  function generateBargainingAdvice({ audit, targetCategory = null, pieceFamily = null } = {}) {
     if (!audit || !audit.available) {
       return { available: false };
     }
 
-    const category = targetCategory && BENCHMARK_RANGES[targetCategory]
+    let category = targetCategory && BENCHMARK_RANGES[targetCategory]
       ? targetCategory
       : (audit.benchmarkCategory === 'below_spot' ? 'plain' : audit.benchmarkCategory);
 
-    const range = BENCHMARK_RANGES[category] || BENCHMARK_RANGES.gulf;
+    let range;
+    let inferred = null;
+
+    if (pieceFamily && JEWELRY_PIECE_FAMILIES[pieceFamily]) {
+      inferred = inferLaborBenchmark({
+        pieceFamily,
+        weight: audit.weight,
+        karat: audit.karat,
+      });
+      range = { min: inferred.min, max: inferred.max };
+      category = pieceFamily;
+    } else {
+      range = BENCHMARK_RANGES[category] || BENCHMARK_RANGES.gulf;
+    }
+
     const rawMetalCost = audit.rawMetalCost;
     const weight = audit.weight;
     const taxRate = audit.taxRate;
@@ -364,18 +455,34 @@
     let verdictKey = 'fair';
     let adviceTemplateKey = 'advice_fair';
 
-    if (laborPerGram <= 25) {
-      verdictKey = 'great_deal';
-      adviceTemplateKey = 'advice_great_deal';
-    } else if (laborPerGram <= 45) {
-      verdictKey = 'fair';
-      adviceTemplateKey = 'advice_fair';
-    } else if (laborPerGram <= 80) {
-      verdictKey = 'moderate_high';
-      adviceTemplateKey = 'advice_negotiate_moderate';
+    if (pieceFamily && inferred) {
+      if (laborPerGram <= range.min) {
+        verdictKey = 'great_deal';
+        adviceTemplateKey = 'advice_great_deal';
+      } else if (laborPerGram <= range.max) {
+        verdictKey = 'fair';
+        adviceTemplateKey = 'advice_fair';
+      } else if (laborPerGram <= range.max * 1.3) {
+        verdictKey = 'moderate_high';
+        adviceTemplateKey = 'advice_negotiate_moderate';
+      } else {
+        verdictKey = 'overpriced';
+        adviceTemplateKey = 'advice_negotiate_high';
+      }
     } else {
-      verdictKey = 'overpriced';
-      adviceTemplateKey = 'advice_negotiate_high';
+      if (laborPerGram <= 25) {
+        verdictKey = 'great_deal';
+        adviceTemplateKey = 'advice_great_deal';
+      } else if (laborPerGram <= 45) {
+        verdictKey = 'fair';
+        adviceTemplateKey = 'advice_fair';
+      } else if (laborPerGram <= 80) {
+        verdictKey = 'moderate_high';
+        adviceTemplateKey = 'advice_negotiate_moderate';
+      } else {
+        verdictKey = 'overpriced';
+        adviceTemplateKey = 'advice_negotiate_high';
+      }
     }
 
     const potentialSavings = Math.max(0, audit.quotedTotal - maxFairPrice);
@@ -387,6 +494,10 @@
       weight,
       laborPerGram,
       targetBenchmark: category,
+      pieceFamily: pieceFamily || null,
+      inferredTier: inferred ? inferred.tierKey : null,
+      minFairLaborPerGram: range.min,
+      maxFairLaborPerGram: range.max,
       minFairPrice,
       maxFairPrice,
       suggestedOffer,
@@ -454,6 +565,8 @@
     generateBargainingAdvice,
     calculateZakat,
     BENCHMARK_RANGES,
+    JEWELRY_PIECE_FAMILIES,
+    inferLaborBenchmark,
     NISAB_GOLD_24K_GRAMS,
     COUNTRY_VAT_RATES,
     defaultTaxRateForKarat,

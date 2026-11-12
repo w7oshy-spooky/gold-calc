@@ -87,6 +87,26 @@
       });
     });
 
+    let currentPieceFamily = 'ring_earring';
+    const pieceFamilyButtons = Array.from(document.querySelectorAll('.piece-family-btn'));
+
+    function setPieceFamily(family) {
+      if (!family) return;
+      currentPieceFamily = family;
+      pieceFamilyButtons.forEach((btn) => {
+        const active = btn.dataset.family === currentPieceFamily;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', String(active));
+      });
+    }
+
+    pieceFamilyButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setPieceFamily(btn.dataset.family);
+        onChange({ type: 'piece-family', pieceFamily: currentPieceFamily });
+      });
+    });
+
     if (elements.hasStonesToggle) {
       elements.hasStonesToggle.addEventListener('change', () => {
         if (elements.stoneWeightContainer) {
@@ -142,15 +162,11 @@
         if (elements.labor) elements.labor.textContent = formatting.formatMoney(audit.laborCost);
         if (elements.laborPerGram) elements.laborPerGram.textContent = formatting.formatMoney(audit.laborPerGram);
 
-        if (elements.benchmarkBadge) {
-          const badgeKey = audit.benchmarkCategory;
-          const label = copy.benchmarks?.[badgeKey] || badgeKey;
-          elements.benchmarkBadge.textContent = label;
-          elements.benchmarkBadge.className = `benchmark-badge benchmark-${badgeKey}`;
-        }
-
         if (core.generateBargainingAdvice) {
-          latestAdvice = core.generateBargainingAdvice({ audit });
+          latestAdvice = core.generateBargainingAdvice({
+            audit,
+            pieceFamily: currentPieceFamily,
+          });
           if (latestAdvice && latestAdvice.available && elements.bargainingAdviceContainer) {
             elements.bargainingAdviceContainer.hidden = false;
             if (elements.fairPriceRangeOutput) {
@@ -164,6 +180,17 @@
               elements.bargainAdviceText.textContent = template.replace('{offer}', offerStr);
             }
           }
+        }
+
+        if (elements.benchmarkBadge) {
+          const badgeKey = latestAdvice?.verdictKey || audit.benchmarkCategory;
+          const familyName = copy.pieceFamilies?.[currentPieceFamily] || '';
+          const verdictLabel = copy.adviceLabels?.[badgeKey] || copy.benchmarks?.[badgeKey] || badgeKey;
+          const rangeInfo = latestAdvice?.minFairLaborPerGram !== undefined
+            ? ` (${latestAdvice.minFairLaborPerGram}–${latestAdvice.maxFairLaborPerGram} ر.س/ج)`
+            : '';
+          elements.benchmarkBadge.textContent = familyName ? `${familyName}${rangeInfo}: ${verdictLabel}` : verdictLabel;
+          elements.benchmarkBadge.className = `benchmark-badge benchmark-${badgeKey}`;
         }
       }
 
@@ -219,6 +246,8 @@
     return {
       render,
       setKarat,
+      setPieceFamily,
+      getPieceFamily: () => currentPieceFamily,
       getLatestAudit: () => latestAudit,
       getLatestAdvice: () => latestAdvice,
     };

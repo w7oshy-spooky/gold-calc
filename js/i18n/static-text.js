@@ -275,7 +275,18 @@
       s265: "Before market visit",
       s266: "Direct LIVE",
       s267: "Chart karat",
-      s268: "Calculated pure 24K price:"
+      s268: "Calculated pure 24K price:",
+      s269: "Item Category (for fair labor benchmark)",
+      s270: "Rings, earrings, bands",
+      s271: "Ring/Earring",
+      s272: "Bangles, cuffs, wide bracelets",
+      s273: "Bangle/Cuff",
+      s274: "Chains, chokers, necklaces",
+      s275: "Chain/Necklace",
+      s276: "Bridal sets, hand chains, heritage",
+      s277: "Set/Bridal",
+      s278: "Bullion bars, coins, sovereign",
+      s279: "Bullion/Coin"
   };
 
   const DICTIONARIES = { en: EN };

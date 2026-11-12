@@ -94,13 +94,28 @@
       }
     }
 
-    const success = Boolean(detectedKarat || detectedWeight || detectedPrice);
+    // 5. Piece family detection
+    let detectedPieceFamily = null;
+    if (/(?:خاتم|خواتم|دبلة|دبله|توينز|حلق|اخراس|أخراس|خرص|تراكي|بريمة|بريمه|شناكل|ring|rings|earring|earrings)/i.test(normalized)) {
+      detectedPieceFamily = 'ring_earring';
+    } else if (/(?:بناجر|بنجرة|بنجره|غوايش|غويشة|غويشه|أساور|اساور|سوار|اسورة|أسورة|bangle|bangles|bracelet|bracelets)/i.test(normalized)) {
+      detectedPieceFamily = 'bangle';
+    } else if (/(?:سلسلة|سلسله|سلاسل|عقد|عقود|قلادة|قلاده|شوكر|تشوكر|خلخال|خلاخل|chain|chains|necklace|necklaces)/i.test(normalized)) {
+      detectedPieceFamily = 'chain';
+    } else if (/(?:طقم|اطقم|أطقم|شبكة|شبكه|كف|كفوف|كرسي جابر|رشرش|هامة|هامه|حزام|set|sets|bridal)/i.test(normalized)) {
+      detectedPieceFamily = 'set_bridal';
+    } else if (/(?:سبيكة|سبيكه|سبائك|سبايك|جنيه|جنيهات|ليرة|ليره|bullion|bar|bars|coin|coins)/i.test(normalized)) {
+      detectedPieceFamily = 'bullion';
+    }
+
+    const success = Boolean(detectedKarat || detectedWeight || detectedPrice || detectedPieceFamily);
 
     return {
       success,
       karat: detectedKarat,
       weight: detectedWeight !== null && Number.isFinite(detectedWeight) && detectedWeight > 0 ? detectedWeight : null,
       quotedTotal: detectedPrice !== null && Number.isFinite(detectedPrice) && detectedPrice > 0 ? detectedPrice : null,
+      pieceFamily: detectedPieceFamily,
       hasStones,
       rawText,
     };

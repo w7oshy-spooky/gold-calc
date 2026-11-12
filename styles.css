@@ -109,6 +109,16 @@ body .page-content{margin-top:.25rem}
 .transaction-card .mode-btn{border-color:transparent;background:transparent;color:var(--muted);min-height:46px;border-radius:11px}
 .transaction-card .mode-btn.active{background:var(--gold);color:var(--gold-ink)}
 
+.piece-family-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  min-height:54px;padding:6px 2px;border:1px solid var(--line-strong);border-radius:.85rem;
+  background:var(--field);color:var(--text);cursor:pointer;transition:all .15s ease;user-select:none;
+}
+.piece-family-btn:active{transform:scale(.96)}
+.piece-family-btn.active{background:#e8bf5522;color:var(--gold);border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+[data-theme="light"] .piece-family-btn{background:var(--field);color:var(--text);border-color:var(--line-strong)}
+[data-theme="light"] .piece-family-btn.active{background:#fdf6e2;color:#996f0b;border-color:var(--gold)}
+
 .num-input,.market-input{
   direction:ltr!important;unicode-bidi:isolate;
   width:100%;text-align:center;background:var(--bg);border:1px solid var(--line-strong);border-radius:.85rem;
@@ -438,6 +448,10 @@ html[dir=rtl] #comparisonDifference,html[dir=rtl] #comparisonPercent{direction:l
 .benchmark-gulf{background:#0e283b;color:#60a5fa;border:1px solid #1e4a73}
 .benchmark-italian{background:#332912;color:#e8bf55;border:1px solid #6b521c}
 .benchmark-luxury{background:#2a1b38;color:#c084fc;border:1px solid #583377}
+.benchmark-great_deal{background:#112a1f;color:#5fd49a;border:1px solid #1a563a}
+.benchmark-fair{background:#0e283b;color:#60a5fa;border:1px solid #1e4a73}
+.benchmark-moderate_high{background:#332912;color:#e8bf55;border:1px solid #6b521c}
+.benchmark-overpriced{background:#3b1e16;color:#ef8a7a;border:1px solid #822718}
 .stone-callout{background:#2a1d0f;border:1px solid #85531b;border-radius:0.75rem;padding:0.75rem}
 .sharia-badge{display:inline-flex;align-items:center;gap:0.35rem;background:#10281e;color:#5fd49a;border:1px solid #1c523b;border-radius:0.5rem;padding:0.25rem 0.5rem;font-size:0.65rem;font-weight:700}
 .country-vat-btn{cursor:pointer;transition:all 0.15s ease}.country-vat-btn:active{transform:scale(0.96)}.tax-mode-btn{cursor:pointer;transition:all 0.15s ease}.tax-mode-btn:active{transform:scale(0.96)}
@@ -713,6 +727,10 @@ main:not([data-active-tab="calc"]):not([data-active-tab="auditor"]):not([data-ac
 [data-theme="light"] .benchmark-gulf{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
 [data-theme="light"] .benchmark-italian{background:#fffbeb;color:#b45309;border-color:#fde68a}
 [data-theme="light"] .benchmark-luxury{background:#faf5ff;color:#7e22ce;border-color:#e9d5ff}
+[data-theme="light"] .benchmark-great_deal{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
+[data-theme="light"] .benchmark-fair{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+[data-theme="light"] .benchmark-moderate_high{background:#fffbeb;color:#b45309;border-color:#fde68a}
+[data-theme="light"] .benchmark-overpriced{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
 [data-theme="light"] .stone-callout{background:#fefce8;border:1px solid #fef08a;color:#854d0e}
 [data-theme="light"] .sharia-badge{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
 

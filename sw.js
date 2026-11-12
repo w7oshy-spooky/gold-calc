@@ -1,7 +1,7 @@
 'use strict';
 
 // CACHE_NAME is generated from the APP_SHELL contents: run `npm run stamp:sw` after changing any of them.
-const CACHE_NAME = 'gold-calc-shell-c574a28dcf';
+const CACHE_NAME = 'gold-calc-shell-1d816479f8';
 const NETWORK_TIMEOUT_MS = 3000;
 
 const APP_SHELL = [

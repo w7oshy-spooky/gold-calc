@@ -680,6 +680,9 @@
         const quotedInput = document.getElementById('quotedTotal');
         if (quotedInput) quotedInput.value = parsed.quotedTotal;
       }
+      if (parsed.pieceFamily && auditorUi.setPieceFamily) {
+        auditorUi.setPieceFamily(parsed.pieceFamily);
+      }
       if (parsed.hasStones) {
         const toggle = document.getElementById('hasStonesToggle');
         if (toggle && !toggle.checked) {
