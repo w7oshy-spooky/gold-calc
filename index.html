@@ -6,8 +6,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0d0f12">
+  <meta name="color-scheme" content="light dark">
   <meta name="description" content="حاسبة لشراء وبيع الذهب بالريال السعودي مع العيار والمصنعية والضريبة ومقارنة عرض المحل بالسعر المرجعي." data-t-attr="content:s001">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-bAAtH1AvKJR9D/bV/3b4JIk0xSc1DuGv5svRo8xuKAU='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://gold-calc-live.vercel.app; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-/YWssLrbn9HS+AFr7+z6GEwwjlWNFBdumHritOWiwKA='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://gold-calc-live.vercel.app; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
   <title data-t="s002">حاسبة الذهب</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -28,7 +29,13 @@
       try{
         var t=localStorage.getItem('gold_theme')||(JSON.parse(localStorage.getItem('gold-calc-preferences-v1')||'{}')).theme;
         if(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches){t='light';}
-        if(t==='light'){document.documentElement.setAttribute('data-theme','light');}
+        var m=document.querySelector('meta[name="color-scheme"]');
+        if(t==='light'){
+          document.documentElement.setAttribute('data-theme','light');
+          if(m){m.content='light';}
+        }else if(t==='dark'){
+          if(m){m.content='dark';}
+        }
       }catch(e){}
     })();
   </script>

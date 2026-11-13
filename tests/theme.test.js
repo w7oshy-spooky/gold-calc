@@ -25,16 +25,19 @@ function createMockDocument(lang = 'ar') {
   const root = createMockElement('html', { lang });
   const toggleBtn = createMockElement('button', { id: 'themeToggle' });
   const metaColor = createMockElement('meta', { name: 'theme-color', content: '#0d0f12' });
+  const metaColorScheme = createMockElement('meta', { name: 'color-scheme', content: 'light dark' });
 
   return {
     documentElement: root,
     getElementById: (id) => (id === 'themeToggle' ? toggleBtn : null),
     querySelector: (sel) => {
       if (sel.includes('meta[name="theme-color"]')) return metaColor;
+      if (sel.includes('meta[name="color-scheme"]')) return metaColorScheme;
       return null;
     },
     _toggleBtn: toggleBtn,
     _metaColor: metaColor,
+    _metaColorScheme: metaColorScheme,
   };
 }
 
@@ -61,6 +64,7 @@ test('theme-ui initializes with default dark theme when no preference stored', (
   assert.equal(themeUI.getTheme(), 'dark');
   assert.equal(doc.documentElement.getAttribute('data-theme'), 'dark');
   assert.equal(doc._metaColor.getAttribute('content'), '#0d0f12');
+  assert.equal(doc._metaColorScheme.getAttribute('content'), 'dark');
   assert.equal(doc._toggleBtn.getAttribute('aria-pressed'), 'false');
   assert.match(doc._toggleBtn.getAttribute('aria-label'), /نهاري/);
 });
@@ -83,6 +87,7 @@ test('theme-ui switches to light theme on toggle, sets attribute, meta and stora
   assert.equal(themeUI.getTheme(), 'light');
   assert.equal(doc.documentElement.getAttribute('data-theme'), 'light');
   assert.equal(doc._metaColor.getAttribute('content'), '#f7f6f2');
+  assert.equal(doc._metaColorScheme.getAttribute('content'), 'light');
   assert.equal(doc._toggleBtn.getAttribute('aria-pressed'), 'true');
   assert.match(doc._toggleBtn.getAttribute('aria-label'), /ليلي/);
   assert.equal(storage.getItem(themeApi.STORAGE_KEY), 'light');
@@ -94,6 +99,7 @@ test('theme-ui switches to light theme on toggle, sets attribute, meta and stora
   assert.equal(themeUI.getTheme(), 'dark');
   assert.equal(doc.documentElement.getAttribute('data-theme'), 'dark');
   assert.equal(doc._metaColor.getAttribute('content'), '#0d0f12');
+  assert.equal(doc._metaColorScheme.getAttribute('content'), 'dark');
   assert.equal(storage.getItem(themeApi.STORAGE_KEY), 'dark');
 });
 
@@ -110,6 +116,7 @@ test('theme-ui initializes with stored light preference', () => {
   assert.equal(themeUI.getTheme(), 'light');
   assert.equal(doc.documentElement.getAttribute('data-theme'), 'light');
   assert.equal(doc._metaColor.getAttribute('content'), '#f7f6f2');
+  assert.equal(doc._metaColorScheme.getAttribute('content'), 'light');
   assert.match(doc._toggleBtn.getAttribute('aria-label'), /Dark Mode/);
 });
 

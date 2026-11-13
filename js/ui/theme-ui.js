@@ -20,6 +20,7 @@
 
     const toggleButton = document.getElementById('themeToggle');
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    const metaColorScheme = document.querySelector('meta[name="color-scheme"]');
     const isArabic = (document.documentElement?.getAttribute && document.documentElement.getAttribute('lang') === 'ar') || document.documentElement?.lang === 'ar';
 
     function getSystemTheme() {
@@ -54,6 +55,10 @@
 
       if (metaThemeColor) {
         metaThemeColor.setAttribute('content', activeTheme === THEME_LIGHT ? '#f7f6f2' : '#0d0f12');
+      }
+
+      if (metaColorScheme) {
+        metaColorScheme.setAttribute('content', activeTheme);
       }
 
       if (toggleButton) {
