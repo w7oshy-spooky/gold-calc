@@ -67,15 +67,40 @@
   let invoiceItems = [];
   let lastInvoice = null;
   let userManuallyEditedWorkmanship = false;
+  let lastJewelryFamily = 'ring_earring';
+  let lastJewelryKarat = 21;
 
   function syncInferredWorkmanship(targetFamily) {
     if (!core.inferLaborBenchmark || typeof transactionUi === 'undefined' || !transactionUi) return;
-    const family = targetFamily || (typeof auditorUi !== 'undefined' && auditorUi?.getPieceFamily ? auditorUi.getPieceFamily() : 'ring_earring');
+    const currentFamily = typeof auditorUi !== 'undefined' && auditorUi?.getPieceFamily ? auditorUi.getPieceFamily() : 'ring_earring';
+    const family = targetFamily || currentFamily;
     const input = transactionUi.getTransactionInput();
+
+    // Auto-switch karat & tax for bullion
+    if (family === 'bullion') {
+      if (Number(input.karat) !== 24) {
+        lastJewelryKarat = Number(input.karat) || 21;
+        transactionUi.setKarat(24);
+        if (typeof auditorUi !== 'undefined' && auditorUi?.setKarat) {
+          auditorUi.setKarat(24);
+        }
+      }
+    } else {
+      lastJewelryFamily = family;
+      if (Number(input.karat) === 24) {
+        const restoreKarat = [18, 21, 22].includes(lastJewelryKarat) ? lastJewelryKarat : 21;
+        transactionUi.setKarat(restoreKarat);
+        if (typeof auditorUi !== 'undefined' && auditorUi?.setKarat) {
+          auditorUi.setKarat(restoreKarat);
+        }
+      }
+    }
+
+    const currentInput = transactionUi.getTransactionInput();
     const inferred = core.inferLaborBenchmark({
       pieceFamily: family,
-      weight: input.weight,
-      karat: input.karat,
+      weight: currentInput.weight,
+      karat: currentInput.karat,
     });
     if (inferred && Number.isFinite(inferred.defaultLabor) && inferred.defaultLabor > 0) {
       transactionUi.applyInput({ workmanshipPerGram: inferred.defaultLabor });
@@ -115,6 +140,22 @@
     copy,
     onChange(change) {
       if (change.type === 'karat' || change.type === 'adjust' || change.type === 'labor-tax-mode') vibrate();
+      if (change.type === 'karat') {
+        const selectedKarat = Number(change.value);
+        if (selectedKarat === 24) {
+          if (typeof auditorUi !== 'undefined' && auditorUi?.getPieceFamily && auditorUi.getPieceFamily() !== 'bullion') {
+            if (auditorUi.setPieceFamily) auditorUi.setPieceFamily('bullion');
+            syncInferredWorkmanship('bullion');
+          }
+        } else {
+          lastJewelryKarat = selectedKarat;
+          if (typeof auditorUi !== 'undefined' && auditorUi?.getPieceFamily && auditorUi.getPieceFamily() === 'bullion') {
+            const restoreFamily = (lastJewelryFamily && lastJewelryFamily !== 'bullion') ? lastJewelryFamily : 'ring_earring';
+            if (auditorUi.setPieceFamily) auditorUi.setPieceFamily(restoreFamily);
+            syncInferredWorkmanship(restoreFamily);
+          }
+        }
+      }
       if ((change.type === 'input' && change.id === 'workmanship') || (change.type === 'adjust' && change.id === 'workmanship')) {
         userManuallyEditedWorkmanship = true;
       } else if (!userManuallyEditedWorkmanship && (change.type === 'karat' || change.id === 'weight' || (change.type === 'adjust' && change.id === 'weight'))) {
@@ -606,8 +647,25 @@
       });
     quoteComparisonUi.render(comparison);
 
+    const activeFamily = typeof auditorUi !== 'undefined' && auditorUi?.getPieceFamily ? auditorUi.getPieceFamily() : 'ring_earring';
+    const hasStones = Boolean(document.getElementById('hasStonesToggle')?.checked);
+    const stoneWeight = hasStones ? (Number(document.getElementById('stoneWeightInput')?.value) || 0) : 0;
+    const netGoldWeight = (hasStones && stoneWeight > 0) ? Math.max(0.01, input.weight - stoneWeight) : input.weight;
+
+    const estimate = core.estimateFairPriceRange ? core.estimateFairPriceRange({
+      price24k,
+      karat: input.karat,
+      weight: netGoldWeight,
+      pieceFamily: activeFamily,
+      taxRate: input.taxRate,
+    }) : null;
+
+    if (summaryUi && summaryUi.renderEstimate) {
+      summaryUi.renderEstimate(estimate);
+    }
+
     if (auditorUi) {
-      auditorUi.render({ price24k, karat: input.karat, taxRate: input.taxRate });
+      auditorUi.render({ price24k, karat: input.karat, taxRate: input.taxRate, estimate });
     }
 
     if (vaultUi) {

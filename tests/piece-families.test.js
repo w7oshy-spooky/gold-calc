@@ -113,3 +113,58 @@ test('inferLaborBenchmark provides fair defaultLabor per gram for calculator aut
   const medBullion = core.inferLaborBenchmark({ pieceFamily: 'bullion', weight: 20, karat: 24 });
   assert.equal(medBullion.defaultLabor, 14);
 });
+
+test('estimateFairPriceRange calculates fair range and handles 15% VAT for jewelry', () => {
+  const est = core.estimateFairPriceRange({
+    price24k: 400,
+    karat: 21,
+    weight: 10,
+    pieceFamily: 'ring_earring',
+    taxRate: 15,
+  });
+
+  assert.equal(est.available, true);
+  assert.equal(est.karat, 21);
+  assert.equal(est.weight, 10);
+  assert.equal(est.gramPrice, 350);
+  assert.equal(est.rawMetalCost, 3500);
+  assert.equal(est.isTaxExempt, false);
+  assert.equal(est.taxRate, 15);
+  assert.equal(est.minLaborPerGram, 20);
+  assert.equal(est.maxLaborPerGram, 30);
+  assert.equal(est.defaultLaborPerGram, 25);
+  assert.equal(est.minFairPrice, 4255);
+  assert.equal(est.maxFairPrice, 4370);
+  assert.equal(est.midFairPrice, 4312.5);
+});
+
+test('estimateFairPriceRange treats bullion and 24K as tax exempt (0% VAT)', () => {
+  const est = core.estimateFairPriceRange({
+    price24k: 400,
+    karat: 24,
+    weight: 10,
+    pieceFamily: 'bullion',
+    taxRate: 15, // should be overridden to 0 for bullion
+  });
+
+  assert.equal(est.available, true);
+  assert.equal(est.karat, 24);
+  assert.equal(est.weight, 10);
+  assert.equal(est.gramPrice, 400);
+  assert.equal(est.rawMetalCost, 4000);
+  assert.equal(est.isTaxExempt, true);
+  assert.equal(est.taxRate, 0);
+  assert.equal(est.minLaborPerGram, 10);
+  assert.equal(est.maxLaborPerGram, 18);
+  assert.equal(est.defaultLaborPerGram, 14);
+  // Zero VAT: exactly raw + labor
+  assert.equal(est.minFairPrice, 4100);
+  assert.equal(est.maxFairPrice, 4180);
+  assert.equal(est.midFairPrice, 4140);
+});
+
+test('estimateFairPriceRange returns available: false for non-positive price or weight', () => {
+  assert.equal(core.estimateFairPriceRange({ price24k: 0, weight: 10 }).available, false);
+  assert.equal(core.estimateFairPriceRange({ price24k: 400, weight: 0 }).available, false);
+  assert.equal(core.estimateFairPriceRange({ price24k: -10, weight: 5 }).available, false);
+});

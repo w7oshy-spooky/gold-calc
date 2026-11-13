@@ -398,12 +398,24 @@
         </div>
       </div>
 
-      <div class="bg-gradient-to-l from-amber-50 to-yellow-50 rounded-xl p-3 border border-amber-100 flex justify-between items-center">
-        <div class="flex items-center gap-1.5">
-          <span class="live-dot" aria-hidden="true"></span>
-          <span class="text-gray-500 text-xs font-bold"><span data-t="s078">سعر الجرام / عيار</span> <span id="selectedKaratLabel" class="text-amber-600 font-black">21</span><span data-t="s079">ق</span></span>
+      <div class="bg-gradient-to-l from-amber-50 to-yellow-50 rounded-xl p-3 border border-amber-100 flex flex-col gap-2">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-1.5">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span class="text-gray-500 text-xs font-bold"><span data-t="s078">سعر الجرام / عيار</span> <span id="selectedKaratLabel" class="text-amber-600 font-black">21</span><span data-t="s079">ق</span></span>
+          </div>
+          <div><span class="text-amber-700 font-black text-base live-val" id="karatPriceOutput">0.00</span> <span class="text-amber-400 text-xs" data-t="s080">ر.س</span></div>
         </div>
-        <div><span class="text-amber-700 font-black text-base live-val" id="karatPriceOutput">0.00</span> <span class="text-amber-400 text-xs" data-t="s080">ر.س</span></div>
+        <div id="pieceEstimatePreview" class="pt-2 border-t border-amber-200/50 flex justify-between items-center text-xs">
+          <span class="text-gray-600 font-medium flex items-center gap-1 text-[11px]">
+            <span>🏷️</span>
+            <span data-t="s280">تقدير القطعة العادل:</span>
+          </span>
+          <span class="font-mono text-gray-800 text-[11px]">
+            <strong id="pieceEstimateMid" class="text-amber-700 font-bold text-xs">—</strong>
+            <span class="text-[10px] text-gray-500 font-normal mr-1">(<span id="pieceEstimateRange">—</span>)</span>
+          </span>
+        </div>
       </div>
 
       <!-- Stone & Zircon Deductor -->

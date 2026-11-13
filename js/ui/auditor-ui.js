@@ -120,7 +120,7 @@
       elements.stoneWeightInput.addEventListener('input', () => onChange({ type: 'stone-weight' }));
     }
 
-    function render({ price24k = 0, karat, taxRate } = {}) {
+    function render({ price24k = 0, karat, taxRate, estimate = null } = {}) {
       if (!elements.panel) return null;
 
       const effectiveKarat = karat !== undefined ? Number(karat) : currentKarat;
@@ -151,8 +151,24 @@
         if (elements.labor) elements.labor.textContent = '—';
         if (elements.laborPerGram) elements.laborPerGram.textContent = '—';
         if (elements.benchmarkBadge) {
-          elements.benchmarkBadge.textContent = copy.comparePrompt || 'أدخل العرض والوزن';
+          if (estimate && estimate.available) {
+            const template = copy.expectedPriceRangeBadge || '💡 السعر العادل المتوقع للقطعة: {min} — {max} ر.س (المصنعية ~{labor} ر.س/جم)';
+            elements.benchmarkBadge.textContent = template
+              .replace('{min}', formatting.formatMoney(Math.round(estimate.minFairPrice)))
+              .replace('{max}', formatting.formatMoney(Math.round(estimate.maxFairPrice)))
+              .replace('{labor}', estimate.defaultLaborPerGram);
+          } else {
+            elements.benchmarkBadge.textContent = copy.comparePrompt || 'أدخل العرض والوزن';
+          }
           elements.benchmarkBadge.className = 'benchmark-badge benchmark-neutral';
+        }
+        if (elements.quotedTotal) {
+          if (estimate && estimate.available) {
+            const placeholderTpl = copy.quotedPlaceholderFair || 'مثال لعرض عادل: ~ {offer} ر.س';
+            elements.quotedTotal.placeholder = placeholderTpl.replace('{offer}', formatting.formatMoney(Math.round(estimate.midFairPrice)));
+          } else {
+            elements.quotedTotal.placeholder = copy.quotedTotalPlaceholder || 'أدخل العرض للمقارنة';
+          }
         }
         if (elements.bargainingAdviceContainer) elements.bargainingAdviceContainer.hidden = true;
       } else {

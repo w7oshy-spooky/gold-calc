@@ -508,6 +508,65 @@
     };
   }
 
+  function estimateFairPriceRange({
+    price24k = 0,
+    karat = 21,
+    weight = 0,
+    pieceFamily = 'ring_earring',
+    taxRate = 15,
+  } = {}) {
+    const p24 = Number(price24k);
+    const k = normalizeKarat(karat);
+    const w = Number(weight);
+    const tax = clampTaxRate(taxRate);
+
+    if (!Number.isFinite(p24) || p24 <= 0 || !Number.isFinite(w) || w <= 0) {
+      return { available: false };
+    }
+
+    const inferred = inferLaborBenchmark({
+      pieceFamily,
+      weight: w,
+      karat: k,
+    });
+
+    if (!inferred) {
+      return { available: false };
+    }
+
+    const gramPrice = (p24 * k) / 24;
+    const rawMetalCost = gramPrice * w;
+    const isBullion = pieceFamily === 'bullion' || k === 24;
+    const effectiveTaxRate = isBullion ? 0 : tax;
+    const vatMultiplier = 1 + (effectiveTaxRate / 100);
+
+    const minLaborCost = inferred.min * w;
+    const maxLaborCost = inferred.max * w;
+    const defaultLaborCost = inferred.defaultLabor * w;
+
+    const minFairPrice = (rawMetalCost + minLaborCost) * vatMultiplier;
+    const maxFairPrice = (rawMetalCost + maxLaborCost) * vatMultiplier;
+    const midFairPrice = (rawMetalCost + defaultLaborCost) * vatMultiplier;
+
+    return {
+      available: true,
+      gramPrice,
+      rawMetalCost,
+      pieceFamily,
+      karat: k,
+      weight: w,
+      taxRate: effectiveTaxRate,
+      isTaxExempt: isBullion,
+      inferredTier: inferred.tierKey,
+      minLaborPerGram: inferred.min,
+      maxLaborPerGram: inferred.max,
+      defaultLaborPerGram: inferred.defaultLabor,
+      minFairPrice,
+      maxFairPrice,
+      midFairPrice,
+    };
+  }
+
   function calculateZakat({ items = [], price24k = 0, exemptPersonalUse = true, hawlMet = true } = {}) {
     const safePrice24k = sanitizeNonNegative(price24k);
     const itemList = Array.isArray(items) ? items : [];
@@ -564,6 +623,7 @@
     calculateStoneDeduction,
     calculateTradeIn,
     generateBargainingAdvice,
+    estimateFairPriceRange,
     calculateZakat,
     BENCHMARK_RANGES,
     JEWELRY_PIECE_FAMILIES,

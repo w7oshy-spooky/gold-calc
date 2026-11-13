@@ -31,9 +31,9 @@ function setup() {
   for (const id of [
     'transactionMode', 'weight', 'karat', 'workmanship', 'profit', 'tax', 'taxRange', 'sellDeduction',
     'quotedTotal', 'buyCostsPanel', 'vatPanel', 'sellDeductionPanel', 'transactionHelp', 'quotedTotalLabel',
-    'workmanshipLabel', 'profitLabel', 'sellDeductionLabel', 'taxLabel', 'taxValueLabel',
+    'workmanshipLabel', 'profitLabel', 'sellDeductionLabel', 'taxLabel', 'taxValueLabel', 'bullionNotice',
   ]) {
-    elements[id] = fakeElement({ id, value: values[id] ?? '' });
+    elements[id] = fakeElement({ id, value: values[id] ?? '', hidden: id === 'bullionNotice' });
   }
   const adjustButtons = [
     fakeElement({ dataset: { adjustTarget: 'workmanship', adjustAmount: '5' } }),
@@ -81,4 +81,24 @@ test('restores saved inputs and resets to the page defaults', () => {
   assert.equal(String(input.taxRate), '15');
   assert.equal(input.quotedTotal, '');
   assert.equal(elements.buyCostsPanel.hidden, false);
+});
+
+test('setKarat(24) automatically zeroes tax rate and displays bullion notice, restoring on jewelry switch', () => {
+  const { ui, elements } = setup();
+
+  // Initially 21k with 15% VAT
+  assert.equal(elements.tax.value, '15');
+  assert.equal(elements.bullionNotice.hidden, true);
+
+  // Switch to 24k (Bullion)
+  ui.setKarat(24);
+  assert.equal(elements.karat.value, 24);
+  assert.equal(elements.tax.value, 0);
+  assert.equal(elements.bullionNotice.hidden, false);
+
+  // Switch back to 21k (Jewelry)
+  ui.setKarat(21);
+  assert.equal(elements.karat.value, 21);
+  assert.equal(elements.tax.value, 15);
+  assert.equal(elements.bullionNotice.hidden, true);
 });

@@ -59,7 +59,27 @@
       elements.finalTotalOutput.textContent = formatting.formatMoney(result.total);
     }
 
-    return { render };
+    const pieceEstimateMid = document.getElementById('pieceEstimateMid');
+    const pieceEstimateRange = document.getElementById('pieceEstimateRange');
+
+    function renderEstimate(estimate) {
+      if (!pieceEstimateMid || !pieceEstimateRange) return;
+      if (!estimate || !estimate.available) {
+        pieceEstimateMid.textContent = '—';
+        pieceEstimateRange.textContent = '—';
+        return;
+      }
+      pieceEstimateMid.textContent = `~ ${formatting.formatMoney(Math.round(estimate.midFairPrice))}`;
+      const currency = copy.currency || 'ر.س';
+      if (estimate.isTaxExempt) {
+        const exemptLabel = copy.fairEstimateTaxExempt || 'معفاة من الضريبة';
+        pieceEstimateRange.textContent = `${formatting.formatMoney(Math.round(estimate.minFairPrice))} — ${formatting.formatMoney(Math.round(estimate.maxFairPrice))} ${currency} (${exemptLabel})`;
+      } else {
+        pieceEstimateRange.textContent = `${formatting.formatMoney(Math.round(estimate.minFairPrice))} — ${formatting.formatMoney(Math.round(estimate.maxFairPrice))} ${currency}`;
+      }
+    }
+
+    return { render, renderEstimate };
   }
 
   return { createSummaryUI };

@@ -286,7 +286,8 @@
       s276: "Bridal sets, hand chains, heritage",
       s277: "Set/Bridal",
       s278: "Bullion bars, coins, sovereign",
-      s279: "Bullion/Coin"
+      s279: "Bullion/Coin",
+      s280: "Fair Item Estimate:"
   };
 
   const DICTIONARIES = { en: EN };
